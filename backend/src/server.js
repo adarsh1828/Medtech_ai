@@ -87,3 +87,5 @@ initializeDatabase()
     console.error('Failed to initialize database:', err);
     process.exit(1);
   });
+
+export default app;
