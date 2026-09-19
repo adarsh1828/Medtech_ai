@@ -129,7 +129,7 @@ router.post('/doctors', async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
 
     const userResult = await run(
-      'INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, "doctor", ?, ?)',
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'doctor', ?, ?)",
       [email.toLowerCase().trim(), password_hash, full_name.trim(), phone || null]
     );
 

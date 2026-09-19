@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
 
     const userResult = await run(
-      'INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, "patient", ?, ?)',
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'patient', ?, ?)",
       [email.toLowerCase().trim(), password_hash, full_name.trim(), phone || null]
     );
 
@@ -64,7 +64,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Failed to complete patient registration: ' + (err?.message || err) });
+    res.status(500).json({ error: 'Failed to complete patient registration. Please try again.' });
   }
 });
 
@@ -100,7 +100,7 @@ router.post('/register-doctor', async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
 
     const userResult = await run(
-      'INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, "doctor", ?, ?)',
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'doctor', ?, ?)",
       [email.toLowerCase().trim(), password_hash, full_name.trim(), phone || null]
     );
 
@@ -185,7 +185,7 @@ router.post('/register-admin', async (req, res) => {
       : full_name.trim();
 
     const userResult = await run(
-      'INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, "admin", ?, ?)',
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'admin', ?, ?)",
       [email.toLowerCase().trim(), password_hash, displayName, phone || null]
     );
 
