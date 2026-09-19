@@ -166,7 +166,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found.' });
     }
 
-    const validStatuses = ['scheduled', 'in_consultation', 'completed', 'cancelled'];
+    const validStatuses = ['scheduled', 'confirmed', 'in_consultation', 'completed', 'cancelled'];
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status value.' });
     }

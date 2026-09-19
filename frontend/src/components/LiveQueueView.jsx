@@ -50,7 +50,7 @@ export default function LiveQueueView({ user, hospitalInfo }) {
       setDoctors(docsRes.doctors || []);
 
       // Check if there is a newly active "in_consultation" appointment
-      const activeAppt = appts.find(a => a.status === 'in_consultation') || appts.find(a => a.status === 'scheduled');
+      const activeAppt = appts.find(a => a.status === 'in_consultation') || appts.find(a => a.status === 'confirmed') || appts.find(a => a.status === 'scheduled');
       if (activeAppt && activeAppt.token_number !== prevActiveTokenRef.current) {
         if (prevActiveTokenRef.current !== null && soundEnabled) {
           playHospitalChime();
@@ -113,7 +113,7 @@ export default function LiveQueueView({ user, hospitalInfo }) {
 
   // Group appointments
   const inConsultationList = appointments.filter(a => a.status === 'in_consultation');
-  const upcomingScheduled = appointments.filter(a => a.status === 'scheduled');
+  const upcomingScheduled = appointments.filter(a => a.status === 'scheduled' || a.status === 'confirmed');
   const activeNowServing = inConsultationList[0] || upcomingScheduled[0];
 
   return (

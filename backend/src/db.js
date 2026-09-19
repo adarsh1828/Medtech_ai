@@ -173,7 +173,7 @@ export async function initializeDatabase() {
       appointment_date TEXT NOT NULL,
       time_slot TEXT NOT NULL,
       token_number INTEGER NOT NULL,
-      status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled', 'in_consultation', 'completed', 'cancelled')),
+      status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled', 'confirmed', 'in_consultation', 'completed', 'cancelled')),
       reason_for_visit TEXT,
       vitals_bp TEXT,
       vitals_pulse TEXT,
@@ -349,6 +349,43 @@ export async function initializeDatabase() {
     await run("UPDATE Invoices SET total_amount = total_amount * 10, discount = discount * 10, tax = tax * 10, net_amount = net_amount * 10 WHERE net_amount > 0 AND net_amount < 300");
     await run("UPDATE InvoiceItems SET unit_price = unit_price * 10, total_price = total_price * 10 WHERE unit_price > 0 AND unit_price < 200");
   } catch (e) {}
+
+  // Auto-migration for Appointments status to allow 'confirmed' in CHECK constraint
+  try {
+    const apptMaster = await getOne("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Appointments'");
+    if (apptMaster && apptMaster.sql && !apptMaster.sql.includes("'confirmed'")) {
+      console.log('Migrating Appointments table to allow confirmed status in CHECK constraint...');
+      await run('PRAGMA foreign_keys = OFF');
+      await run(`
+        CREATE TABLE Appointments_migration (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          patient_id INTEGER NOT NULL,
+          doctor_id INTEGER NOT NULL,
+          department_id INTEGER NOT NULL,
+          appointment_date TEXT NOT NULL,
+          time_slot TEXT NOT NULL,
+          token_number INTEGER NOT NULL,
+          status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled', 'confirmed', 'in_consultation', 'completed', 'cancelled')),
+          reason_for_visit TEXT,
+          vitals_bp TEXT,
+          vitals_pulse TEXT,
+          vitals_temp TEXT,
+          vitals_weight TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (patient_id) REFERENCES Patients(id),
+          FOREIGN KEY (doctor_id) REFERENCES Doctors(id),
+          FOREIGN KEY (department_id) REFERENCES Departments(id)
+        )
+      `);
+      await run('INSERT INTO Appointments_migration SELECT * FROM Appointments');
+      await run('DROP TABLE Appointments');
+      await run('ALTER TABLE Appointments_migration RENAME TO Appointments');
+      await run('PRAGMA foreign_keys = ON');
+      console.log('Appointments table successfully migrated to support confirmed status.');
+    }
+  } catch (err) {
+    console.error('Error migrating Appointments status CHECK constraint:', err);
+  }
 
   console.log('Database tables verified.');
 
