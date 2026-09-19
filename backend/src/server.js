@@ -28,6 +28,29 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Ensure database is initialized before handling requests (essential for Vercel Serverless)
+let dbInitPromise = null;
+const ensureDb = () => {
+  if (!dbInitPromise) {
+    dbInitPromise = initializeDatabase().catch(err => {
+      console.error('Failed to initialize database:', err);
+      dbInitPromise = null;
+      throw err;
+    });
+  }
+  return dbInitPromise;
+};
+
+app.use(async (req, res, next) => {
+  if (req.path === '/api/health') return next();
+  try {
+    await ensureDb();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Database initialization error: ' + err.message });
+  }
+});
+
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/departments', departmentsRouter);
@@ -73,19 +96,21 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error. Please try again.' });
 });
 
-// Boot database and start listener
-initializeDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`=============================================`);
-      console.log(` MedTech AI Hospital API running on port ${PORT}`);
-      console.log(` URL: http://localhost:${PORT}/api/health`);
-      console.log(`=============================================`);
+// Boot database and start listener locally (on Vercel, requests are handled serverlessly via ensureDb)
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  ensureDb()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`=============================================`);
+        console.log(` MedTech AI Hospital API running on port ${PORT}`);
+        console.log(` URL: http://localhost:${PORT}/api/health`);
+        console.log(`=============================================`);
+      });
+    })
+    .catch((err) => {
+      console.error('Failed to initialize database:', err);
+      process.exit(1);
     });
-  })
-  .catch((err) => {
-    console.error('Failed to initialize database:', err);
-    process.exit(1);
-  });
+}
 
 export default app;

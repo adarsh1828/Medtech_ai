@@ -3,9 +3,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 
+import os from 'os';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dbPath = path.resolve(__dirname, '../../medtech.db');
+
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const dbPath = isVercel
+  ? path.join(os.tmpdir(), 'medtech.db')
+  : path.resolve(__dirname, '../../medtech.db');
 
 const verboseSqlite = sqlite3.verbose();
 export const db = new verboseSqlite.Database(dbPath, (err) => {
