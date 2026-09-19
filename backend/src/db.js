@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const dbPath = isVercel
-  ? path.join(os.tmpdir(), 'medtech.db')
+  ? ':memory:'
   : path.resolve(__dirname, '../../medtech.db');
 
 const verboseSqlite = sqlite3.verbose();
@@ -22,10 +22,15 @@ export const db = new verboseSqlite.Database(dbPath, (err) => {
   }
 });
 
-// Enable WAL mode and foreign keys
+// Configure SQLite PRAGMAs
 db.serialize(() => {
   db.run('PRAGMA foreign_keys = ON');
-  db.run('PRAGMA journal_mode = WAL');
+  if (isVercel) {
+    db.run('PRAGMA journal_mode = MEMORY');
+    db.run('PRAGMA synchronous = OFF');
+  } else {
+    db.run('PRAGMA journal_mode = WAL');
+  }
 });
 
 // Promise wrappers for async/await
