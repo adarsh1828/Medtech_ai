@@ -359,333 +359,284 @@ export async function initializeDatabase() {
   await seedDefaultInvoices();
 }
 
+// Idempotent Seeding Helper Functions
+async function getOrInsertUser(email, passwordHash, role, fullName, phone) {
+  const existing = await getOne('SELECT id FROM Users WHERE email = ?', [email]);
+  if (existing) return existing.id;
+  const res = await run(
+    `INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, ?, ?, ?)`,
+    [email, passwordHash, role, fullName, phone]
+  );
+  return res.lastID;
+}
+
+async function getOrInsertDepartment(name, code, description, floorNumber, headDoctorName, iconName) {
+  const existing = await getOne('SELECT id FROM Departments WHERE code = ?', [code]);
+  if (existing) return existing.id;
+  const res = await run(
+    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name) VALUES (?, ?, ?, ?, ?, ?)`,
+    [name, code, description, floorNumber, headDoctorName, iconName]
+  );
+  return res.lastID;
+}
+
+async function getOrInsertDoctor(userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee) {
+  const existing = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [userId]);
+  if (existing) return existing.id;
+  const res = await run(
+    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee]
+  );
+  return res.lastID;
+}
+
+async function getOrInsertPatient(userId, fullName, dob, gender, bloodGroup, phone, emergencyContact, address, allergies, historySummary) {
+  const existing = await getOne('SELECT id FROM Patients WHERE user_id = ?', [userId]);
+  if (existing) return existing.id;
+  const res = await run(
+    `INSERT INTO Patients (user_id, full_name, dob, gender, blood_group, phone, emergency_contact, address, allergies, medical_history_summary)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, fullName, dob, gender, bloodGroup, phone, emergencyContact, address, allergies, historySummary]
+  );
+  return res.lastID;
+}
+
+async function getOrInsertLabTest(name, code, category, normalRange, units, description) {
+  const existing = await getOne('SELECT id FROM LabTests WHERE test_code = ?', [code]);
+  if (existing) return existing.id;
+  const res = await run(
+    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [name, code, category, normalRange, units, description]
+  );
+  return res.lastID;
+}
 
 async function seedDefaultData() {
   const existingDoctors = await getOne('SELECT COUNT(*) as count FROM Doctors');
-  if (existingDoctors && existingDoctors.count > 0) {
-    console.log('Database already has data. Skipping seed.');
+  const docCount = existingDoctors ? (existingDoctors.count ?? existingDoctors['count'] ?? 0) : 0;
+  if (Number(docCount) > 0) {
+    console.log('Database already has doctor records. Skipping default seed.');
     return;
   }
 
-  // If partial users exist from previous interrupted seed, clean them up
-  try {
-    await run("DELETE FROM Users WHERE email IN ('admin@medtech.ai', 'dr.sarah@medtech.ai', 'dr.arjun@medtech.ai', 'dr.emily@medtech.ai', 'dr.marcus@medtech.ai', 'elena.rodriguez@email.com')");
-  } catch (e) {}
-
-  console.log('Seeding initial clinical and hospital data...');
+  console.log('Seeding initial clinical and hospital data idempotently...');
   const salt = await bcrypt.genSalt(10);
   const adminHash = await bcrypt.hash('admin123', salt);
   const doctorHash = await bcrypt.hash('doctor123', salt);
   const patientHash = await bcrypt.hash('patient123', salt);
 
-  // 1. Seed Users
-  // Admin
-  const adminUser = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'admin', 'Dr. Arthur Pendelton', '+1 (555) 019-2831')`,
-    ['admin@medtech.ai', adminHash]
+  // 1. Seed Users (idempotent)
+  const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Dr. Arthur Pendelton', '+1 (555) 019-2831');
+  const doc1UserId = await getOrInsertUser('dr.sarah@medtech.ai', doctorHash, 'doctor', 'Dr. Sarah Chen, MD', '+1 (555) 302-8812');
+  const doc2UserId = await getOrInsertUser('dr.arjun@medtech.ai', doctorHash, 'doctor', 'Dr. Arjun Mehta, DM', '+1 (555) 441-9923');
+  const doc3UserId = await getOrInsertUser('dr.emily@medtech.ai', doctorHash, 'doctor', 'Dr. Emily Vance, MS', '+1 (555) 872-1144');
+  const doc4UserId = await getOrInsertUser('dr.marcus@medtech.ai', doctorHash, 'doctor', 'Dr. Marcus Holloway, MD', '+1 (555) 901-4422');
+
+  const patient1UserId = await getOrInsertUser('elena.rodriguez@email.com', patientHash, 'patient', 'Elena Rodriguez', '+1 (555) 672-9011');
+  const patient2UserId = await getOrInsertUser('james.wilson@email.com', patientHash, 'patient', 'James Wilson', '+1 (555) 789-2234');
+  const patient3UserId = await getOrInsertUser('sophia.kim@email.com', patientHash, 'patient', 'Sophia Kim', '+1 (555) 234-9988');
+
+  // 2. Seed Departments (idempotent)
+  const deptCardioId = await getOrInsertDepartment('Cardiology', 'CARD', 'Advanced cardiovascular diagnostics, interventions, and coronary care', 3, 'Dr. Sarah Chen, MD', 'Heart');
+  const deptNeuroId = await getOrInsertDepartment('Neurology', 'NEUR', 'Comprehensive brain, spinal cord, and neuro-muscular clinical care', 4, 'Dr. Arjun Mehta, DM', 'Brain');
+  const deptOrthoId = await getOrInsertDepartment('Orthopedics', 'ORTH', 'Joint replacements, trauma, sports medicine, and spinal stabilization', 2, 'Dr. Emily Vance, MS', 'Bone');
+  const deptPediatricsId = await getOrInsertDepartment('Pediatrics', 'PED', 'Infant, child, and adolescent healthcare with specialized neonatal support', 1, 'Dr. Marcus Holloway, MD', 'Baby');
+  const deptGenMedId = await getOrInsertDepartment('General Medicine', 'GENM', 'Primary ambulatory care, acute illness assessment, and chronic disease management', 1, 'Dr. Arthur Pendelton', 'Stethoscope');
+
+  // 3. Seed Doctors (idempotent)
+  const doc1Id = await getOrInsertDoctor(doc1UserId, 'Dr. Sarah Chen, MD', deptCardioId, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302', '09:00 AM - 05:00 PM', 1, 650.00);
+  const doc2Id = await getOrInsertDoctor(doc2UserId, 'Dr. Arjun Mehta, DM', deptNeuroId, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408', '09:00 AM - 05:00 PM', 1, 750.00);
+  const doc3Id = await getOrInsertDoctor(doc3UserId, 'Dr. Emily Vance, MS', deptOrthoId, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214', '09:00 AM - 05:00 PM', 1, 550.00);
+  const doc4Id = await getOrInsertDoctor(doc4UserId, 'Dr. Marcus Holloway, MD', deptPediatricsId, 'MD (Pediatrics), FAAP', 'Pediatric Pulmonology & Preventive Child Health', 8, 'Room 105', '09:00 AM - 05:00 PM', 0, 500.00);
+
+  // 4. Seed Patients (idempotent)
+  const pat1Id = await getOrInsertPatient(
+    patient1UserId,
+    'Elena Rodriguez',
+    '1991-04-12',
+    'Female',
+    'O+',
+    '+1 (555) 672-9011',
+    'Carlos Rodriguez (Spouse) - +1 (555) 672-9019',
+    '742 Evergreen Terrace, Springfield',
+    'Penicillin, Aspirin',
+    'Mild hypertension diagnosed 2021; seasonal allergic rhinitis'
   );
 
-  // Doctors
-  const doc1User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'doctor', 'Dr. Sarah Chen, MD', '+1 (555) 302-8812')`,
-    ['dr.sarah@medtech.ai', doctorHash]
+  const pat2Id = await getOrInsertPatient(
+    patient2UserId,
+    'James Wilson',
+    '1983-09-24',
+    'Male',
+    'A-',
+    '+1 (555) 789-2234',
+    'Karen Wilson (Sister) - +1 (555) 789-2290',
+    '1284 Oakridge Lane, Metropolis',
+    'Sulfa drugs',
+    'Type 2 Diabetes Mellitus (HbA1c 6.8%), Left ACL reconstruction 2019'
   );
 
-  const doc2User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'doctor', 'Dr. Arjun Mehta, DM', '+1 (555) 441-9923')`,
-    ['dr.arjun@medtech.ai', doctorHash]
+  const pat3Id = await getOrInsertPatient(
+    patient3UserId,
+    'Sophia Kim',
+    '1998-11-03',
+    'Female',
+    'B+',
+    '+1 (555) 234-9988',
+    'Hana Kim (Mother) - +1 (555) 234-9911',
+    '45 Pine Needle Court, Seattle',
+    'None reported',
+    'No major prior hospitalizations'
   );
 
-  const doc3User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'doctor', 'Dr. Emily Vance, MS', '+1 (555) 872-1144')`,
-    ['dr.emily@medtech.ai', doctorHash]
-  );
+  // 5. Seed Lab Tests (idempotent)
+  const test1Id = await getOrInsertLabTest('Complete Blood Count (CBC)', 'CBC-01', 'Hematology', 'Hemoglobin: 12.0 - 16.0; WBC: 4.5 - 11.0', 'g/dL, 10^3/uL', 'Automated red and white cell indices');
+  const test2Id = await getOrInsertLabTest('Lipid Profile Panel', 'LIP-02', 'Biochemistry', 'Total Chol: < 200; LDL: < 100; HDL: > 50', 'mg/dL', 'Cardiovascular risk evaluation and lipid fractionation');
+  const test3Id = await getOrInsertLabTest('Glycated Hemoglobin (HbA1c)', 'HBA1C', 'Endocrinology', '< 5.7 (Normal), 5.7-6.4 (Prediabetes)', '%', '3-month weighted average blood glucose level');
+  const test4Id = await getOrInsertLabTest('12-Lead Electrocardiogram (ECG)', 'ECG-04', 'Cardiology', 'Normal Sinus Rhythm, 60-100 bpm', 'bpm', 'Non-invasive electrical activity of the heart');
+  const test5Id = await getOrInsertLabTest('Serum Creatinine & eGFR', 'REN-05', 'Nephrology', 'Creatinine: 0.6 - 1.2; eGFR: > 90', 'mg/dL, mL/min', 'Renal functional clearance and glomerular filtration');
 
-  const doc4User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'doctor', 'Dr. Marcus Holloway, MD', '+1 (555) 901-4422')`,
-    ['dr.marcus@medtech.ai', doctorHash]
-  );
-
-  // Patients
-  const patient1User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'patient', 'Elena Rodriguez', '+1 (555) 672-9011')`,
-    ['elena.rodriguez@email.com', patientHash]
-  );
-
-  const patient2User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'patient', 'James Wilson', '+1 (555) 789-2234')`,
-    ['james.wilson@email.com', patientHash]
-  );
-
-  const patient3User = await run(
-    `INSERT INTO Users (email, password_hash, role, full_name, phone)
-     VALUES (?, ?, 'patient', 'Sophia Kim', '+1 (555) 234-9988')`,
-    ['sophia.kim@email.com', patientHash]
-  );
-
-  // 2. Seed Departments
-  const deptCardio = await run(
-    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Cardiology', 'CARD', 'Advanced cardiovascular diagnostics, interventions, and coronary care', 3, 'Dr. Sarah Chen, MD', 'Heart']
-  );
-
-  const deptNeuro = await run(
-    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Neurology', 'NEUR', 'Comprehensive brain, spinal cord, and neuro-muscular clinical care', 4, 'Dr. Arjun Mehta, DM', 'Brain']
-  );
-
-  const deptOrtho = await run(
-    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Orthopedics', 'ORTH', 'Joint replacements, trauma, sports medicine, and spinal stabilization', 2, 'Dr. Emily Vance, MS', 'Bone']
-  );
-
-  const deptPediatrics = await run(
-    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Pediatrics', 'PED', 'Infant, child, and adolescent healthcare with specialized neonatal support', 1, 'Dr. Marcus Holloway, MD', 'Baby']
-  );
-
-  const deptGenMed = await run(
-    `INSERT INTO Departments (name, code, description, floor_number, head_doctor_name, icon_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['General Medicine', 'GENM', 'Primary ambulatory care, acute illness assessment, and chronic disease management', 1, 'Dr. Arthur Pendelton', 'Stethoscope']
-  );
-
-  // 3. Seed Doctors
-  const doc1 = await run(
-    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 650.00)`,
-    [doc1User.lastID, 'Dr. Sarah Chen, MD', deptCardio.lastID, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302', '09:00 AM - 05:00 PM']
-  );
-
-  const doc2 = await run(
-    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 750.00)`,
-    [doc2User.lastID, 'Dr. Arjun Mehta, DM', deptNeuro.lastID, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408', '09:00 AM - 05:00 PM']
-  );
-
-  const doc3 = await run(
-    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 550.00)`,
-    [doc3User.lastID, 'Dr. Emily Vance, MS', deptOrtho.lastID, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214', '09:00 AM - 05:00 PM']
-  );
-
-  const doc4 = await run(
-    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 500.00)`,
-    [doc4User.lastID, 'Dr. Marcus Holloway, MD', deptPediatrics.lastID, 'MD (Pediatrics), FAAP', 'Pediatric Pulmonology & Preventive Child Health', 8, 'Room 105', '09:00 AM - 05:00 PM']
-  );
-
-  // 4. Seed Patients
-  const pat1 = await run(
-    `INSERT INTO Patients (user_id, full_name, dob, gender, blood_group, phone, emergency_contact, address, allergies, medical_history_summary)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      patient1User.lastID,
-      'Elena Rodriguez',
-      '1991-04-12',
-      'Female',
-      'O+',
-      '+1 (555) 672-9011',
-      'Carlos Rodriguez (Spouse) - +1 (555) 672-9019',
-      '742 Evergreen Terrace, Springfield',
-      'Penicillin, Aspirin',
-      'Mild hypertension diagnosed 2021; seasonal allergic rhinitis'
-    ]
-  );
-
-  const pat2 = await run(
-    `INSERT INTO Patients (user_id, full_name, dob, gender, blood_group, phone, emergency_contact, address, allergies, medical_history_summary)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      patient2User.lastID,
-      'James Wilson',
-      '1983-09-24',
-      'Male',
-      'A-',
-      '+1 (555) 789-2234',
-      'Karen Wilson (Sister) - +1 (555) 789-2290',
-      '1284 Oakridge Lane, Metropolis',
-      'Sulfa drugs',
-      'Type 2 Diabetes Mellitus (HbA1c 6.8%), Left ACL reconstruction 2019'
-    ]
-  );
-
-  const pat3 = await run(
-    `INSERT INTO Patients (user_id, full_name, dob, gender, blood_group, phone, emergency_contact, address, allergies, medical_history_summary)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      patient3User.lastID,
-      'Sophia Kim',
-      '1998-11-03',
-      'Female',
-      'B+',
-      '+1 (555) 234-9988',
-      'Hana Kim (Mother) - +1 (555) 234-9911',
-      '45 Pine Needle Court, Seattle',
-      'None reported',
-      'No major prior hospitalizations'
-    ]
-  );
-
-  // 5. Seed Lab Tests
-  const test1 = await run(
-    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Complete Blood Count (CBC)', 'CBC-01', 'Hematology', 'Hemoglobin: 12.0 - 16.0; WBC: 4.5 - 11.0', 'g/dL, 10^3/uL', 'Automated red and white cell indices']
-  );
-
-  const test2 = await run(
-    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Lipid Profile Panel', 'LIP-02', 'Biochemistry', 'Total Chol: < 200; LDL: < 100; HDL: > 50', 'mg/dL', 'Cardiovascular risk evaluation and lipid fractionation']
-  );
-
-  const test3 = await run(
-    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Glycated Hemoglobin (HbA1c)', 'HBA1C', 'Endocrinology', '< 5.7 (Normal), 5.7-6.4 (Prediabetes)', '%', '3-month weighted average blood glucose level']
-  );
-
-  const test4 = await run(
-    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['12-Lead Electrocardiogram (ECG)', 'ECG-04', 'Cardiology', 'Normal Sinus Rhythm, 60-100 bpm', 'bpm', 'Non-invasive electrical activity of the heart']
-  );
-
-  const test5 = await run(
-    `INSERT INTO LabTests (test_name, test_code, category, normal_range, units, description)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['Serum Creatinine & eGFR', 'REN-05', 'Nephrology', 'Creatinine: 0.6 - 1.2; eGFR: > 90', 'mg/dL, mL/min', 'Renal functional clearance and glomerular filtration']
-  );
-
-  // 6. Seed Appointments
+  // 6. Seed Appointments (if empty)
+  const existingAppts = await getOne('SELECT COUNT(*) as count FROM Appointments');
+  const apptCount = existingAppts ? (existingAppts.count ?? existingAppts['count'] ?? 0) : 0;
   const today = new Date().toISOString().split('T')[0];
-  const appt1 = await run(
-    `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
-     VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?, '124/82', '76 bpm', '98.4 F', '68 kg')`,
-    [pat1.lastID, doc1.lastID, deptCardio.lastID, today, '10:00 AM', 101, 'Routine follow-up for episodic palpitations and blood pressure check']
-  );
 
-  const appt2 = await run(
-    `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
-     VALUES (?, ?, ?, ?, ?, ?, 'in_consultation', ?, '132/88', '82 bpm', '98.6 F', '79 kg')`,
-    [pat2.lastID, doc2.lastID, deptNeuro.lastID, today, '10:30 AM', 102, 'Persistent tension headaches with visual aura in right eye']
-  );
-
-  const appt3 = await run(
-    `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
-     VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, '118/74', '70 bpm', '98.1 F', '58 kg')`,
-    [pat3.lastID, doc1.lastID, deptCardio.lastID, today, '09:00 AM', 100, 'Pre-employment cardiology clearance and baseline vitals examination']
-  );
-
-  // 7. Seed Past Prescription for Completed Appointment 3
-  const rx1 = await run(
-    `INSERT INTO Prescriptions (appointment_id, patient_id, doctor_id, diagnosis, clinical_notes, advice, follow_up_date)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [
-      appt3.lastID,
-      pat3.lastID,
-      doc1.lastID,
-      'Normal Sinus Rhythm with Physiological Sinus Tachycardia on Exertion',
-      'Normal S1/S2 heart sounds, no audible murmurs or gallops. Normal baseline ECG. Recommended adequate hydration.',
-      'Maintain adequate hydration (2.5L daily). Limit stimulant energy drinks. Annual wellness checkup.',
-      '2026-12-15'
-    ]
-  );
-
-  await run(
-    `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [rx1.lastID, 'Oral Hydration & Electrolyte Sachet', '1 Sachet', 'Once daily', '14 days', 'Dissolve in 500ml water every morning after breakfast']
-  );
-
-  await run(
-    `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [rx1.lastID, 'Vitamin D3 & Calcium Cholecalciferol', '60,000 IU', 'Once weekly', '8 weeks', 'Take with full glass of warm milk after dinner']
-  );
-
-  // 8. Seed Lab Reports for Elena Rodriguez
-  await run(
-    `INSERT INTO LabReports (patient_id, test_id, doctor_id, test_date, status, result_value, reference_range, remarks)
-     VALUES (?, ?, ?, ?, 'completed', ?, ?, ?)`,
-    [
-      pat1.lastID,
-      test2.lastID,
-      doc1.lastID,
-      today,
-      'Total: 184 mg/dL | LDL: 98 mg/dL | HDL: 56 mg/dL',
-      'Total < 200 mg/dL, LDL < 100 mg/dL',
-      'Optimal lipid profile. Continue cardioprotective dietary measures.'
-    ]
-  );
-
-  await run(
-    `INSERT INTO LabReports (patient_id, test_id, doctor_id, test_date, status, result_value, reference_range, remarks)
-     VALUES (?, ?, ?, ?, 'completed', ?, ?, ?)`,
-    [
-      pat1.lastID,
-      test4.lastID,
-      doc1.lastID,
-      today,
-      'Normal Sinus Rhythm, PR interval 148ms, QRS 86ms, Rate 72 bpm',
-      'Sinus Rhythm (60-100 bpm)',
-      'No ST-segment abnormalities or ischemic changes noted.'
-    ]
-  );
-
-  // 9. Seed Hospital Beds (Across wards)
-  const bedsData = [
-    // ICU
-    ['ICU-101', 'ICU', deptCardio.lastID, 'occupied', pat2.lastID, 'Post-procedure cardiac monitoring'],
-    ['ICU-102', 'ICU', deptCardio.lastID, 'available', null, 'Cleaned & sterilized. Ventilator ready.'],
-    ['ICU-103', 'ICU', deptNeuro.lastID, 'occupied', null, 'Stroke step-down bed'],
-    ['ICU-104', 'ICU', deptNeuro.lastID, 'maintenance', null, 'Routine telemetry sensor calibration'],
-    // Emergency
-    ['ER-201', 'Emergency', deptGenMed.lastID, 'available', null, 'Rapid triage resuscitation bay'],
-    ['ER-202', 'Emergency', deptGenMed.lastID, 'available', null, 'Rapid triage observation'],
-    ['ER-203', 'Emergency', deptGenMed.lastID, 'occupied', null, 'Acute trauma observation'],
-    ['ER-204', 'Emergency', deptGenMed.lastID, 'available', null, 'Oxygen supply tested'],
-    // General Ward
-    ['GW-301', 'General Ward', deptGenMed.lastID, 'available', null, 'Standard telemetry bed'],
-    ['GW-302', 'General Ward', deptGenMed.lastID, 'occupied', null, 'Post-op recovery day 2'],
-    ['GW-303', 'General Ward', deptOrtho.lastID, 'available', null, 'Equipped with orthopedic traction'],
-    ['GW-304', 'General Ward', deptOrtho.lastID, 'occupied', null, 'Joint rehabilitation patient'],
-    ['GW-305', 'General Ward', deptCardio.lastID, 'available', null, 'Standard bed'],
-    ['GW-306', 'General Ward', deptPediatrics.lastID, 'available', null, 'Standard bed'],
-    // Semi-Private
-    ['SP-401', 'Semi-Private', deptCardio.lastID, 'available', null, 'Deluxe monitoring twin unit'],
-    ['SP-402', 'Semi-Private', deptNeuro.lastID, 'occupied', null, 'Rehabilitation monitoring'],
-    // Pediatric Ward
-    ['PED-501', 'Pediatric Ward', deptPediatrics.lastID, 'available', null, 'Child-friendly telemetry crib'],
-    ['PED-502', 'Pediatric Ward', deptPediatrics.lastID, 'occupied', null, 'Observation pediatric unit']
-  ];
-
-  for (const b of bedsData) {
+  let appt3Id = null;
+  if (Number(apptCount) === 0) {
     await run(
-      `INSERT INTO Beds (bed_number, ward_type, department_id, status, patient_id, notes, admitted_at)
+      `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
+       VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?, '124/82', '76 bpm', '98.4 F', '68 kg')`,
+      [pat1Id, doc1Id, deptCardioId, today, '10:00 AM', 101, 'Routine follow-up for episodic palpitations and blood pressure check']
+    );
+
+    await run(
+      `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
+       VALUES (?, ?, ?, ?, ?, ?, 'in_consultation', ?, '132/88', '82 bpm', '98.6 F', '79 kg')`,
+      [pat2Id, doc2Id, deptNeuroId, today, '10:30 AM', 102, 'Persistent tension headaches with visual aura in right eye']
+    );
+
+    const appt3Res = await run(
+      `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
+       VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, '118/74', '70 bpm', '98.1 F', '58 kg')`,
+      [pat3Id, doc1Id, deptCardioId, today, '09:00 AM', 100, 'Pre-employment cardiology clearance and baseline vitals examination']
+    );
+    appt3Id = appt3Res.lastID;
+  } else {
+    const existingAppt3 = await getOne('SELECT id FROM Appointments WHERE token_number = 100');
+    if (existingAppt3) appt3Id = existingAppt3.id;
+  }
+
+  // 7. Seed Prescription (if empty)
+  const existingRx = await getOne('SELECT COUNT(*) as count FROM Prescriptions');
+  const rxCount = existingRx ? (existingRx.count ?? existingRx['count'] ?? 0) : 0;
+  if (Number(rxCount) === 0 && appt3Id) {
+    const rx1 = await run(
+      `INSERT INTO Prescriptions (appointment_id, patient_id, doctor_id, diagnosis, clinical_notes, advice, follow_up_date)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [b[0], b[1], b[2], b[3], b[4], b[5], b[3] === 'occupied' ? today + ' 08:30:00' : null]
+      [
+        appt3Id,
+        pat3Id,
+        doc1Id,
+        'Normal Sinus Rhythm with Physiological Sinus Tachycardia on Exertion',
+        'Normal S1/S2 heart sounds, no audible murmurs or gallops. Normal baseline ECG. Recommended adequate hydration.',
+        'Maintain adequate hydration (2.5L daily). Limit stimulant energy drinks. Annual wellness checkup.',
+        '2026-12-15'
+      ]
+    );
+
+    await run(
+      `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [rx1.lastID, 'Oral Hydration & Electrolyte Sachet', '1 Sachet', 'Once daily', '14 days', 'Dissolve in 500ml water every morning after breakfast']
+    );
+
+    await run(
+      `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [rx1.lastID, 'Vitamin D3 & Calcium Cholecalciferol', '60,000 IU', 'Once weekly', '8 weeks', 'Take with full glass of warm milk after dinner']
     );
   }
 
-  console.log('Seed completed successfully!');
+  // 8. Seed Lab Reports (if empty)
+  const existingReports = await getOne('SELECT COUNT(*) as count FROM LabReports');
+  const repCount = existingReports ? (existingReports.count ?? existingReports['count'] ?? 0) : 0;
+  if (Number(repCount) === 0) {
+    await run(
+      `INSERT INTO LabReports (patient_id, test_id, doctor_id, test_date, status, result_value, reference_range, remarks)
+       VALUES (?, ?, ?, ?, 'completed', ?, ?, ?)`,
+      [
+        pat1Id,
+        test2Id,
+        doc1Id,
+        today,
+        'Total: 184 mg/dL | LDL: 98 mg/dL | HDL: 56 mg/dL',
+        'Total < 200 mg/dL, LDL < 100 mg/dL',
+        'Optimal lipid profile. Continue cardioprotective dietary measures.'
+      ]
+    );
+
+    await run(
+      `INSERT INTO LabReports (patient_id, test_id, doctor_id, test_date, status, result_value, reference_range, remarks)
+       VALUES (?, ?, ?, ?, 'completed', ?, ?, ?)`,
+      [
+        pat1Id,
+        test4Id,
+        doc1Id,
+        today,
+        'Normal Sinus Rhythm, PR interval 148ms, QRS 86ms, Rate 72 bpm',
+        'Sinus Rhythm (60-100 bpm)',
+        'No ST-segment abnormalities or ischemic changes noted.'
+      ]
+    );
+  }
+
+  // 9. Seed Beds (idempotent)
+  const bedsData = [
+    // ICU
+    ['ICU-101', 'ICU', deptCardioId, 'occupied', pat2Id, 'Post-procedure cardiac monitoring'],
+    ['ICU-102', 'ICU', deptCardioId, 'available', null, 'Cleaned & sterilized. Ventilator ready.'],
+    ['ICU-103', 'ICU', deptNeuroId, 'occupied', null, 'Stroke step-down bed'],
+    ['ICU-104', 'ICU', deptNeuroId, 'maintenance', null, 'Routine telemetry sensor calibration'],
+    // Emergency
+    ['ER-201', 'Emergency', deptGenMedId, 'available', null, 'Rapid triage resuscitation bay'],
+    ['ER-202', 'Emergency', deptGenMedId, 'available', null, 'Rapid triage observation'],
+    ['ER-203', 'Emergency', deptGenMedId, 'occupied', null, 'Acute trauma observation'],
+    ['ER-204', 'Emergency', deptGenMedId, 'available', null, 'Oxygen supply tested'],
+    // General Ward
+    ['GW-301', 'General Ward', deptGenMedId, 'available', null, 'Standard telemetry bed'],
+    ['GW-302', 'General Ward', deptGenMedId, 'occupied', null, 'Post-op recovery day 2'],
+    ['GW-303', 'General Ward', deptOrthoId, 'available', null, 'Equipped with orthopedic traction'],
+    ['GW-304', 'General Ward', deptOrthoId, 'occupied', null, 'Joint rehabilitation patient'],
+    ['GW-305', 'General Ward', deptCardioId, 'available', null, 'Standard bed'],
+    ['GW-306', 'General Ward', deptPediatricsId, 'available', null, 'Standard bed'],
+    // Semi-Private
+    ['SP-401', 'Semi-Private', deptCardioId, 'available', null, 'Deluxe monitoring twin unit'],
+    ['SP-402', 'Semi-Private', deptNeuroId, 'occupied', null, 'Rehabilitation monitoring'],
+    // Pediatric Ward
+    ['PED-501', 'Pediatric Ward', deptPediatricsId, 'available', null, 'Child-friendly telemetry crib'],
+    ['PED-502', 'Pediatric Ward', deptPediatricsId, 'occupied', null, 'Observation pediatric unit']
+  ];
+
+  for (const b of bedsData) {
+    const existingBed = await getOne('SELECT id FROM Beds WHERE bed_number = ?', [b[0]]);
+    if (!existingBed) {
+      await run(
+        `INSERT INTO Beds (bed_number, ward_type, department_id, status, patient_id, notes, admitted_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [b[0], b[1], b[2], b[3], b[4], b[5], b[3] === 'occupied' ? today + ' 08:30:00' : null]
+      );
+    }
+  }
+
+  console.log('Clinical and hospital seed completed successfully!');
 }
 
 async function seedDefaultInvoices() {
   const existing = await getOne('SELECT COUNT(*) as count FROM Invoices');
-  if (existing && existing.count > 0) {
+  const count = existing ? (existing.count ?? existing['count'] ?? 0) : 0;
+  if (Number(count) > 0) {
     return;
   }
 
@@ -701,38 +652,20 @@ async function seedDefaultInvoices() {
   const today = new Date().toISOString().split('T')[0];
 
   // Invoice 1: Sophia Kim (Completed OPD + Lab + Meds) - Paid via UPI
-  const inv1 = await run(
-    `INSERT INTO Invoices (invoice_number, patient_id, appointment_id, doctor_id, total_amount, discount, tax, net_amount, payment_status, payment_method, transaction_ref, notes, paid_at)
-     VALUES (?, ?, 3, ?, 115.00, 10.00, 5.00, 110.00, 'paid', 'upi', 'UPI/2026/8931201948', 'OPD Cardiology consultation & wellness baseline testing', ?)`,
-    ['INV-2026-0001', pat3 ? pat3.id : pat1.id, doc1.id, today + ' 09:45:00']
-  );
-
-  const items1 = [
-    [inv1.lastID, 'Specialist Clinical Consultation Fee', 'consultation', 1, 65.00, 65.00],
-    [inv1.lastID, '12-Lead Electrocardiogram (ECG)', 'lab', 1, 35.00, 35.00],
-    [inv1.lastID, 'Oral Hydration & Vitamin D3 Prescription pack', 'medicine', 1, 15.00, 15.00]
-  ];
-  for (const item of items1) {
-    await run(
-      `INSERT INTO InvoiceItems (invoice_id, description, category, quantity, unit_price, total_price)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      item
-    );
-  }
-
-  // Invoice 2: James Wilson (Neurology OPD & Lab) - Paid via Card
-  if (pat2 && doc2) {
-    const inv2 = await run(
+  const existingInv1 = await getOne('SELECT id FROM Invoices WHERE invoice_number = ?', ['INV-2026-0001']);
+  if (!existingInv1) {
+    const inv1 = await run(
       `INSERT INTO Invoices (invoice_number, patient_id, appointment_id, doctor_id, total_amount, discount, tax, net_amount, payment_status, payment_method, transaction_ref, notes, paid_at)
-       VALUES (?, ?, 2, ?, 125.00, 0.00, 6.25, 131.25, 'paid', 'card', 'TXN-VISA-991204', 'Neurovascular assessment & biochemical profiling', ?)`,
-      ['INV-2026-0002', pat2.id, doc2.id, today + ' 11:15:00']
+       VALUES (?, ?, 3, ?, 1150.00, 100.00, 50.00, 1100.00, 'paid', 'upi', 'UPI/2026/8931201948', 'OPD Cardiology consultation & wellness baseline testing', ?)`,
+      ['INV-2026-0001', pat3 ? pat3.id : pat1.id, doc1.id, today + ' 09:45:00']
     );
 
-    const items2 = [
-      [inv2.lastID, 'Senior Neurologist Consultation', 'consultation', 1, 75.00, 75.00],
-      [inv2.lastID, 'Serum Creatinine & Electrolyte Panel', 'lab', 1, 50.00, 50.00]
+    const items1 = [
+      [inv1.lastID, 'Specialist Clinical Consultation Fee', 'consultation', 1, 650.00, 650.00],
+      [inv1.lastID, '12-Lead Electrocardiogram (ECG)', 'lab', 1, 350.00, 350.00],
+      [inv1.lastID, 'Oral Hydration & Vitamin D3 Prescription pack', 'medicine', 1, 150.00, 150.00]
     ];
-    for (const item of items2) {
+    for (const item of items1) {
       await run(
         `INSERT INTO InvoiceItems (invoice_id, description, category, quantity, unit_price, total_price)
          VALUES (?, ?, ?, ?, ?, ?)`,
@@ -741,19 +674,47 @@ async function seedDefaultInvoices() {
     }
   }
 
-  // Invoice 3: Elena Rodriguez (Scheduled OPD check) - Pending Payment
-  const inv3 = await run(
-    `INSERT INTO Invoices (invoice_number, patient_id, appointment_id, doctor_id, total_amount, discount, tax, net_amount, payment_status, payment_method, notes)
-     VALUES (?, ?, 1, ?, 65.00, 0.00, 3.25, 68.25, 'pending', 'upi', 'Follow-up blood pressure & rhythm evaluation')`,
-    ['INV-2026-0003', pat1.id, doc1.id]
-  );
+  // Invoice 2: James Wilson (Neurology OPD & Lab) - Paid via Card
+  if (pat2 && doc2) {
+    const existingInv2 = await getOne('SELECT id FROM Invoices WHERE invoice_number = ?', ['INV-2026-0002']);
+    if (!existingInv2) {
+      const inv2 = await run(
+        `INSERT INTO Invoices (invoice_number, patient_id, appointment_id, doctor_id, total_amount, discount, tax, net_amount, payment_status, payment_method, transaction_ref, notes, paid_at)
+         VALUES (?, ?, 2, ?, 1250.00, 0.00, 62.50, 1312.50, 'paid', 'card', 'TXN-VISA-991204', 'Neurovascular assessment & biochemical profiling', ?)`,
+        ['INV-2026-0002', pat2.id, doc2.id, today + ' 11:15:00']
+      );
 
-  await run(
-    `INSERT INTO InvoiceItems (invoice_id, description, category, quantity, unit_price, total_price)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [inv3.lastID, 'Cardiology Ambulatory Visit Fee', 'consultation', 1, 65.00, 65.00]
-  );
+      const items2 = [
+        [inv2.lastID, 'Senior Neurologist Consultation', 'consultation', 1, 750.00, 750.00],
+        [inv2.lastID, 'Serum Creatinine & Electrolyte Panel', 'lab', 1, 500.00, 500.00]
+      ];
+      for (const item of items2) {
+        await run(
+          `INSERT INTO InvoiceItems (invoice_id, description, category, quantity, unit_price, total_price)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          item
+        );
+      }
+    }
+  }
+
+  // Invoice 3: Elena Rodriguez (Scheduled OPD check) - Pending Payment
+  const existingInv3 = await getOne('SELECT id FROM Invoices WHERE invoice_number = ?', ['INV-2026-0003']);
+  if (!existingInv3) {
+    const inv3 = await run(
+      `INSERT INTO Invoices (invoice_number, patient_id, appointment_id, doctor_id, total_amount, discount, tax, net_amount, payment_status, payment_method, notes)
+       VALUES (?, ?, 1, ?, 650.00, 0.00, 32.50, 682.50, 'pending', 'upi', 'Follow-up blood pressure & rhythm evaluation')`,
+      ['INV-2026-0003', pat1.id, doc1.id]
+    );
+
+    await run(
+      `INSERT INTO InvoiceItems (invoice_id, description, category, quantity, unit_price, total_price)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [inv3.lastID, 'Cardiology Ambulatory Visit Fee', 'consultation', 1, 650.00, 650.00]
+    );
+  }
 
   console.log('Sample hospital invoices seeded successfully.');
 }
+
 
