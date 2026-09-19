@@ -64,7 +64,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Failed to complete patient registration. Please try again.' });
+    res.status(500).json({ error: 'Failed to complete patient registration: ' + (err?.message || err) });
   }
 });
 
