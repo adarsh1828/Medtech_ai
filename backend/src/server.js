@@ -77,11 +77,14 @@ app.get('/api/hospital', async (req, res) => {
 
 // Health check
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const isTurso = Boolean((process.env.TURSO_DATABASE_URL || process.env.TURSO_URL) && process.env.TURSO_AUTH_TOKEN);
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'MedTech AI Hospital Management System API'
+    service: 'MedTech AI Hospital Management System API',
+    turso_connected: isTurso,
+    turso_env_keys: Object.keys(process.env).filter(k => k.toLowerCase().includes('turso'))
   });
 });
 
