@@ -361,11 +361,16 @@ export async function initializeDatabase() {
 
 
 async function seedDefaultData() {
-  const existingUsers = await getOne('SELECT COUNT(*) as count FROM Users');
-  if (existingUsers && existingUsers.count > 0) {
+  const existingDoctors = await getOne('SELECT COUNT(*) as count FROM Doctors');
+  if (existingDoctors && existingDoctors.count > 0) {
     console.log('Database already has data. Skipping seed.');
     return;
   }
+
+  // If partial users exist from previous interrupted seed, clean them up
+  try {
+    await run("DELETE FROM Users WHERE email IN ('admin@medtech.ai', 'dr.sarah@medtech.ai', 'dr.arjun@medtech.ai', 'dr.emily@medtech.ai', 'dr.marcus@medtech.ai', 'elena.rodriguez@email.com')");
+  } catch (e) {}
 
   console.log('Seeding initial clinical and hospital data...');
   const salt = await bcrypt.genSalt(10);
@@ -459,26 +464,26 @@ async function seedDefaultData() {
   // 3. Seed Doctors
   const doc1 = await run(
     `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 65.00)`,
-    [doc1User.lastID, 'Dr. Sarah Chen, MD', deptCardio.lastID, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302']
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 650.00)`,
+    [doc1User.lastID, 'Dr. Sarah Chen, MD', deptCardio.lastID, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302', '09:00 AM - 05:00 PM']
   );
 
   const doc2 = await run(
     `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 75.00)`,
-    [doc2User.lastID, 'Dr. Arjun Mehta, DM', deptNeuro.lastID, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408']
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 750.00)`,
+    [doc2User.lastID, 'Dr. Arjun Mehta, DM', deptNeuro.lastID, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408', '09:00 AM - 05:00 PM']
   );
 
   const doc3 = await run(
     `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 55.00)`,
-    [doc3User.lastID, 'Dr. Emily Vance, MS', deptOrtho.lastID, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214']
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 550.00)`,
+    [doc3User.lastID, 'Dr. Emily Vance, MS', deptOrtho.lastID, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214', '09:00 AM - 05:00 PM']
   );
 
   const doc4 = await run(
     `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 50.00)`,
-    [doc4User.lastID, 'Dr. Marcus Holloway, MD', deptPediatrics.lastID, 'MD (Pediatrics), FAAP', 'Pediatric Pulmonology & Preventive Child Health', 8, 'Room 105']
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 500.00)`,
+    [doc4User.lastID, 'Dr. Marcus Holloway, MD', deptPediatrics.lastID, 'MD (Pediatrics), FAAP', 'Pediatric Pulmonology & Preventive Child Health', 8, 'Room 105', '09:00 AM - 05:00 PM']
   );
 
   // 4. Seed Patients
