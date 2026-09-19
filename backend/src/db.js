@@ -1,60 +1,93 @@
+import { createClient } from '@libsql/client';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
-
 import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-const dbPath = isVercel
-  ? ':memory:'
-  : path.resolve(__dirname, '../../medtech.db');
+// Check if Turso Cloud credentials are provided in environment variables
+const tursoUrl = process.env.TURSO_DATABASE_URL || process.env.TURSO_URL;
+const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
+const isTursoEnabled = Boolean(tursoUrl && tursoAuthToken);
 
-const verboseSqlite = sqlite3.verbose();
-export const db = new verboseSqlite.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Could not connect to SQLite database:', err.message);
-  } else {
-    console.log('Connected to SQLite database at', dbPath);
+let tursoClient = null;
+let localDb = null;
+
+if (isTursoEnabled) {
+  console.log('⚡ Turso Cloud Database active! Connecting to:', tursoUrl);
+  tursoClient = createClient({
+    url: tursoUrl,
+    authToken: tursoAuthToken
+  });
+} else {
+  const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  const dbPath = isVercel
+    ? ':memory:'
+    : path.resolve(__dirname, '../../medtech.db');
+
+  const verboseSqlite = sqlite3.verbose();
+  localDb = new verboseSqlite.Database(dbPath, (err) => {
+    if (err) {
+      console.error('Could not connect to SQLite database:', err.message);
+    } else {
+      console.log('Connected to local SQLite database at', dbPath);
+    }
+  });
+
+  localDb.serialize(() => {
+    localDb.run('PRAGMA foreign_keys = ON');
+    if (isVercel) {
+      localDb.run('PRAGMA journal_mode = MEMORY');
+      localDb.run('PRAGMA synchronous = OFF');
+    } else {
+      localDb.run('PRAGMA journal_mode = WAL');
+    }
+  });
+}
+
+// Export db instance for backwards compatibility
+export const db = localDb;
+
+// Promise wrappers for async/await (routes call query, getOne, run)
+export const query = async (sql, params = []) => {
+  if (isTursoEnabled) {
+    const res = await tursoClient.execute({ sql, args: params });
+    return Array.from(res.rows).map(row => ({ ...row }));
   }
-});
-
-// Configure SQLite PRAGMAs
-db.serialize(() => {
-  db.run('PRAGMA foreign_keys = ON');
-  if (isVercel) {
-    db.run('PRAGMA journal_mode = MEMORY');
-    db.run('PRAGMA synchronous = OFF');
-  } else {
-    db.run('PRAGMA journal_mode = WAL');
-  }
-});
-
-// Promise wrappers for async/await
-export const query = (sql, params = []) => {
   return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
+    localDb.all(sql, params, (err, rows) => {
       if (err) reject(err);
       else resolve(rows || []);
     });
   });
 };
 
-export const getOne = (sql, params = []) => {
+export const getOne = async (sql, params = []) => {
+  if (isTursoEnabled) {
+    const res = await tursoClient.execute({ sql, args: params });
+    return res.rows.length > 0 ? { ...res.rows[0] } : null;
+  }
   return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
+    localDb.get(sql, params, (err, row) => {
       if (err) reject(err);
       else resolve(row || null);
     });
   });
 };
 
-export const run = (sql, params = []) => {
+export const run = async (sql, params = []) => {
+  if (isTursoEnabled) {
+    const res = await tursoClient.execute({ sql, args: params });
+    return {
+      lastID: Number(res.lastInsertRowid || 0),
+      changes: res.rowsAffected || 0
+    };
+  }
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
+    localDb.run(sql, params, function (err) {
       if (err) reject(err);
       else resolve({ lastID: this.lastID, changes: this.changes });
     });
