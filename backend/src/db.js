@@ -268,13 +268,6 @@ export async function initializeDatabase() {
   } catch (e) {}
   await run("UPDATE HospitalSettings SET currency_symbol = COALESCE(currency_symbol, '₹'), currency_code = COALESCE(currency_code, 'INR') WHERE id = 1");
 
-  // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
-  await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");
-
-  // Calibrate seeded invoices to realistic Indian Rupee amounts
-  await run("UPDATE Invoices SET total_amount = total_amount * 10, discount = discount * 10, tax = tax * 10, net_amount = net_amount * 10 WHERE net_amount > 0 AND net_amount < 300");
-  await run("UPDATE InvoiceItems SET unit_price = unit_price * 10, total_price = total_price * 10 WHERE unit_price > 0 AND unit_price < 200");
-
   // 12. Invoices (OPD & IPD Billing)
   await run(`
     CREATE TABLE IF NOT EXISTS Invoices (
@@ -312,6 +305,17 @@ export async function initializeDatabase() {
       FOREIGN KEY (invoice_id) REFERENCES Invoices(id) ON DELETE CASCADE
     )
   `);
+
+  // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
+  try {
+    await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");
+  } catch (e) {}
+
+  // Calibrate seeded invoices to realistic Indian Rupee amounts
+  try {
+    await run("UPDATE Invoices SET total_amount = total_amount * 10, discount = discount * 10, tax = tax * 10, net_amount = net_amount * 10 WHERE net_amount > 0 AND net_amount < 300");
+    await run("UPDATE InvoiceItems SET unit_price = unit_price * 10, total_price = total_price * 10 WHERE unit_price > 0 AND unit_price < 200");
+  } catch (e) {}
 
   console.log('Database tables verified.');
 
