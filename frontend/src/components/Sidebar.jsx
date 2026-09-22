@@ -14,11 +14,12 @@ import {
   Tv,
   UserCheck,
   Shield,
-  User
+  User,
+  X
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo }) {
+export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, isMobileOpen, onCloseMobile }) {
   const { t } = useLanguage();
 
   const userRole = user?.role || 'patient';
@@ -164,52 +165,75 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo })
   };
 
   return (
-    <aside style={{
-      width: '270px',
-      backgroundColor: 'var(--bg-sidebar)',
-      borderRight: '1px solid var(--border-subtle)',
-      display: 'flex',
-      flexDirection: 'column',
-      flexShrink: 0,
-      userSelect: 'none'
-    }}>
-      {/* Brand Header */}
-      <div style={{
-        padding: '20px 18px',
-        borderBottom: '1px solid var(--border-subtle)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}>
-        {/* Powered by MedTech AI Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '3px 8px',
-            borderRadius: '20px',
-            background: 'rgba(6, 182, 212, 0.12)',
-            border: '1px solid rgba(6, 182, 212, 0.3)',
-            fontSize: '0.68rem',
-            fontWeight: '700',
-            color: '#38bdf8',
-            letterSpacing: '0.04em'
-          }}>
-            <HeartPulse className="heartbeat-icon" size={12} />
-            {t('brand.poweredBy', 'POWERED BY MEDTECH AI')}
+    <>
+      {/* Mobile Drawer Backdrop */}
+      {isMobileOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <aside className={`app-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+        {/* Brand Header */}
+        <div style={{
+          padding: '20px 18px',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          position: 'relative'
+        }}>
+          {/* Powered by MedTech AI Badge & Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '3px 8px',
+              borderRadius: '20px',
+              background: 'rgba(6, 182, 212, 0.12)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              fontSize: '0.68rem',
+              fontWeight: '700',
+              color: '#38bdf8',
+              letterSpacing: '0.04em'
+            }}>
+              <HeartPulse className="heartbeat-icon" size={12} />
+              {t('brand.poweredBy', 'POWERED BY MEDTECH AI')}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{
+                fontSize: '0.65rem',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                background: 'rgba(16, 185, 129, 0.15)',
+                color: '#34d399',
+                fontWeight: '700'
+              }}>
+                {t('brand.live', 'LIVE')}
+              </span>
+              {isMobileOpen && (
+                <button
+                  onClick={onCloseMobile}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '6px',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Close Menu"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
           </div>
-          <span style={{
-            fontSize: '0.65rem',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            background: 'rgba(16, 185, 129, 0.15)',
-            color: '#34d399',
-            fontWeight: '700'
-          }}>
-            {t('brand.live', 'LIVE')}
-          </span>
-        </div>
 
         {/* Big Prominent Hospital Name */}
         <div>
@@ -255,7 +279,10 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo })
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                onCloseMobile?.();
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -370,5 +397,6 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo })
         </div>
       </div>
     </aside>
+    </>
   );
 }

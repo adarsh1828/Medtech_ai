@@ -14,12 +14,13 @@ import {
   Check, 
   Sun, 
   Moon,
-  Search
+  Search,
+  Menu
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
-export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, onOpenBookModal, onOpenHospitalSettings, onOpenSearch }) {
+export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, onOpenBookModal, onOpenHospitalSettings, onOpenSearch, onToggleMobileMenu }) {
   const { language, setLanguage, t, supportedLanguages, currentLangMeta } = useLanguage();
   const { theme, toggleTheme, isDark } = useTheme();
   const [timeStr, setTimeStr] = useState('');
@@ -62,15 +63,24 @@ export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, o
 
   return (
     <header className="top-header">
-      {/* Left: Quick Live Clock & Hospital Telemetry */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      {/* Left: Mobile Drawer Trigger & Live Clock */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button
+          className="mobile-menu-btn"
+          onClick={onToggleMobileMenu}
+          title="Open Menu"
+          aria-label="Open Navigation Menu"
+        >
+          <Menu size={20} />
+        </button>
+
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
           background: 'rgba(255, 255, 255, 0.03)',
           border: '1px solid var(--border-subtle)',
-          padding: '6px 14px',
+          padding: '6px 12px',
           borderRadius: '8px',
           fontSize: '0.8rem',
           color: 'var(--text-secondary)',
@@ -82,7 +92,7 @@ export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, o
       </div>
 
       {/* Right: Actions & User Info & Language Selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
         
         {/* Global Spotlight Search Button */}
         <button
@@ -103,8 +113,8 @@ export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, o
           title="Spotlight Search (Ctrl + K)"
         >
           <Search size={14} color="var(--primary)" />
-          <span style={{ display: 'inline-block' }}>Search...</span>
-          <kbd style={{
+          <span className="hide-on-mobile" style={{ display: 'inline-block' }}>Search...</span>
+          <kbd className="hide-on-mobile" style={{
             fontSize: '0.65rem',
             padding: '2px 5px',
             borderRadius: '4px',

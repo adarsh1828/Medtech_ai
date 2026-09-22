@@ -354,28 +354,14 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       </header>
 
       {/* Main Container */}
-      <main style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '30px 20px',
-        zIndex: 5
-      }}>
+      <main className="auth-main-container">
         <div style={{
           width: '100%',
           maxWidth: tab === 'login' ? '540px' : '680px',
           transition: 'max-width 0.25s ease'
         }}>
           {/* Main Card */}
-          <div className="glass-card" style={{
-            padding: '30px',
-            borderRadius: '16px',
-            border: '1px solid rgba(6, 182, 212, 0.25)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.45)',
-            background: 'rgba(15, 23, 42, 0.85)',
-            backdropFilter: 'blur(20px)'
-          }}>
+          <div className="glass-card auth-card-wrapper">
             {/* Header / Lock Badge */}
             <div style={{ textAlign: 'center', marginBottom: '22px' }}>
               <div style={{
@@ -429,7 +415,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   </span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                <div className="auth-preset-grid">
                   {/* Patient Demo */}
                   <button
                     type="button"
@@ -707,7 +693,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
             {/* 2. Patient Register Tab */}
             {tab === 'register' && (
               <form onSubmit={handleRegisterPatient}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="responsive-two-col">
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label className="form-label">Full Name *</label>
                     <input
@@ -839,7 +825,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="responsive-two-col">
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label className="form-label">Doctor Full Name (with Title) *</label>
                     <input
@@ -980,7 +966,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="responsive-two-col">
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label className="form-label">Executive Full Name *</label>
                     <input

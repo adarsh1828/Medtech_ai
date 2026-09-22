@@ -3,13 +3,11 @@ import { X, Stethoscope, Plus, Trash2, HeartPulse, FileText, CheckCircle, AlertT
 import { api } from '../api';
 
 export default function ConsultationModal({ isOpen, onClose, appointment, onSuccess }) {
-  if (!isOpen || !appointment) return null;
-
   const [vitals, setVitals] = useState({
-    vitals_bp: appointment.vitals_bp || '120/80',
-    vitals_pulse: appointment.vitals_pulse || '72 bpm',
-    vitals_temp: appointment.vitals_temp || '98.6 F',
-    vitals_weight: appointment.vitals_weight || '65 kg'
+    vitals_bp: appointment?.vitals_bp || '120/80',
+    vitals_pulse: appointment?.vitals_pulse || '72 bpm',
+    vitals_temp: appointment?.vitals_temp || '98.6 F',
+    vitals_weight: appointment?.vitals_weight || '65 kg'
   });
 
   const [diagnosis, setDiagnosis] = useState('');
@@ -28,6 +26,22 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
       instructions: 'Take with plenty of water'
     }
   ]);
+
+  // Sync state when appointment changes or modal opens
+  useEffect(() => {
+    if (appointment && isOpen) {
+      setVitals({
+        vitals_bp: appointment.vitals_bp || '120/80',
+        vitals_pulse: appointment.vitals_pulse || '72 bpm',
+        vitals_temp: appointment.vitals_temp || '98.6 F',
+        vitals_weight: appointment.vitals_weight || '65 kg'
+      });
+      setDiagnosis('');
+      setClinicalNotes('');
+      setAdvice('');
+      setFollowUpDate('');
+    }
+  }, [appointment, isOpen]);
 
   useEffect(() => {
     const validMeds = medicines.map(m => m.medicine_name.trim()).filter(Boolean);
@@ -108,6 +122,8 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
       setSubmitting(false);
     }
   };
+
+  if (!isOpen || !appointment) return null;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

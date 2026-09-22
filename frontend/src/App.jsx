@@ -18,11 +18,23 @@ import ConsultationModal from './components/ConsultationModal';
 import OnboardDoctorModal from './components/OnboardDoctorModal';
 import HospitalSettingsModal from './components/HospitalSettingsModal';
 import AuthPage from './components/AuthPage';
+import { 
+  Calendar, 
+  FileText, 
+  FlaskConical, 
+  Receipt, 
+  Sparkles, 
+  BedDouble, 
+  LayoutDashboard, 
+  Tv, 
+  Stethoscope 
+} from 'lucide-react';
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [hospitalInfo, setHospitalInfo] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modals state
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -174,6 +186,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         user={user}
         hospitalInfo={hospitalInfo}
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -185,6 +199,7 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           onOpenHospitalSettings={() => setIsHospitalSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)}
           onOpenBookModal={() => {
             setPreselectedDeptId(null);
             setPreselectedDocId(null);
@@ -319,6 +334,129 @@ export default function App() {
           setActiveTab('prescriptions');
         }}
       />
+
+      {/* Mobile Bottom Navigation Bar (Smartphones <= 768px) */}
+      <nav className="mobile-bottom-nav">
+        {user?.role === 'patient' && (
+          <>
+            <button
+              className={`mobile-nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+              onClick={() => setActiveTab('appointments')}
+            >
+              <Calendar size={18} />
+              <span>Visits</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('prescriptions')}
+            >
+              <FileText size={18} />
+              <span>Rx</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'lab-reports' ? 'active' : ''}`}
+              onClick={() => setActiveTab('lab-reports')}
+            >
+              <FlaskConical size={18} />
+              <span>Labs</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
+              onClick={() => setActiveTab('billing')}
+            >
+              <Receipt size={18} />
+              <span>Bills</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'ai-triage' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ai-triage')}
+            >
+              <Sparkles size={18} />
+              <span>AI</span>
+            </button>
+          </>
+        )}
+
+        {user?.role === 'doctor' && (
+          <>
+            <button
+              className={`mobile-nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+              onClick={() => setActiveTab('appointments')}
+            >
+              <Calendar size={18} />
+              <span>OPD</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('prescriptions')}
+            >
+              <FileText size={18} />
+              <span>Rx</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'beds' ? 'active' : ''}`}
+              onClick={() => setActiveTab('beds')}
+            >
+              <BedDouble size={18} />
+              <span>Beds</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'lab-reports' ? 'active' : ''}`}
+              onClick={() => setActiveTab('lab-reports')}
+            >
+              <FlaskConical size={18} />
+              <span>Labs</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'ai-triage' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ai-triage')}
+            >
+              <Sparkles size={18} />
+              <span>AI</span>
+            </button>
+          </>
+        )}
+
+        {user?.role === 'admin' && (
+          <>
+            <button
+              className={`mobile-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              <LayoutDashboard size={18} />
+              <span>Center</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'live-queue' ? 'active' : ''}`}
+              onClick={() => setActiveTab('live-queue')}
+            >
+              <Tv size={18} />
+              <span>Queue</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+              onClick={() => setActiveTab('appointments')}
+            >
+              <Calendar size={18} />
+              <span>OPD</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
+              onClick={() => setActiveTab('billing')}
+            >
+              <Receipt size={18} />
+              <span>Bills</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'doctors' ? 'active' : ''}`}
+              onClick={() => setActiveTab('doctors')}
+            >
+              <Stethoscope size={18} />
+              <span>Staff</span>
+            </button>
+          </>
+        )}
+      </nav>
     </div>
   );
 }

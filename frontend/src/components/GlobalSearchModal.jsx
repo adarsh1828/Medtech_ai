@@ -15,8 +15,6 @@ import {
 import { api } from '../api';
 
 export default function GlobalSearchModal({ isOpen, onClose, onNavigate }) {
-  if (!isOpen) return null;
-
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
@@ -29,9 +27,11 @@ export default function GlobalSearchModal({ isOpen, onClose, onNavigate }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
-    loadAllSearchData();
-  }, []);
+    if (isOpen) {
+      inputRef.current?.focus();
+      loadAllSearchData();
+    }
+  }, [isOpen]);
 
   const loadAllSearchData = async () => {
     setLoading(true);
@@ -159,6 +159,8 @@ export default function GlobalSearchModal({ isOpen, onClose, onNavigate }) {
     onNavigate(item.tab);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 9999, alignItems: 'flex-start', paddingTop: '12vh' }}>
