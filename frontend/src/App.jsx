@@ -35,6 +35,31 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [hospitalInfo, setHospitalInfo] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('medtech_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('medtech_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth <= 768) {
+      setIsMobileMenuOpen(prev => !prev);
+    } else {
+      toggleSidebarCollapse();
+    }
+  };
 
   // Modals state
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -188,6 +213,8 @@ export default function App() {
         hospitalInfo={hospitalInfo}
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapse}
       />
 
       {/* Main Content Area */}
@@ -199,7 +226,8 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           onOpenHospitalSettings={() => setIsHospitalSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
-          onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={handleToggleSidebar}
           onOpenBookModal={() => {
             setPreselectedDeptId(null);
             setPreselectedDocId(null);

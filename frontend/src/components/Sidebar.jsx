@@ -15,11 +15,22 @@ import {
   UserCheck,
   Shield,
   User,
-  X
+  X,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, isMobileOpen, onCloseMobile }) {
+export default function Sidebar({ 
+  activeTab, 
+  setActiveTab, 
+  user, 
+  hospitalInfo, 
+  isMobileOpen, 
+  onCloseMobile,
+  isCollapsed,
+  onToggleCollapse
+}) {
   const { t } = useLanguage();
 
   const userRole = user?.role || 'patient';
@@ -174,10 +185,10 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, i
         />
       )}
 
-      <aside className={`app-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+      <aside className={`app-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
         {/* Brand Header */}
         <div style={{
-          padding: '20px 18px',
+          padding: isCollapsed ? '16px 8px' : '20px 18px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           flexDirection: 'column',
@@ -185,12 +196,12 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, i
           position: 'relative'
         }}>
           {/* Powered by MedTech AI Badge & Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between' }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '3px 8px',
+              padding: isCollapsed ? '4px' : '3px 8px',
               borderRadius: '20px',
               background: 'rgba(6, 182, 212, 0.12)',
               border: '1px solid rgba(6, 182, 212, 0.3)',
@@ -198,21 +209,48 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, i
               fontWeight: '700',
               color: '#38bdf8',
               letterSpacing: '0.04em'
-            }}>
-              <HeartPulse className="heartbeat-icon" size={12} />
-              {t('brand.poweredBy', 'POWERED BY MEDTECH AI')}
+            }}
+            title={t('brand.poweredBy', 'POWERED BY MEDTECH AI')}
+            >
+              <HeartPulse className="heartbeat-icon" size={14} />
+              {!isCollapsed && <span>{t('brand.poweredBy', 'POWERED BY MEDTECH AI')}</span>}
             </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                fontSize: '0.65rem',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                background: 'rgba(16, 185, 129, 0.15)',
-                color: '#34d399',
-                fontWeight: '700'
-              }}>
-                {t('brand.live', 'LIVE')}
-              </span>
+              {!isCollapsed && (
+                <span style={{
+                  fontSize: '0.65rem',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  fontWeight: '700'
+                }}>
+                  {t('brand.live', 'LIVE')}
+                </span>
+              )}
+
+              {/* Fold Sidebar Toggle Button (Desktop) */}
+              <button
+                onClick={onToggleCollapse}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '6px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '5px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s ease'
+                }}
+                title={isCollapsed ? "Unfold Sidebar (Expand Menu)" : "Fold Sidebar (Maximize Dashboard)"}
+              >
+                {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+              </button>
+
+              {/* Mobile Close Button */}
               {isMobileOpen && (
                 <button
                   onClick={onCloseMobile}
@@ -222,7 +260,7 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, i
                     borderRadius: '6px',
                     color: 'var(--text-secondary)',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: '5px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -235,168 +273,182 @@ export default function Sidebar({ activeTab, setActiveTab, user, hospitalInfo, i
             </div>
           </div>
 
-        {/* Big Prominent Hospital Name */}
-        <div>
-          <h1 style={{ 
-            fontFamily: 'var(--font-display)', 
-            fontWeight: '800', 
-            fontSize: '1.15rem', 
-            lineHeight: '1.25',
-            letterSpacing: '-0.02em',
-            textTransform: 'uppercase',
-            color: 'var(--text-primary)',
-            textShadow: '0 2px 10px rgba(6, 182, 212, 0.15)'
-          }}>
-            {hospitalInfo?.hospital_name || t('brand.defaultHospital', 'CITY MULTI-SPECIALTY HOSPITAL')}
-          </h1>
-          <div style={{ 
-            fontSize: '0.72rem', 
-            color: 'var(--text-secondary)',
-            marginTop: '3px',
-            lineHeight: '1.3'
-          }}>
-            {hospitalInfo?.tagline || t('brand.defaultTagline', 'Tertiary Clinical Care & 24x7 Trauma Center')}
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div style={{ padding: '20px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
-        <div style={{ 
-          fontSize: '0.68rem', 
-          fontWeight: '700', 
-          textTransform: 'uppercase', 
-          letterSpacing: '0.08em', 
-          color: 'var(--text-muted)',
-          padding: '0 12px 8px 12px' 
-        }}>
-          {getRoleSectionHeader()}
+          {/* Big Prominent Hospital Name */}
+          {!isCollapsed && (
+            <div>
+              <h1 style={{ 
+                fontFamily: 'var(--font-display)', 
+                fontWeight: '800', 
+                fontSize: '1.15rem', 
+                lineHeight: '1.25',
+                letterSpacing: '-0.02em',
+                textTransform: 'uppercase',
+                color: 'var(--text-primary)',
+                textShadow: '0 2px 10px rgba(6, 182, 212, 0.15)'
+              }}>
+                {hospitalInfo?.hospital_name || t('brand.defaultHospital', 'CITY MULTI-SPECIALTY HOSPITAL')}
+              </h1>
+              <div style={{ 
+                fontSize: '0.72rem', 
+                color: 'var(--text-secondary)',
+                marginTop: '3px',
+                lineHeight: '1.3'
+              }}>
+                {hospitalInfo?.tagline || t('brand.defaultTagline', 'Tertiary Clinical Care & 24x7 Trauma Center')}
+              </div>
+            </div>
+          )}
         </div>
 
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                onCloseMobile?.();
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: isActive ? '600' : '500',
-                color: isActive ? '#38bdf8' : 'var(--text-secondary)',
-                backgroundColor: isActive ? 'rgba(6, 182, 212, 0.08)' : 'transparent',
-                border: '1px solid',
-                borderColor: isActive ? 'rgba(6, 182, 212, 0.25)' : 'transparent',
-                cursor: 'pointer',
-                textAlign: 'left',
-                width: '100%',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                }
-              }}
-            >
-              <Icon size={18} style={{ color: isActive ? '#38bdf8' : 'var(--text-muted)' }} />
-              <span style={{ flex: 1 }}>{item.label}</span>
-              {item.badge && (
-                <span style={{
-                  fontSize: '0.65rem',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)',
-                  color: '#fff',
-                  fontWeight: '700'
-                }}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* User Profile Card in Sidebar Footer */}
-      {user && (
-        <div style={{
-          padding: '12px 16px',
-          borderTop: '1px solid var(--border-subtle)',
-          backgroundColor: 'rgba(255, 255, 255, 0.015)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: userRole === 'admin' ? 'rgba(244, 63, 94, 0.15)' : userRole === 'doctor' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-            border: `1px solid ${userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399'}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399',
-            flexShrink: 0
-          }}>
-            {userRole === 'admin' ? <Shield size={18} /> : userRole === 'doctor' ? <Stethoscope size={18} /> : <UserCheck size={18} />}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              fontSize: '0.85rem',
-              fontWeight: '700',
-              color: 'var(--text-primary)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
+        {/* Navigation */}
+        <div style={{ padding: isCollapsed ? '16px 8px' : '20px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
+          {!isCollapsed && (
+            <div style={{ 
+              fontSize: '0.68rem', 
+              fontWeight: '700', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.08em', 
+              color: 'var(--text-muted)',
+              padding: '0 12px 8px 12px' 
             }}>
-              {user.fullName || user.email}
+              {getRoleSectionHeader()}
             </div>
-            <div style={{ marginTop: '2px' }}>
-              {getRoleBadge(userRole)}
+          )}
+
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  onCloseMobile?.();
+                }}
+                title={item.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: isCollapsed ? 'center' : 'flex-start',
+                  gap: '12px',
+                  padding: isCollapsed ? '12px 0' : '10px 14px',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: isActive ? '600' : '500',
+                  color: isActive ? '#38bdf8' : 'var(--text-secondary)',
+                  backgroundColor: isActive ? 'rgba(6, 182, 212, 0.08)' : 'transparent',
+                  border: '1px solid',
+                  borderColor: isActive ? 'rgba(6, 182, 212, 0.25)' : 'transparent',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }
+                }}
+              >
+                <Icon size={isCollapsed ? 20 : 18} style={{ color: isActive ? '#38bdf8' : 'var(--text-muted)' }} />
+                {!isCollapsed && <span style={{ flex: 1 }}>{item.label}</span>}
+                {!isCollapsed && item.badge && (
+                  <span style={{
+                    fontSize: '0.65rem',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)',
+                    color: '#fff',
+                    fontWeight: '700'
+                  }}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* User Profile Card in Sidebar Footer */}
+        {user && (
+          <div 
+            style={{
+              padding: isCollapsed ? '12px 0' : '12px 16px',
+              borderTop: '1px solid var(--border-subtle)',
+              backgroundColor: 'rgba(255, 255, 255, 0.015)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isCollapsed ? 'center' : 'flex-start',
+              gap: '10px'
+            }}
+            title={user.fullName || user.email}
+          >
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: userRole === 'admin' ? 'rgba(244, 63, 94, 0.15)' : userRole === 'doctor' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+              border: `1px solid ${userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399',
+              flexShrink: 0
+            }}>
+              {userRole === 'admin' ? <Shield size={18} /> : userRole === 'doctor' ? <Stethoscope size={18} /> : <UserCheck size={18} />}
+            </div>
+            {!isCollapsed && (
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {user.fullName || user.email}
+                </div>
+                <div style={{ marginTop: '2px' }}>
+                  {getRoleBadge(userRole)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Hospital Status Footer */}
+        {!isCollapsed && (
+          <div style={{
+            padding: '14px 16px',
+            borderTop: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--bg-card-subtle)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#10b981',
+                boxShadow: '0 0 8px #10b981'
+              }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#34d399' }}>
+                {t('brand.statusReady', 'EMERGENCY READY')}
+              </span>
+            </div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              {t('brand.statusSubtext', 'SQLite WAL • Level-1 Trauma Active')}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Hospital Status Footer */}
-      <div style={{
-        padding: '14px 16px',
-        borderTop: '1px solid var(--border-subtle)',
-        backgroundColor: 'var(--bg-card-subtle)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: '#10b981',
-            boxShadow: '0 0 8px #10b981'
-          }} />
-          <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#34d399' }}>
-            {t('brand.statusReady', 'EMERGENCY READY')}
-          </span>
-        </div>
-        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-          {t('brand.statusSubtext', 'SQLite WAL • Level-1 Trauma Active')}
-        </div>
-      </div>
-    </aside>
-    </>
-  );
-}
+        )}
+      </aside>
+      </>
+    );
+  }

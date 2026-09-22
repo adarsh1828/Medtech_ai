@@ -15,12 +15,24 @@ import {
   Sun, 
   Moon,
   Search,
-  Menu
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
-export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, onOpenBookModal, onOpenHospitalSettings, onOpenSearch, onToggleMobileMenu }) {
+export default function TopHeader({ 
+  user, 
+  onQuickLogin, 
+  onLogout, 
+  onOpenLogin, 
+  onOpenBookModal, 
+  onOpenHospitalSettings, 
+  onOpenSearch, 
+  isSidebarCollapsed, 
+  onToggleSidebar 
+}) {
   const { language, setLanguage, t, supportedLanguages, currentLangMeta } = useLanguage();
   const { theme, toggleTheme, isDark } = useTheme();
   const [timeStr, setTimeStr] = useState('');
@@ -63,15 +75,15 @@ export default function TopHeader({ user, onQuickLogin, onLogout, onOpenLogin, o
 
   return (
     <header className="top-header">
-      {/* Left: Mobile Drawer Trigger & Live Clock */}
+      {/* Left: Sidebar Fold/Expand Toggle & Live Clock */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
-          className="mobile-menu-btn"
-          onClick={onToggleMobileMenu}
-          title="Open Menu"
-          aria-label="Open Navigation Menu"
+          className="sidebar-toggle-btn"
+          onClick={onToggleSidebar}
+          title={isSidebarCollapsed ? "Unfold Sidebar (Expand Menu)" : "Fold Sidebar (Maximize Dashboard)"}
+          aria-label="Toggle Sidebar"
         >
-          <Menu size={20} />
+          {isSidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
         <div style={{
