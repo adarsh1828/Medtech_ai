@@ -532,14 +532,15 @@ export async function initializeDatabase() {
   try {
     const userMaster = await getOne("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Users'");
     if (userMaster && userMaster.sql && !userMaster.sql.includes("'nurse'")) {
-      console.log('Migrating Users table to allow nurse and cleaning roles in CHECK constraint...');
+      console.log('Migrating Users table to allow nurse and cleaning roles...');
       await run('PRAGMA foreign_keys = OFF');
+      await run('DROP TABLE IF EXISTS Users_migration');
       await run(`
         CREATE TABLE Users_migration (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           email TEXT UNIQUE NOT NULL,
           password_hash TEXT NOT NULL,
-          role TEXT NOT NULL CHECK(role IN ('patient', 'doctor', 'admin', 'nurse', 'cleaning', 'staff')),
+          role TEXT NOT NULL,
           full_name TEXT NOT NULL,
           phone TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -549,7 +550,7 @@ export async function initializeDatabase() {
       await run('DROP TABLE Users');
       await run('ALTER TABLE Users_migration RENAME TO Users');
       await run('PRAGMA foreign_keys = ON');
-      console.log('Users table successfully migrated to support nurse and cleaning roles.');
+      console.log('Users table successfully migrated to support all roles.');
     }
   } catch (err) {
     console.error('Error migrating Users role CHECK constraint:', err);
@@ -575,7 +576,11 @@ export async function initializeDatabase() {
   await seedDefaultInvoices();
 
   // Seed staff (nurse, cleaning) and sanitation QR tasks
-  await seedStaffAndSanitation();
+  try {
+    await seedStaffAndSanitation();
+  } catch (err) {
+    console.error('Staff and sanitation seed warning:', err.message);
+  }
 }
 
 // Idempotent Seeding Helper Functions
