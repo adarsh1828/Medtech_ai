@@ -528,6 +528,33 @@ export async function initializeDatabase() {
     console.error('Error migrating Appointments status CHECK constraint:', err);
   }
 
+  // Auto-migration for Users role to allow 'nurse', 'cleaning', 'staff' in CHECK constraint
+  try {
+    const userMaster = await getOne("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Users'");
+    if (userMaster && userMaster.sql && !userMaster.sql.includes("'nurse'")) {
+      console.log('Migrating Users table to allow nurse and cleaning roles in CHECK constraint...');
+      await run('PRAGMA foreign_keys = OFF');
+      await run(`
+        CREATE TABLE Users_migration (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL CHECK(role IN ('patient', 'doctor', 'admin', 'nurse', 'cleaning', 'staff')),
+          full_name TEXT NOT NULL,
+          phone TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      await run('INSERT INTO Users_migration (id, email, password_hash, role, full_name, phone, created_at) SELECT id, email, password_hash, role, full_name, phone, created_at FROM Users');
+      await run('DROP TABLE Users');
+      await run('ALTER TABLE Users_migration RENAME TO Users');
+      await run('PRAGMA foreign_keys = ON');
+      console.log('Users table successfully migrated to support nurse and cleaning roles.');
+    }
+  } catch (err) {
+    console.error('Error migrating Users role CHECK constraint:', err);
+  }
+
   // Auto-migration for Doctors table: ensure status and approved_at columns exist
   try {
     await run("ALTER TABLE Doctors ADD COLUMN status TEXT DEFAULT 'approved'");
