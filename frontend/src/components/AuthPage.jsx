@@ -18,7 +18,9 @@ import {
   ArrowRight,
   Activity,
   Sparkles,
-  KeyRound
+  KeyRound,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { api, setStoredToken, setStoredUser } from '../api';
 import { useLanguage } from '../context/LanguageContext';
@@ -31,6 +33,8 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
   const [tab, setTab] = useState('login'); // 'login' | 'register' | 'doctor_register' | 'admin_register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -723,15 +727,39 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Lock size={14} color="var(--primary)" /> Password
                   </label>
-                  <input
-                    type="password"
-                    required
-                    className="form-input"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{ height: '42px' }}
-                  />
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      className="form-input"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      style={{ height: '42px', paddingRight: '42px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: showPassword ? 'var(--primary)' : 'var(--text-muted)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '6px',
+                        borderRadius: '6px',
+                        transition: 'color 0.15s ease'
+                      }}
+                      title={showPassword ? "Hide Password / पासवर्ड लपवा" : "Show Password / पासवर्ड पाहा"}
+                      aria-label={showPassword ? "Hide Password" : "Show Password"}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -789,14 +817,39 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
 
                   <div className="form-group">
                     <label className="form-label">Account Password *</label>
-                    <input
-                      type="password"
-                      required
-                      className="form-input"
-                      placeholder="••••••••"
-                      value={regForm.password}
-                      onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
-                    />
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={regForm.password}
+                        onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px',
+                          borderRadius: '6px',
+                          transition: 'color 0.15s ease'
+                        }}
+                        title={showRegPassword ? "Hide Password / पासवर्ड लपवा" : "Show Password / पासवर्ड पाहा"}
+                        aria-label={showRegPassword ? "Hide Password" : "Show Password"}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -1052,14 +1105,39 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
 
                   <div className="form-group">
                     <label className="form-label">Account Password *</label>
-                    <input
-                      type="password"
-                      required
-                      className="form-input"
-                      placeholder="••••••••"
-                      value={docForm.password}
-                      onChange={(e) => setDocForm({ ...docForm, password: e.target.value })}
-                    />
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={docForm.password}
+                        onChange={(e) => setDocForm({ ...docForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px',
+                          borderRadius: '6px',
+                          transition: 'color 0.15s ease'
+                        }}
+                        title={showRegPassword ? "Hide Password / पासवर्ड लपवा" : "Show Password / पासवर्ड पाहा"}
+                        aria-label={showRegPassword ? "Hide Password" : "Show Password"}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -1194,14 +1272,39 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
 
                   <div className="form-group">
                     <label className="form-label">Admin Password *</label>
-                    <input
-                      type="password"
-                      required
-                      className="form-input"
-                      placeholder="••••••••"
-                      value={adminForm.password}
-                      onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
-                    />
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={adminForm.password}
+                        onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px',
+                          borderRadius: '6px',
+                          transition: 'color 0.15s ease'
+                        }}
+                        title={showRegPassword ? "Hide Password / पासवर्ड लपवा" : "Show Password / पासवर्ड पाहा"}
+                        aria-label={showRegPassword ? "Hide Password" : "Show Password"}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="form-group">
