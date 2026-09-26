@@ -18,7 +18,6 @@ import ConsultationModal from './components/ConsultationModal';
 import OnboardDoctorModal from './components/OnboardDoctorModal';
 import HospitalSettingsModal from './components/HospitalSettingsModal';
 import EmergencySOSModal from './components/EmergencySOSModal';
-import HospitalPitchBar from './components/HospitalPitchBar';
 import AuthPage from './components/AuthPage';
 import { 
   Calendar, 
@@ -240,13 +239,6 @@ export default function App() {
         />
 
         <main className="content-inner" key={refreshKey}>
-          {/* Executive Hospital Presentation & Role Showcase Bar */}
-          <HospitalPitchBar
-            user={user}
-            onQuickLogin={handleQuickLogin}
-            onOpenEmergency={() => setIsEmergencyOpen(true)}
-          />
-
           {activeTab === 'dashboard' && user?.role === 'admin' && (
             <DashboardView
               user={user}
