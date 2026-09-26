@@ -97,7 +97,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.2s ease-out' }}>
       {/* Top Hero Banner */}
-      <div style={{
+      <div className="dashboard-hero-banner" style={{
         background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(139, 92, 246, 0.08) 100%)',
         border: '1px solid rgba(6, 182, 212, 0.3)',
         borderTop: '1px solid rgba(6, 182, 212, 0.5)',
@@ -151,7 +151,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', zIndex: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div className="dashboard-hero-actions" style={{ display: 'flex', gap: '12px', zIndex: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button
             onClick={() => setActiveTab('ai-triage')}
             className="btn btn-outline"
@@ -182,11 +182,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
       </div>
 
       {/* Quick Action Executive Command Dock */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px'
-      }}>
+      <div className="dashboard-quick-dock">
         <button
           onClick={() => setActiveTab('appointments')}
           className="glass-card"
@@ -349,7 +345,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
       )}
 
       {/* Main 2-Column Section: Appointments Queue + Department Bed Distribution */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px' }}>
+      <div className="dashboard-main-grid">
         {/* Appointments Queue */}
         <div className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>

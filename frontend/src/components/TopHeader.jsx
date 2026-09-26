@@ -17,7 +17,8 @@ import {
   Search,
   Menu,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  HeartPulse
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -76,8 +77,8 @@ export default function TopHeader({
 
   return (
     <header className="top-header">
-      {/* Left: Sidebar Fold/Expand Toggle & Live Clock */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      {/* Left: Sidebar Fold/Expand Toggle & Mobile Brand & Live Clock */}
+      <div className="top-header-left" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <button
           className="sidebar-toggle-btn"
           onClick={onToggleSidebar}
@@ -87,7 +88,24 @@ export default function TopHeader({
           {isSidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
-        <div style={{
+        {/* Mobile Brand Title (visible only on mobile <= 768px) */}
+        <div className="show-on-mobile-flex" style={{ alignItems: 'center', gap: '6px' }}>
+          <HeartPulse size={18} color="var(--primary)" className="heartbeat-icon" />
+          <span style={{
+            fontWeight: '800',
+            fontSize: '0.95rem',
+            background: 'linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap'
+          }}>
+            MedTech AI
+          </span>
+        </div>
+
+        {/* Desktop Live Clock */}
+        <div className="hide-on-mobile" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -104,6 +122,7 @@ export default function TopHeader({
           <span>{timeStr || t('header.liveClock', 'LIVE')}</span>
         </div>
 
+        {/* Desktop NABH Badge */}
         <div className="hide-on-mobile" style={{
           display: 'flex',
           alignItems: 'center',
@@ -122,11 +141,12 @@ export default function TopHeader({
       </div>
 
       {/* Right: Actions & User Info & Language Selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+      <div className="top-header-actions">
         
-        {/* Global Spotlight Search Button */}
+        {/* Global Spotlight Search Button - Desktop Only */}
         <button
           onClick={onOpenSearch}
+          className="hide-on-mobile"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -143,8 +163,8 @@ export default function TopHeader({
           title="Spotlight Search (Ctrl + K)"
         >
           <Search size={14} color="var(--primary)" />
-          <span className="hide-on-mobile" style={{ display: 'inline-block' }}>Search...</span>
-          <kbd className="hide-on-mobile" style={{
+          <span>Search...</span>
+          <kbd style={{
             fontSize: '0.65rem',
             padding: '2px 5px',
             borderRadius: '4px',
@@ -168,7 +188,7 @@ export default function TopHeader({
               gap: '6px',
               background: isLangDropdownOpen ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255, 255, 255, 0.04)',
               border: `1px solid ${isLangDropdownOpen ? 'rgba(6, 182, 212, 0.5)' : 'var(--border-subtle)'}`,
-              padding: '6px 10px',
+              padding: '6px 9px',
               borderRadius: '8px',
               color: isLangDropdownOpen ? '#38bdf8' : 'var(--text-primary)',
               fontSize: '0.8rem',
@@ -178,9 +198,9 @@ export default function TopHeader({
             }}
             title={t('header.languages', 'Language')}
           >
-            <Globe size={15} color="var(--primary)" />
+            <Globe size={15} color="var(--primary)" className="hide-on-mobile" />
             <span style={{ fontSize: '0.9rem' }}>{currentLangMeta?.flag}</span>
-            <span style={{ fontWeight: '600' }}>{currentLangMeta?.nativeLabel}</span>
+            <span className="hide-on-mobile" style={{ fontWeight: '600' }}>{currentLangMeta?.nativeLabel}</span>
             <ChevronDown size={14} style={{ opacity: 0.7, transform: isLangDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
           </button>
 
@@ -271,25 +291,26 @@ export default function TopHeader({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '35px',
-            height: '35px',
+            width: '34px',
+            height: '34px',
             borderRadius: '8px',
             background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.05)',
             border: '1px solid var(--border-subtle)',
             color: isDark ? '#fbbf24' : '#0284c7',
             cursor: 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            flexShrink: 0
           }}
           title={isDark ? 'Switch to Day Mode' : 'Switch to Night Mode'}
         >
-          {isDark ? <Sun size={17} /> : <Moon size={17} />}
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
+        {/* Hospital Settings - Desktop Only */}
         {user?.role === 'admin' && (
-
           <button
             onClick={onOpenHospitalSettings}
-            className="btn btn-outline btn-sm"
+            className="btn btn-outline btn-sm hide-on-mobile"
             style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#38bdf8' }}
             title="Configure Hospital Name and White-label Branding"
           >
@@ -305,41 +326,47 @@ export default function TopHeader({
             color: '#ffffff',
             border: 'none',
             borderRadius: '8px',
-            padding: '6px 12px',
-            fontSize: '0.8rem',
+            padding: '6px 10px',
+            fontSize: '0.78rem',
             fontWeight: '800',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '5px',
             cursor: 'pointer',
             boxShadow: '0 2px 10px rgba(225, 29, 72, 0.35)',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.15s ease',
+            flexShrink: 0
           }}
           title="24x7 Ambulance & Emergency Trauma Center"
         >
           <span className="telemetry-beacon-emergency" />
-          <span>🚨 SOS 108</span>
+          <span className="hide-on-mobile">🚨 SOS 108</span>
+          <span className="show-on-mobile-inline">🚨 108</span>
         </button>
 
+        {/* Book Appointment - Desktop Only (Mobile has it on Dashboard & Bottom Nav) */}
         <button
           onClick={onOpenBookModal}
-          className="btn btn-primary btn-sm"
+          className="btn btn-primary btn-sm hide-on-mobile"
         >
           <Plus size={16} /> {t('header.bookAppointment', 'Book Appointment')}
         </button>
 
+        {/* User Account / Auth Section */}
         {user ? (
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '8px',
             background: 'var(--bg-card)',
             border: '1px solid var(--border-subtle)',
-            padding: '6px 12px 6px 14px',
-            borderRadius: '10px'
+            padding: '4px 8px',
+            borderRadius: '10px',
+            flexShrink: 0
           }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+            {/* Desktop user full name & badge */}
+            <div className="hide-on-mobile" style={{ textAlign: 'right', paddingRight: '4px' }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-primary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user.fullName || user.email}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2px' }}>
@@ -347,21 +374,43 @@ export default function TopHeader({
               </div>
             </div>
 
+            {/* Mobile compact role avatar circle */}
+            <div className="show-on-mobile-flex" style={{ alignItems: 'center' }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: user.role === 'admin' ? 'rgba(244, 63, 94, 0.2)' : user.role === 'doctor' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                border: `1px solid ${user.role === 'admin' ? '#f43f5e' : user.role === 'doctor' ? '#06b6d4' : '#10b981'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                color: user.role === 'admin' ? '#fb7185' : user.role === 'doctor' ? '#38bdf8' : '#34d399'
+              }}
+              title={`${user.fullName || user.email} (${user.role})`}
+              >
+                {(user.fullName?.[0] || user.role?.[0] || 'U').toUpperCase()}
+              </div>
+            </div>
+
             <button
               onClick={onLogout}
               className="btn btn-outline btn-sm"
-              style={{ padding: '6px', color: 'var(--text-muted)' }}
+              style={{ padding: '6px', color: 'var(--text-muted)', minHeight: 'unset', height: '30px', width: '30px' }}
               title={t('header.signOut', 'Sign Out')}
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
             </button>
           </div>
         ) : (
           <button
             onClick={onOpenLogin}
             className="btn btn-outline btn-sm"
+            style={{ padding: '6px 12px', minHeight: 'unset', height: '32px' }}
           >
-            <User size={15} /> {t('header.signIn', 'Sign In')}
+            <User size={15} /> <span className="hide-on-mobile">{t('header.signIn', 'Sign In')}</span>
           </button>
         )}
       </div>

@@ -44,7 +44,7 @@ export default function LabReportsView({ user }) {
           <h3>No Diagnostic Reports Found</h3>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '18px' }}>
+        <div className="lab-reports-grid">
           {reports.map((rpt) => {
             const isCompleted = rpt.status === 'completed';
 

@@ -261,7 +261,7 @@ export default function LiveQueueView({ user, hospitalInfo }) {
       </div>
 
       {/* Grid: Doctor Cabin Status & Upcoming Queue */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      <div className="live-queue-grid">
         {/* Active Doctor Cabin Chambers */}
         <div className="glass-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>

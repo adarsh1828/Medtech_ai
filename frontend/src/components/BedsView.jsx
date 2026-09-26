@@ -206,7 +206,7 @@ export default function BedsView({ user }) {
           <h3>No Beds Found in this Filter</h3>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+        <div className="beds-grid">
           {filteredBeds.map((bed) => {
             const isAvailable = bed.status === 'available';
             const isOccupied = bed.status === 'occupied';

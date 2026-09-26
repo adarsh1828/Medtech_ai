@@ -153,7 +153,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '16px' }}>
+        <div className="appointments-grid">
           {filteredAppointments.map((appt) => {
             const isDoctor = user?.role === 'doctor';
             const isAdmin = user?.role === 'admin';

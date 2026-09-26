@@ -255,7 +255,7 @@ export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDocto
               </p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '18px' }}>
+            <div className="doctors-grid">
               {pendingDoctors.map((pDoc) => (
                 <div
                   key={pDoc.id}
@@ -426,7 +426,7 @@ export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDocto
               <h3>No Physicians Found</h3>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '18px' }}>
+            <div className="doctors-grid">
               {filteredDoctors.map((doc) => {
                 const isOnDuty = !!doc.is_on_duty;
                 const canToggleDuty = user?.role === 'admin' || (user?.role === 'doctor' && user.doctorId === doc.id);
