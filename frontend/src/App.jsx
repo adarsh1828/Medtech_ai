@@ -19,6 +19,8 @@ import OnboardDoctorModal from './components/OnboardDoctorModal';
 import HospitalSettingsModal from './components/HospitalSettingsModal';
 import EmergencySOSModal from './components/EmergencySOSModal';
 import AuthPage from './components/AuthPage';
+import NurseStationView from './components/NurseStationView';
+import HousekeepingView from './components/HousekeepingView';
 import { 
   Calendar, 
   FileText, 
@@ -28,7 +30,9 @@ import {
   BedDouble, 
   LayoutDashboard, 
   Tv, 
-  Stethoscope 
+  Stethoscope,
+  HeartPulse,
+  QrCode
 } from 'lucide-react';
 
 export default function App() {
@@ -85,7 +89,11 @@ export default function App() {
     const stored = getStoredUser();
     if (stored) {
       setUser(stored);
-      if (stored.role === 'patient' || stored.role === 'doctor') {
+      if (stored.role === 'nurse') {
+        setActiveTab('nurse-station');
+      } else if (stored.role === 'cleaning') {
+        setActiveTab('housekeeping');
+      } else if (stored.role === 'patient' || stored.role === 'doctor') {
         setActiveTab('appointments');
       } else {
         setActiveTab('dashboard');
@@ -108,13 +116,23 @@ export default function App() {
   // Guard activeTab based on user role to prevent accessing unauthorized views
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'patient') {
+    if (user.role === 'nurse') {
+      const allowed = ['nurse-station', 'beds', 'prescriptions', 'lab-reports'];
+      if (!allowed.includes(activeTab)) {
+        setActiveTab('nurse-station');
+      }
+    } else if (user.role === 'cleaning') {
+      const allowed = ['housekeeping'];
+      if (!allowed.includes(activeTab)) {
+        setActiveTab('housekeeping');
+      }
+    } else if (user.role === 'patient') {
       const allowed = ['appointments', 'prescriptions', 'lab-reports', 'billing', 'ai-triage'];
       if (!allowed.includes(activeTab)) {
         setActiveTab('appointments');
       }
     } else if (user.role === 'doctor') {
-      const allowed = ['appointments', 'prescriptions', 'beds', 'lab-reports', 'ai-triage'];
+      const allowed = ['appointments', 'prescriptions', 'beds', 'lab-reports', 'ai-triage', 'nurse-station'];
       if (!allowed.includes(activeTab)) {
         setActiveTab('appointments');
       }
@@ -137,7 +155,11 @@ export default function App() {
     if (hospital) {
       setHospitalInfo(hospital);
     }
-    if (loggedUser.role === 'patient' || loggedUser.role === 'doctor') {
+    if (loggedUser.role === 'nurse') {
+      setActiveTab('nurse-station');
+    } else if (loggedUser.role === 'cleaning') {
+      setActiveTab('housekeeping');
+    } else if (loggedUser.role === 'patient' || loggedUser.role === 'doctor') {
       setActiveTab('appointments');
     } else {
       setActiveTab('dashboard');
@@ -151,7 +173,11 @@ export default function App() {
       setStoredToken(res.token);
       setStoredUser(res.user);
       setUser(res.user);
-      if (res.user.role === 'patient' || res.user.role === 'doctor') {
+      if (res.user.role === 'nurse') {
+        setActiveTab('nurse-station');
+      } else if (res.user.role === 'cleaning') {
+        setActiveTab('housekeeping');
+      } else if (res.user.role === 'patient' || res.user.role === 'doctor') {
         setActiveTab('appointments');
       } else {
         setActiveTab('dashboard');
@@ -303,6 +329,20 @@ export default function App() {
           {activeTab === 'ai-triage' && (
             <AITriageView
               onBookWithDepartment={handleBookWithDepartment}
+            />
+          )}
+
+          {activeTab === 'nurse-station' && (
+            <NurseStationView
+              user={user}
+              hospitalInfo={hospitalInfo}
+            />
+          )}
+
+          {activeTab === 'housekeeping' && (
+            <HousekeepingView
+              user={user}
+              hospitalInfo={hospitalInfo}
             />
           )}
         </main>
@@ -492,6 +532,51 @@ export default function App() {
             >
               <Stethoscope size={18} />
               <span>Staff</span>
+            </button>
+          </>
+        )}
+
+        {user?.role === 'nurse' && (
+          <>
+            <button
+              className={`mobile-nav-item ${activeTab === 'nurse-station' ? 'active' : ''}`}
+              onClick={() => setActiveTab('nurse-station')}
+            >
+              <HeartPulse size={18} />
+              <span>Station</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'beds' ? 'active' : ''}`}
+              onClick={() => setActiveTab('beds')}
+            >
+              <BedDouble size={18} />
+              <span>Beds</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('prescriptions')}
+            >
+              <FileText size={18} />
+              <span>Rx Meds</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${activeTab === 'lab-reports' ? 'active' : ''}`}
+              onClick={() => setActiveTab('lab-reports')}
+            >
+              <FlaskConical size={18} />
+              <span>Labs</span>
+            </button>
+          </>
+        )}
+
+        {user?.role === 'cleaning' && (
+          <>
+            <button
+              className={`mobile-nav-item ${activeTab === 'housekeeping' ? 'active' : ''}`}
+              onClick={() => setActiveTab('housekeeping')}
+            >
+              <QrCode size={18} />
+              <span>QR Clean</span>
             </button>
           </>
         )}

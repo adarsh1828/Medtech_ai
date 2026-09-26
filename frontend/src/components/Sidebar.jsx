@@ -68,10 +68,24 @@ export default function Sidebar({
       roles: ['admin', 'doctor', 'patient']
     },
     { 
+      id: 'nurse-station', 
+      label: 'Nurse Station & Meds', 
+      icon: HeartPulse, 
+      badge: 'CLINICAL',
+      roles: ['nurse', 'admin', 'doctor']
+    },
+    { 
+      id: 'housekeeping', 
+      label: 'Housekeeping & QR Audits', 
+      icon: Sparkles, 
+      badge: 'HYGIENE',
+      roles: ['cleaning', 'admin']
+    },
+    { 
       id: 'beds', 
       label: t('nav.beds', 'Ward & Inpatient Beds'), 
       icon: BedDouble,
-      roles: ['admin', 'doctor']
+      roles: ['admin', 'doctor', 'nurse']
     },
     { 
       id: 'doctors', 
@@ -85,7 +99,7 @@ export default function Sidebar({
         ? t('nav.myPrescriptions', 'My Prescriptions') 
         : t('nav.prescriptions', 'Prescriptions & Rx'), 
       icon: FileText,
-      roles: ['admin', 'doctor', 'patient']
+      roles: ['admin', 'doctor', 'patient', 'nurse']
     },
     { 
       id: 'lab-reports', 
@@ -93,7 +107,7 @@ export default function Sidebar({
         ? t('nav.myLabReports', 'My Lab Reports') 
         : t('nav.labReports', 'Diagnostic Labs'), 
       icon: FlaskConical,
-      roles: ['admin', 'doctor', 'patient']
+      roles: ['admin', 'doctor', 'patient', 'nurse']
     },
     { 
       id: 'ai-triage', 
@@ -112,6 +126,10 @@ export default function Sidebar({
         return t('brand.patientPortal', 'PATIENT HEALTH PORTAL');
       case 'doctor':
         return t('brand.doctorStation', 'PHYSICIAN CLINICAL STATION');
+      case 'nurse':
+        return 'NURSE CLINICAL STATION';
+      case 'cleaning':
+        return 'HOUSEKEEPING & SANITATION';
       case 'admin':
       default:
         return t('brand.adminCommand', 'HOSPITAL COMMAND CENTER');
@@ -152,6 +170,40 @@ export default function Sidebar({
             fontWeight: '700'
           }}>
             <Stethoscope size={11} /> DOCTOR
+          </span>
+        );
+      case 'nurse':
+        return (
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.68rem',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            background: 'rgba(99, 102, 241, 0.15)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            color: '#818cf8',
+            fontWeight: '700'
+          }}>
+            <HeartPulse size={11} /> NURSE
+          </span>
+        );
+      case 'cleaning':
+        return (
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.68rem',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            color: '#fbbf24',
+            fontWeight: '700'
+          }}>
+            <Sparkles size={11} /> CLEANING
           </span>
         );
       case 'patient':

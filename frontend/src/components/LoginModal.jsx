@@ -210,33 +210,51 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>
               Instant Access Presets
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
               <button
                 type="button"
                 onClick={() => fillDemo('admin@medtech.ai', 'admin123')}
                 className="btn btn-outline btn-sm"
-                style={{ padding: '6px 4px', flexDirection: 'column', gap: '4px' }}
+                style={{ padding: '6px 2px', flexDirection: 'column', gap: '3px' }}
               >
-                <Shield size={15} color="#fb7185" />
-                <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Admin</span>
+                <Shield size={14} color="#fb7185" />
+                <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>Admin</span>
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('dr.sarah@medtech.ai', 'doctor123')}
                 className="btn btn-outline btn-sm"
-                style={{ padding: '6px 4px', flexDirection: 'column', gap: '4px' }}
+                style={{ padding: '6px 2px', flexDirection: 'column', gap: '3px' }}
               >
-                <Stethoscope size={15} color="#38bdf8" />
-                <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Doctor</span>
+                <Stethoscope size={14} color="#38bdf8" />
+                <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>Doctor</span>
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('elena@medtech.ai', 'patient123')}
                 className="btn btn-outline btn-sm"
-                style={{ padding: '6px 4px', flexDirection: 'column', gap: '4px' }}
+                style={{ padding: '6px 2px', flexDirection: 'column', gap: '3px' }}
               >
-                <UserCheck size={15} color="#34d399" />
-                <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Patient</span>
+                <UserCheck size={14} color="#34d399" />
+                <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>Patient</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo('nurse@medtech.ai', 'nurse123')}
+                className="btn btn-outline btn-sm"
+                style={{ padding: '6px 2px', flexDirection: 'column', gap: '3px', borderColor: 'rgba(99, 102, 241, 0.4)' }}
+              >
+                <Award size={14} color="#818cf8" />
+                <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#818cf8' }}>Nurse</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo('cleaner@medtech.ai', 'cleaner123')}
+                className="btn btn-outline btn-sm"
+                style={{ padding: '6px 2px', flexDirection: 'column', gap: '3px', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+              >
+                <Building2 size={14} color="#fbbf24" />
+                <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#fbbf24' }}>Cleaner</span>
               </button>
             </div>
           </div>

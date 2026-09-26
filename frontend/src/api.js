@@ -61,6 +61,14 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(payload)
   }),
+  registerNurse: (payload) => request('/auth/register-nurse', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  registerCleaning: (payload) => request('/auth/register-cleaning', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
   sendOtp: (email, purpose = 'doctor_registration') => request('/auth/send-otp', {
     method: 'POST',
     body: JSON.stringify({ email, purpose })
@@ -163,6 +171,40 @@ export const api = {
   checkDrugInteractions: (medicines) => request('/ai/check-drug-interactions', {
     method: 'POST',
     body: JSON.stringify({ medicines })
+  }),
+
+  // Housekeeping & Hospital Sanitation Anti-Negligence
+  getCleaningTasks: () => request('/housekeeping/tasks'),
+  scanCleaningQR: (payload) => request('/housekeeping/scan', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getCleaningLogs: () => request('/housekeeping/logs'),
+  getHousekeepingSummary: () => request('/housekeeping/summary'),
+  addCleaningArea: (payload) => request('/housekeeping/add-area', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+
+  // Nurse Station & Patient Vitals & Medication Management
+  getPatientVitals: (patientId = '') => request(`/nurse/vitals${patientId ? `?patient_id=${patientId}` : ''}`),
+  recordPatientVitals: (payload) => request('/nurse/vitals', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getMedicationSchedules: () => request('/nurse/medications'),
+  administerMedication: (id, payload) => request(`/nurse/medications/${id}/administer`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  addMedicationSchedule: (payload) => request('/nurse/medications', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getShiftHandovers: () => request('/nurse/handovers'),
+  submitShiftHandover: (payload) => request('/nurse/handover', {
+    method: 'POST',
+    body: JSON.stringify(payload)
   })
 };
 

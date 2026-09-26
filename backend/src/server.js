@@ -14,6 +14,8 @@ import bedsRouter from './routes/beds.js';
 import adminRouter from './routes/admin.js';
 import billingRouter from './routes/billing.js';
 import aiRouter from './routes/ai.js';
+import housekeepingRouter from './routes/housekeeping.js';
+import nurseRouter from './routes/nurse.js';
 
 dotenv.config();
 
@@ -63,6 +65,8 @@ app.use('/api/beds', bedsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/billing', billingRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/housekeeping', housekeepingRouter);
+app.use('/api/nurse', nurseRouter);
 
 // Public Hospital Info (White-labeling)
 app.get('/api/hospital', async (req, res) => {

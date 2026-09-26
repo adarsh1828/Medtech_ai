@@ -104,7 +104,7 @@ export async function initializeDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL CHECK(role IN ('patient', 'doctor', 'admin')),
+      role TEXT NOT NULL CHECK(role IN ('patient', 'doctor', 'admin', 'nurse', 'cleaning', 'staff')),
       full_name TEXT NOT NULL,
       phone TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -354,6 +354,132 @@ export async function initializeDatabase() {
     )
   `);
 
+  // 15. Nurses (Clinical Nursing & Ward Monitoring Staff)
+  await run(`
+    CREATE TABLE IF NOT EXISTS Nurses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER UNIQUE NOT NULL,
+      full_name TEXT NOT NULL,
+      department_id INTEGER,
+      shift_timings TEXT DEFAULT '08:00 AM - 04:00 PM',
+      assigned_ward TEXT DEFAULT 'General Ward',
+      qualification TEXT DEFAULT 'B.Sc Nursing / GNM',
+      phone TEXT,
+      is_on_duty INTEGER DEFAULT 1,
+      status TEXT DEFAULT 'approved',
+      FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+      FOREIGN KEY (department_id) REFERENCES Departments(id)
+    )
+  `);
+
+  // 16. HousekeepingStaff (Sanitation, Cleaning & Infection Control Staff)
+  await run(`
+    CREATE TABLE IF NOT EXISTS HousekeepingStaff (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER UNIQUE NOT NULL,
+      full_name TEXT NOT NULL,
+      assigned_area TEXT DEFAULT 'General Ward & Restrooms',
+      shift_timings TEXT DEFAULT '07:00 AM - 03:00 PM',
+      phone TEXT,
+      is_on_duty INTEGER DEFAULT 1,
+      FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+    )
+  `);
+
+  // 17. CleaningTasks (Hospital Hygiene Areas with Geo-QR Codes & Anti-Negligence Timers)
+  await run(`
+    CREATE TABLE IF NOT EXISTS CleaningTasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      area_name TEXT NOT NULL,
+      area_code TEXT NOT NULL UNIQUE,
+      area_type TEXT DEFAULT 'Ward Bed',
+      cleaning_frequency_hours INTEGER DEFAULT 4,
+      last_cleaned_at DATETIME,
+      last_cleaned_by TEXT,
+      last_cleaner_id INTEGER,
+      status TEXT DEFAULT 'clean' CHECK(status IN ('clean', 'due', 'overdue')),
+      checklist_mopping INTEGER DEFAULT 1,
+      checklist_linen INTEGER DEFAULT 1,
+      checklist_dustbin INTEGER DEFAULT 1,
+      checklist_sanitizer INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // 18. CleaningLogs (Tamper-proof Audit Trail of every cleaning scan)
+  await run(`
+    CREATE TABLE IF NOT EXISTS CleaningLogs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL,
+      area_name TEXT NOT NULL,
+      area_code TEXT NOT NULL,
+      cleaner_name TEXT NOT NULL,
+      cleaner_id INTEGER,
+      checklist_mopping INTEGER DEFAULT 1,
+      checklist_linen INTEGER DEFAULT 1,
+      checklist_dustbin INTEGER DEFAULT 1,
+      checklist_sanitizer INTEGER DEFAULT 1,
+      photo_url TEXT,
+      notes TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (task_id) REFERENCES CleaningTasks(id) ON DELETE CASCADE
+    )
+  `);
+
+  // 19. PatientVitals (Digital Nurse Station Vitals Tracker)
+  await run(`
+    CREATE TABLE IF NOT EXISTS PatientVitals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      patient_id INTEGER NOT NULL,
+      patient_name TEXT NOT NULL,
+      bed_number TEXT,
+      nurse_id INTEGER,
+      nurse_name TEXT NOT NULL,
+      bp TEXT,
+      pulse TEXT,
+      temp TEXT,
+      spo2 TEXT,
+      sugar TEXT,
+      notes TEXT,
+      recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (patient_id) REFERENCES Patients(id)
+    )
+  `);
+
+  // 20. MedicationSchedules (Prescribed Dose Countdown & Administration Tracker)
+  await run(`
+    CREATE TABLE IF NOT EXISTS MedicationSchedules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      patient_id INTEGER NOT NULL,
+      patient_name TEXT NOT NULL,
+      bed_number TEXT,
+      doctor_name TEXT,
+      medicine_name TEXT NOT NULL,
+      dosage TEXT NOT NULL,
+      scheduled_time TEXT NOT NULL,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'given', 'delayed', 'missed')),
+      given_at DATETIME,
+      given_by_nurse TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (patient_id) REFERENCES Patients(id)
+    )
+  `);
+
+  // 21. ShiftHandovers (Nurse Handover Accountability Lock)
+  await run(`
+    CREATE TABLE IF NOT EXISTS ShiftHandovers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      outgoing_nurse_name TEXT NOT NULL,
+      incoming_nurse_name TEXT NOT NULL,
+      ward_name TEXT NOT NULL,
+      shift_name TEXT NOT NULL,
+      critical_patients_notes TEXT,
+      handover_status TEXT DEFAULT 'accepted' CHECK(handover_status IN ('pending', 'accepted')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
   try {
     await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");
@@ -420,6 +546,9 @@ export async function initializeDatabase() {
 
   // Seed invoices if empty
   await seedDefaultInvoices();
+
+  // Seed staff (nurse, cleaning) and sanitation QR tasks
+  await seedStaffAndSanitation();
 }
 
 // Idempotent Seeding Helper Functions
@@ -779,5 +908,126 @@ async function seedDefaultInvoices() {
 
   console.log('Sample hospital invoices seeded successfully.');
 }
+
+async function seedStaffAndSanitation() {
+  const salt = await bcrypt.genSalt(10);
+
+  // 1. Seed Default Staff Nurse (Sister Sunita Sharma)
+  const existingNurse = await getOne("SELECT id FROM Users WHERE email = 'nurse@medtech.ai'");
+  if (!existingNurse) {
+    const nurseHash = await bcrypt.hash('nurse123', salt);
+    const nurseUser = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES ('nurse@medtech.ai', ?, 'nurse', 'Sister Sunita Sharma', '+91 98200 44551')",
+      [nurseHash]
+    );
+    await run(
+      `INSERT INTO Nurses (user_id, full_name, department_id, shift_timings, assigned_ward, qualification, phone, is_on_duty)
+       VALUES (?, 'Sister Sunita Sharma', 1, '08:00 AM - 04:00 PM', 'General Ward & ICU', 'B.Sc Nursing (Critical Care & Vitals)', '+91 98200 44551', 1)`,
+      [nurseUser.lastID]
+    );
+    console.log('Default nurse account seeded: nurse@medtech.ai / nurse123');
+  }
+
+  // 2. Seed Default Cleaning & Sanitation Staff (Ramesh Shinde)
+  const existingCleaner = await getOne("SELECT id FROM Users WHERE email = 'cleaner@medtech.ai'");
+  if (!existingCleaner) {
+    const cleanerHash = await bcrypt.hash('cleaner123', salt);
+    const cleanerUser = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES ('cleaner@medtech.ai', ?, 'cleaning', 'Ramesh Shinde', '+91 98200 77882')",
+      [cleanerHash]
+    );
+    await run(
+      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty)
+       VALUES (?, 'Ramesh Shinde', 'General Ward, ICU & Restrooms', '07:00 AM - 03:00 PM', '+91 98200 77882', 1)`,
+      [cleanerUser.lastID]
+    );
+    console.log('Default cleaning staff account seeded: cleaner@medtech.ai / cleaner123');
+  }
+
+  // 3. Seed Cleaning Tasks (QR-coded Hygiene Areas)
+  const taskCount = await getOne('SELECT COUNT(*) as count FROM CleaningTasks');
+  if (!taskCount || taskCount.count === 0) {
+    console.log('Seeding hospital sanitation QR zones and cleaning tasks...');
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19);
+    const threeHoursAgo = new Date(now.getTime() - 210 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19);
+    const fiveHoursAgo = new Date(now.getTime() - 320 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19);
+
+    const areas = [
+      { name: 'General Ward - Bed 101', code: 'QR-WARD-A-101', type: 'Ward Bed', freq: 4, lastTime: oneHourAgo, status: 'clean' },
+      { name: 'General Ward - Bed 102', code: 'QR-WARD-A-102', type: 'Ward Bed', freq: 4, lastTime: threeHoursAgo, status: 'due' },
+      { name: 'ICU Isolation Cabin 1', code: 'QR-ICU-01', type: 'ICU', freq: 2, lastTime: oneHourAgo, status: 'clean' },
+      { name: 'ICU Isolation Cabin 2', code: 'QR-ICU-02', type: 'ICU', freq: 2, lastTime: fiveHoursAgo, status: 'overdue' },
+      { name: '1st Floor Central Patient Restroom', code: 'QR-RESTROOM-01', type: 'Restroom', freq: 3, lastTime: fiveHoursAgo, status: 'overdue' },
+      { name: 'Emergency Trauma Bay 1', code: 'QR-ER-BAY-01', type: 'Ward Bed', freq: 2, lastTime: oneHourAgo, status: 'clean' }
+    ];
+
+    for (const a of areas) {
+      const res = await run(
+        `INSERT INTO CleaningTasks (area_name, area_code, area_type, cleaning_frequency_hours, last_cleaned_at, last_cleaned_by, status, checklist_mopping, checklist_linen, checklist_dustbin, checklist_sanitizer)
+         VALUES (?, ?, ?, ?, ?, 'Ramesh Shinde', ?, 1, 1, 1, 1)`,
+        [a.name, a.code, a.type, a.freq, a.lastTime, a.status]
+      );
+
+      // Seed an initial log
+      await run(
+        `INSERT INTO CleaningLogs (task_id, area_name, area_code, cleaner_name, checklist_mopping, checklist_linen, checklist_dustbin, checklist_sanitizer, notes, timestamp)
+         VALUES (?, ?, ?, 'Ramesh Shinde', 1, 1, 1, 1, 'Standard protocol hospital sanitization completed.', ?)`,
+        [res.lastID, a.name, a.code, a.lastTime]
+      );
+    }
+  }
+
+  // 4. Seed Initial Medication Schedules for Nurse Station
+  const medCount = await getOne('SELECT COUNT(*) as count FROM MedicationSchedules');
+  if (!medCount || medCount.count === 0) {
+    const pat1 = await getOne('SELECT id, full_name FROM Patients LIMIT 1 OFFSET 0');
+    const pat2 = await getOne('SELECT id, full_name FROM Patients LIMIT 1 OFFSET 1');
+    const pat3 = await getOne('SELECT id, full_name FROM Patients LIMIT 1 OFFSET 2');
+
+    if (pat1) {
+      await run(
+        `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status, given_at, given_by_nurse)
+         VALUES (?, ?, 'Bed 101', 'Dr. Sarah Jenkins', 'Inj. Ceftriaxone', '1g IV', '10:00 AM', 'given', CURRENT_TIMESTAMP, 'Sister Sunita Sharma')`,
+        [pat1.id, pat1.full_name]
+      );
+      await run(
+        `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status)
+         VALUES (?, ?, 'Bed 101', 'Dr. Sarah Jenkins', 'Tab. Pantoprazole', '40mg Oral', '02:00 PM', 'pending')`,
+        [pat1.id, pat1.full_name]
+      );
+    }
+
+    if (pat2) {
+      await run(
+        `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status)
+         VALUES (?, ?, 'ICU Bed 1', 'Dr. Arthur Pendelton', 'Inj. Enoxaparin', '40mg SC', '03:00 PM', 'pending')`,
+        [pat2.id, pat2.full_name]
+      );
+    }
+
+    if (pat3) {
+      await run(
+        `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status)
+         VALUES (?, ?, 'Bed 102', 'Dr. Marcus Vance', 'Syp. Paracetamol', '650mg Oral', '01:00 PM', 'pending')`,
+        [pat3.id, pat3.full_name]
+      );
+    }
+  }
+
+  // 5. Seed sample patient vitals
+  const vitalsCount = await getOne('SELECT COUNT(*) as count FROM PatientVitals');
+  if (!vitalsCount || vitalsCount.count === 0) {
+    const pat1 = await getOne('SELECT id, full_name FROM Patients LIMIT 1');
+    if (pat1) {
+      await run(
+        `INSERT INTO PatientVitals (patient_id, patient_name, bed_number, nurse_id, nurse_name, bp, pulse, temp, spo2, sugar, notes)
+         VALUES (?, ?, 'Bed 101', 1, 'Sister Sunita Sharma', '120/80 mmHg', '76 bpm', '98.4 °F', '99%', '110 mg/dL', 'Patient is stable, conscious, normal vitals.')`,
+        [pat1.id, pat1.full_name]
+      );
+    }
+  }
+}
+
 
 

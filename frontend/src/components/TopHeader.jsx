@@ -68,6 +68,10 @@ export default function TopHeader({
         return <span className="badge badge-rose"><Shield size={12} /> {t('header.admin', 'ADMIN')}</span>;
       case 'doctor':
         return <span className="badge badge-cyan"><Stethoscope size={12} /> {t('header.doctor', 'DOCTOR')}</span>;
+      case 'nurse':
+        return <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.3)' }}><HeartPulse size={12} /> NURSE</span>;
+      case 'cleaning':
+        return <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}><Sparkles size={12} /> CLEANING</span>;
       case 'patient':
         return <span className="badge badge-emerald"><UserCheck size={12} /> {t('header.patient', 'PATIENT')}</span>;
       default:
@@ -380,14 +384,14 @@ export default function TopHeader({
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                background: user.role === 'admin' ? 'rgba(244, 63, 94, 0.2)' : user.role === 'doctor' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                border: `1px solid ${user.role === 'admin' ? '#f43f5e' : user.role === 'doctor' ? '#06b6d4' : '#10b981'}`,
+                background: user.role === 'admin' ? 'rgba(244, 63, 94, 0.2)' : user.role === 'doctor' ? 'rgba(6, 182, 212, 0.2)' : user.role === 'nurse' ? 'rgba(99, 102, 241, 0.2)' : user.role === 'cleaning' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                border: `1px solid ${user.role === 'admin' ? '#f43f5e' : user.role === 'doctor' ? '#06b6d4' : user.role === 'nurse' ? '#6366f1' : user.role === 'cleaning' ? '#f59e0b' : '#10b981'}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '0.75rem',
                 fontWeight: '700',
-                color: user.role === 'admin' ? '#fb7185' : user.role === 'doctor' ? '#38bdf8' : '#34d399'
+                color: user.role === 'admin' ? '#fb7185' : user.role === 'doctor' ? '#38bdf8' : user.role === 'nurse' ? '#818cf8' : user.role === 'cleaning' ? '#fbbf24' : '#34d399'
               }}
               title={`${user.fullName || user.email} (${user.role})`}
               >

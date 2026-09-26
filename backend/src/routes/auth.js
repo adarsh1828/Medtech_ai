@@ -313,6 +313,132 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
+// Register Staff Nurse
+router.post('/register-nurse', async (req, res) => {
+  try {
+    const { full_name, email, password, phone, assigned_ward, qualification, shift_timings, department_id } = req.body;
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ error: 'Please provide full name, email, and password.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+    if (existingUser) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Please sign in.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    const userResult = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'nurse', ?, ?)",
+      [cleanEmail, password_hash, full_name.trim(), phone || null]
+    );
+
+    const nurseResult = await run(
+      `INSERT INTO Nurses (user_id, full_name, department_id, shift_timings, assigned_ward, qualification, phone, is_on_duty, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'approved')`,
+      [
+        userResult.lastID,
+        full_name.trim(),
+        department_id ? Number(department_id) : 1,
+        shift_timings || '08:00 AM - 04:00 PM',
+        assigned_ward || 'General Ward & ICU',
+        qualification || 'B.Sc Nursing / GNM',
+        phone || null
+      ]
+    );
+
+    const token = generateToken({
+      userId: userResult.lastID,
+      role: 'nurse',
+      nurseId: nurseResult.lastID,
+      email: cleanEmail,
+      fullName: full_name.trim()
+    });
+
+    res.status(201).json({
+      message: 'Staff Nurse account registered successfully!',
+      token,
+      user: {
+        id: userResult.lastID,
+        email: cleanEmail,
+        role: 'nurse',
+        fullName: full_name.trim(),
+        nurseId: nurseResult.lastID,
+        assignedWard: assigned_ward || 'General Ward & ICU',
+        shiftTimings: shift_timings || '08:00 AM - 04:00 PM'
+      }
+    });
+  } catch (err) {
+    console.error('Nurse registration error:', err);
+    res.status(500).json({ error: 'Failed to complete nurse registration. Please try again.' });
+  }
+});
+
+// Register Housekeeping / Cleaning Staff
+router.post('/register-cleaning', async (req, res) => {
+  try {
+    const { full_name, email, password, phone, assigned_area, shift_timings } = req.body;
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ error: 'Please provide full name, email, and password.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+    if (existingUser) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Please sign in.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    const userResult = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'cleaning', ?, ?)",
+      [cleanEmail, password_hash, full_name.trim(), phone || null]
+    );
+
+    const cleanerResult = await run(
+      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty)
+       VALUES (?, ?, ?, ?, ?, 1)`,
+      [
+        userResult.lastID,
+        full_name.trim(),
+        assigned_area || 'General Ward, ICU & Restrooms',
+        shift_timings || '07:00 AM - 03:00 PM',
+        phone || null
+      ]
+    );
+
+    const token = generateToken({
+      userId: userResult.lastID,
+      role: 'cleaning',
+      cleanerId: cleanerResult.lastID,
+      email: cleanEmail,
+      fullName: full_name.trim()
+    });
+
+    res.status(201).json({
+      message: 'Housekeeping & Sanitation account registered successfully!',
+      token,
+      user: {
+        id: userResult.lastID,
+        email: cleanEmail,
+        role: 'cleaning',
+        fullName: full_name.trim(),
+        cleanerId: cleanerResult.lastID,
+        assignedArea: assigned_area || 'General Ward, ICU & Restrooms',
+        shiftTimings: shift_timings || '07:00 AM - 03:00 PM'
+      }
+    });
+  } catch (err) {
+    console.error('Housekeeping registration error:', err);
+    res.status(500).json({ error: 'Failed to complete housekeeping registration. Please try again.' });
+  }
+});
+
 // Login
 
 router.post('/login', async (req, res) => {
@@ -376,6 +502,33 @@ router.post('/login', async (req, res) => {
       extraData.roomNumber = doctor.room_number;
       extraData.isOnDuty = !!doctor.is_on_duty;
       extraData.status = docStatus;
+    } else if (user.role === 'nurse') {
+      const nurse = await getOne(
+        `SELECT n.id, n.assigned_ward, n.shift_timings, n.qualification, n.is_on_duty, n.status, dep.name as department_name
+         FROM Nurses n
+         LEFT JOIN Departments dep ON n.department_id = dep.id
+         WHERE n.user_id = ?`,
+        [user.id]
+      );
+      if (nurse) {
+        extraData.nurseId = nurse.id;
+        extraData.assignedWard = nurse.assigned_ward;
+        extraData.shiftTimings = nurse.shift_timings;
+        extraData.qualification = nurse.qualification;
+        extraData.isOnDuty = !!nurse.is_on_duty;
+        extraData.departmentName = nurse.department_name;
+      }
+    } else if (user.role === 'cleaning') {
+      const cleaner = await getOne(
+        `SELECT id, assigned_area, shift_timings, is_on_duty FROM HousekeepingStaff WHERE user_id = ?`,
+        [user.id]
+      );
+      if (cleaner) {
+        extraData.cleanerId = cleaner.id;
+        extraData.assignedArea = cleaner.assigned_area;
+        extraData.shiftTimings = cleaner.shift_timings;
+        extraData.isOnDuty = !!cleaner.is_on_duty;
+      }
     }
 
     const tokenPayload = {

@@ -91,6 +91,27 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     setup_key: 'MEDTECH-ADMIN-2026'
   });
 
+  // Nurse Registration state
+  const [nurseForm, setNurseForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    phone: '',
+    assigned_ward: 'General Ward & ICU',
+    qualification: 'B.Sc Nursing / GNM',
+    shift_timings: '08:00 AM - 04:00 PM'
+  });
+
+  // Cleaning Staff Registration state
+  const [cleanerForm, setCleanerForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    phone: '',
+    assigned_area: 'General Ward, ICU & Restrooms',
+    shift_timings: '07:00 AM - 03:00 PM'
+  });
+
   useEffect(() => {
     loadDepartments();
   }, []);
@@ -242,6 +263,46 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       onLoginSuccess(res.user, res.hospital);
     } catch (err) {
       setError(err.message || 'Administrator registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterNurse = async (e) => {
+    e.preventDefault();
+    if (!nurseForm.full_name || !nurseForm.email || !nurseForm.password) {
+      setError('Please fill in all mandatory nurse fields.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.registerNurse(nurseForm);
+      setStoredToken(res.token);
+      setStoredUser(res.user);
+      onLoginSuccess(res.user);
+    } catch (err) {
+      setError(err.message || 'Nurse registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterCleaning = async (e) => {
+    e.preventDefault();
+    if (!cleanerForm.full_name || !cleanerForm.email || !cleanerForm.password) {
+      setError('Please fill in all mandatory housekeeping fields.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.registerCleaning(cleanerForm);
+      setStoredToken(res.token);
+      setStoredUser(res.user);
+      onLoginSuccess(res.user);
+    } catch (err) {
+      setError(err.message || 'Cleaning staff registration failed.');
     } finally {
       setLoading(false);
     }
@@ -495,9 +556,9 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     onClick={() => handleSelectPreset('patient', 'elena@medtech.ai', 'patient123')}
                     className="btn btn-outline"
                     style={{
-                      padding: '10px 8px',
+                      padding: '10px 6px',
                       flexDirection: 'column',
-                      gap: '5px',
+                      gap: '4px',
                       borderRadius: '10px',
                       border: selectedRole === 'patient' ? '2px solid #34d399' : '1px solid rgba(16, 185, 129, 0.3)',
                       background: selectedRole === 'patient' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.04)',
@@ -507,12 +568,12 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    <UserCheck size={20} color="#34d399" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#34d399' }}>
+                    <UserCheck size={18} color="#34d399" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#34d399' }}>
                       👤 Patient
                     </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      Elena Rodriguez
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Elena R.
                     </span>
                   </button>
 
@@ -522,9 +583,9 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     onClick={() => handleSelectPreset('doctor', 'dr.sarah@medtech.ai', 'doctor123')}
                     className="btn btn-outline"
                     style={{
-                      padding: '10px 8px',
+                      padding: '10px 6px',
                       flexDirection: 'column',
-                      gap: '5px',
+                      gap: '4px',
                       borderRadius: '10px',
                       border: selectedRole === 'doctor' ? '2px solid #38bdf8' : '1px solid rgba(6, 182, 212, 0.3)',
                       background: selectedRole === 'doctor' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(6, 182, 212, 0.04)',
@@ -534,12 +595,66 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    <Stethoscope size={20} color="#38bdf8" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#38bdf8' }}>
+                    <Stethoscope size={18} color="#38bdf8" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#38bdf8' }}>
                       🩺 Doctor
                     </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      Dr. Sarah Chen
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Dr. Sarah
+                    </span>
+                  </button>
+
+                  {/* Nurse Demo */}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPreset('nurse', 'nurse@medtech.ai', 'nurse123')}
+                    className="btn btn-outline"
+                    style={{
+                      padding: '10px 6px',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      borderRadius: '10px',
+                      border: selectedRole === 'nurse' ? '2px solid #818cf8' : '1px solid rgba(129, 140, 248, 0.3)',
+                      background: selectedRole === 'nurse' ? 'rgba(129, 140, 248, 0.15)' : 'rgba(129, 140, 248, 0.04)',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedRole === 'nurse' ? '0 0 12px rgba(129, 140, 248, 0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <HeartPulse size={18} color="#818cf8" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#818cf8' }}>
+                      👩‍⚕️ Nurse
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Sister Sunita
+                    </span>
+                  </button>
+
+                  {/* Cleaning Staff Demo */}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPreset('cleaning', 'cleaner@medtech.ai', 'cleaner123')}
+                    className="btn btn-outline"
+                    style={{
+                      padding: '10px 6px',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      borderRadius: '10px',
+                      border: selectedRole === 'cleaning' ? '2px solid #fbbf24' : '1px solid rgba(245, 158, 11, 0.3)',
+                      background: selectedRole === 'cleaning' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(245, 158, 11, 0.04)',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedRole === 'cleaning' ? '0 0 12px rgba(251, 191, 36, 0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Sparkles size={18} color="#fbbf24" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#fbbf24' }}>
+                      🧹 Cleaning
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Ramesh S.
                     </span>
                   </button>
 
@@ -549,9 +664,9 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     onClick={() => handleSelectPreset('admin', 'admin@medtech.ai', 'admin123')}
                     className="btn btn-outline"
                     style={{
-                      padding: '10px 8px',
+                      padding: '10px 6px',
                       flexDirection: 'column',
-                      gap: '5px',
+                      gap: '4px',
                       borderRadius: '10px',
                       border: selectedRole === 'admin' ? '2px solid #fb7185' : '1px solid rgba(244, 63, 94, 0.3)',
                       background: selectedRole === 'admin' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.04)',
@@ -561,12 +676,12 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    <Shield size={20} color="#fb7185" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#fb7185' }}>
+                    <Shield size={18} color="#fb7185" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#fb7185' }}>
                       🛡️ Admin
                     </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      Arthur Pendelton
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Arthur P.
                     </span>
                   </button>
                 </div>
@@ -588,6 +703,8 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     <span>
                       {selectedRole === 'patient' && '👤 Elena Rodriguez (Patient) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'doctor' && '🩺 Dr. Sarah Chen (Doctor) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'nurse' && '👩‍⚕️ Sister Sunita Sharma (Staff Nurse) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'cleaning' && '🧹 Ramesh Shinde (Sanitation Staff) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'admin' && '🛡️ Arthur Pendelton (Admin) चे क्रेडेंशियल्स भरले आहेत.'}
                       {' '}लॉगिन करण्यासाठी खालील <strong>"Sign In to Hospital Portal"</strong> बटण दाबा.
                     </span>
@@ -615,7 +732,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   borderBottom: tab === 'login' ? '2px solid var(--primary)' : '2px solid transparent',
                   color: tab === 'login' ? 'var(--text-primary)' : 'var(--text-secondary)',
                   fontWeight: tab === 'login' ? '700' : '500',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap'
                 }}
@@ -633,56 +750,84 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   borderBottom: tab === 'register' ? '2px solid #34d399' : '2px solid transparent',
                   color: tab === 'register' ? '#34d399' : 'var(--text-secondary)',
                   fontWeight: tab === 'register' ? '700' : '500',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap'
                 }}
               >
-                {t('auth.patientReg', 'Patient Register')}
+                👤 {t('auth.patientReg', 'Patient')}
               </button>
               <button
                 type="button"
                 onClick={() => { setTab('doctor_register'); setError(''); }}
                 style={{
-                  flex: 1.1,
+                  flex: 1,
                   padding: '10px 8px',
                   background: 'transparent',
                   border: 'none',
                   borderBottom: tab === 'doctor_register' ? '2px solid #38bdf8' : '2px solid transparent',
                   color: tab === 'doctor_register' ? '#38bdf8' : 'var(--text-secondary)',
                   fontWeight: tab === 'doctor_register' ? '700' : '500',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '5px',
                   whiteSpace: 'nowrap'
                 }}
               >
-                <Stethoscope size={14} /> {t('auth.doctorReg', 'Doctor Register')}
+                🩺 {t('auth.doctorReg', 'Doctor')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setTab('nurse_register'); setError(''); }}
+                style={{
+                  flex: 1,
+                  padding: '10px 8px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: tab === 'nurse_register' ? '2px solid #818cf8' : '2px solid transparent',
+                  color: tab === 'nurse_register' ? '#818cf8' : 'var(--text-secondary)',
+                  fontWeight: tab === 'nurse_register' ? '700' : '500',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                👩‍⚕️ Nurse
+              </button>
+              <button
+                type="button"
+                onClick={() => { setTab('cleaning_register'); setError(''); }}
+                style={{
+                  flex: 1,
+                  padding: '10px 8px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: tab === 'cleaning_register' ? '2px solid #fbbf24' : '2px solid transparent',
+                  color: tab === 'cleaning_register' ? '#fbbf24' : 'var(--text-secondary)',
+                  fontWeight: tab === 'cleaning_register' ? '700' : '500',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                🧹 Cleaning
               </button>
               <button
                 type="button"
                 onClick={() => { setTab('admin_register'); setError(''); }}
                 style={{
-                  flex: 1.1,
+                  flex: 1,
                   padding: '10px 8px',
                   background: 'transparent',
                   border: 'none',
                   borderBottom: tab === 'admin_register' ? '2px solid #fb7185' : '2px solid transparent',
                   color: tab === 'admin_register' ? '#fb7185' : 'var(--text-secondary)',
                   fontWeight: tab === 'admin_register' ? '700' : '500',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '5px',
                   whiteSpace: 'nowrap'
                 }}
               >
-                <Shield size={14} /> {t('auth.adminReg', 'Admin Register')}
+                🛡️ Admin
               </button>
             </div>
 
@@ -1341,6 +1486,279 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   style={{ width: '100%', marginTop: '16px', padding: '12px' }}
                 >
                   {loading ? 'Authorizing Administrator...' : 'Authorize Admin & Open Command Center'}
+                </button>
+              </form>
+            )}
+
+            {/* 5. Nurse Registration Tab */}
+            {tab === 'nurse_register' && (
+              <form onSubmit={handleRegisterNurse}>
+                <div style={{
+                  background: 'rgba(99, 102, 241, 0.08)',
+                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <HeartPulse size={20} color="#818cf8" />
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                    Staff Nurse Portal • Live Medication Administration, Patient Vitals Monitoring & Digital Shift Handovers.
+                  </div>
+                </div>
+
+                <div className="responsive-two-col">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Nurse Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="form-input"
+                      placeholder="e.g. Sister Sunita Sharma"
+                      value={nurseForm.full_name}
+                      onChange={(e) => setNurseForm({ ...nurseForm, full_name: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Official Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      className="form-input"
+                      placeholder="nurse@hospital.org"
+                      value={nurseForm.email}
+                      onChange={(e) => setNurseForm({ ...nurseForm, email: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Account Password *</label>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={nurseForm.password}
+                        onChange={(e) => setNurseForm({ ...nurseForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px'
+                        }}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Contact Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="+91 98765 00000"
+                      value={nurseForm.phone}
+                      onChange={(e) => setNurseForm({ ...nurseForm, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Assigned Ward / Department *</label>
+                    <select
+                      className="form-select"
+                      value={nurseForm.assigned_ward}
+                      onChange={(e) => setNurseForm({ ...nurseForm, assigned_ward: e.target.value })}
+                    >
+                      <option value="General Ward & ICU">General Ward & ICU</option>
+                      <option value="ICU & Critical Care">ICU & Critical Care</option>
+                      <option value="Emergency & Triage">Emergency & Triage</option>
+                      <option value="Pediatric Ward">Pediatric Ward</option>
+                      <option value="Surgical Recovery (OT)">Surgical Recovery (OT)</option>
+                      <option value="Maternity Ward">Maternity Ward</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Nursing Qualification</label>
+                    <select
+                      className="form-select"
+                      value={nurseForm.qualification}
+                      onChange={(e) => setNurseForm({ ...nurseForm, qualification: e.target.value })}
+                    >
+                      <option value="B.Sc Nursing">B.Sc Nursing</option>
+                      <option value="GNM (General Nursing & Midwifery)">GNM (General Nursing & Midwifery)</option>
+                      <option value="Post-Basic B.Sc Nursing">Post-Basic B.Sc Nursing</option>
+                      <option value="M.Sc Critical Care Nursing">M.Sc Critical Care Nursing</option>
+                      <option value="ANM">ANM</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Shift Timings</label>
+                    <select
+                      className="form-select"
+                      value={nurseForm.shift_timings}
+                      onChange={(e) => setNurseForm({ ...nurseForm, shift_timings: e.target.value })}
+                    >
+                      <option value="Morning Shift (08:00 AM - 04:00 PM)">Morning Shift (08:00 AM - 04:00 PM)</option>
+                      <option value="Evening Shift (04:00 PM - 12:00 AM)">Evening Shift (04:00 PM - 12:00 AM)</option>
+                      <option value="Night Shift (12:00 AM - 08:00 AM)">Night Shift (12:00 AM - 08:00 AM)</option>
+                      <option value="General Shift (09:00 AM - 05:00 PM)">General Shift (09:00 AM - 05:00 PM)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn btn-indigo"
+                  style={{ width: '100%', marginTop: '16px', padding: '12px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600' }}
+                >
+                  {loading ? 'Registering Staff Nurse...' : 'Register Nurse & Open Clinical Station'}
+                </button>
+              </form>
+            )}
+
+            {/* 6. Housekeeping / Cleaning Staff Registration Tab */}
+            {tab === 'cleaning_register' && (
+              <form onSubmit={handleRegisterCleaning}>
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <Sparkles size={20} color="#fbbf24" />
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                    Hospital Sanitation & Housekeeping • Physical QR Inspection, Anti-Negligence Checklist & Area Audit Logs.
+                  </div>
+                </div>
+
+                <div className="responsive-two-col">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Staff Member Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="form-input"
+                      placeholder="e.g. Ramesh Shinde"
+                      value={cleanerForm.full_name}
+                      onChange={(e) => setCleanerForm({ ...cleanerForm, full_name: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Staff Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      className="form-input"
+                      placeholder="cleaner@hospital.org"
+                      value={cleanerForm.email}
+                      onChange={(e) => setCleanerForm({ ...cleanerForm, email: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Staff Password *</label>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={cleanerForm.password}
+                        onChange={(e) => setCleanerForm({ ...cleanerForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px'
+                        }}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Contact Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="+91 98765 11111"
+                      value={cleanerForm.phone}
+                      onChange={(e) => setCleanerForm({ ...cleanerForm, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Assigned Cleaning Zone *</label>
+                    <select
+                      className="form-select"
+                      value={cleanerForm.assigned_area}
+                      onChange={(e) => setCleanerForm({ ...cleanerForm, assigned_area: e.target.value })}
+                    >
+                      <option value="General Ward & Restrooms">General Ward & Restrooms</option>
+                      <option value="ICU & Critical Care Sterile Zone">ICU & Critical Care Sterile Zone</option>
+                      <option value="Emergency & Trauma Unit">Emergency & Trauma Unit</option>
+                      <option value="OPD Corridors & Waiting Areas">OPD Corridors & Waiting Areas</option>
+                      <option value="Operation Theatre Complex">Operation Theatre Complex</option>
+                      <option value="Bio-waste & Sanitization Dept">Bio-waste & Sanitization Dept</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Assigned Shift</label>
+                    <select
+                      className="form-select"
+                      value={cleanerForm.shift_timings}
+                      onChange={(e) => setCleanerForm({ ...cleanerForm, shift_timings: e.target.value })}
+                    >
+                      <option value="Morning Shift (07:00 AM - 03:00 PM)">Morning Shift (07:00 AM - 03:00 PM)</option>
+                      <option value="Evening Shift (03:00 PM - 11:00 PM)">Evening Shift (03:00 PM - 11:00 PM)</option>
+                      <option value="Night Shift (11:00 PM - 07:00 AM)">Night Shift (11:00 PM - 07:00 AM)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{ width: '100%', marginTop: '16px', padding: '12px', background: '#d97706', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  {loading ? 'Registering Cleaning Staff...' : 'Register Cleaning Staff & Start QR Audits'}
                 </button>
               </form>
             )}
