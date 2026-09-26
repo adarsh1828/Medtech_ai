@@ -116,10 +116,13 @@ router.post('/book', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Please select department, doctor, appointment date, and time slot.' });
     }
 
-    // Verify doctor belongs to department
-    const doctor = await getOne('SELECT id, full_name, department_id FROM Doctors WHERE id = ?', [doctor_id]);
+    // Verify doctor belongs to department and is approved
+    const doctor = await getOne(
+      "SELECT id, full_name, department_id, status FROM Doctors WHERE id = ? AND (status = 'approved' OR status IS NULL)",
+      [doctor_id]
+    );
     if (!doctor) {
-      return res.status(404).json({ error: 'Selected doctor could not be found.' });
+      return res.status(404).json({ error: 'Selected doctor is unavailable or pending administrative approval.' });
     }
 
     // Calculate queue token number for this doctor on this day

@@ -30,6 +30,7 @@ export default function TopHeader({
   onOpenBookModal, 
   onOpenHospitalSettings, 
   onOpenSearch, 
+  onOpenEmergency,
   isSidebarCollapsed, 
   onToggleSidebar 
 }) {
@@ -98,8 +99,25 @@ export default function TopHeader({
           color: 'var(--text-secondary)',
           fontFamily: 'var(--font-mono)'
         }}>
+          <span className="telemetry-beacon-live" />
           <Clock size={14} color="var(--primary)" />
           <span>{timeStr || t('header.liveClock', 'LIVE')}</span>
+        </div>
+
+        <div className="hide-on-mobile" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '4px 10px',
+          borderRadius: '6px',
+          background: 'rgba(6, 182, 212, 0.08)',
+          border: '1px solid rgba(6, 182, 212, 0.2)',
+          fontSize: '0.72rem',
+          fontWeight: '700',
+          color: '#38bdf8',
+          letterSpacing: '0.03em'
+        }}>
+          <span>NABH LEVEL-1 • 24x7 CLINICAL OPS</span>
         </div>
       </div>
 
@@ -278,6 +296,30 @@ export default function TopHeader({
             <Building2 size={15} /> {t('header.hospitalSettings', 'Hospital Settings')}
           </button>
         )}
+
+        {/* 24x7 Emergency SOS Button */}
+        <button
+          onClick={onOpenEmergency}
+          style={{
+            background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            fontSize: '0.8rem',
+            fontWeight: '800',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            cursor: 'pointer',
+            boxShadow: '0 2px 10px rgba(225, 29, 72, 0.35)',
+            transition: 'all 0.15s ease'
+          }}
+          title="24x7 Ambulance & Emergency Trauma Center"
+        >
+          <span className="telemetry-beacon-emergency" />
+          <span>🚨 SOS 108</span>
+        </button>
 
         <button
           onClick={onOpenBookModal}

@@ -17,6 +17,8 @@ import BookAppointmentModal from './components/BookAppointmentModal';
 import ConsultationModal from './components/ConsultationModal';
 import OnboardDoctorModal from './components/OnboardDoctorModal';
 import HospitalSettingsModal from './components/HospitalSettingsModal';
+import EmergencySOSModal from './components/EmergencySOSModal';
+import HospitalPitchBar from './components/HospitalPitchBar';
 import AuthPage from './components/AuthPage';
 import { 
   Calendar, 
@@ -68,6 +70,7 @@ export default function App() {
   const [isOnboardDoctorOpen, setIsOnboardDoctorOpen] = useState(false);
   const [isHospitalSettingsOpen, setIsHospitalSettingsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
   // Selection states for modal triggers
   const [activeConsultationAppt, setActiveConsultationAppt] = useState(null);
@@ -226,6 +229,7 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           onOpenHospitalSettings={() => setIsHospitalSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenEmergency={() => setIsEmergencyOpen(true)}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={handleToggleSidebar}
           onOpenBookModal={() => {
@@ -236,11 +240,19 @@ export default function App() {
         />
 
         <main className="content-inner" key={refreshKey}>
+          {/* Executive Hospital Presentation & Role Showcase Bar */}
+          <HospitalPitchBar
+            user={user}
+            onQuickLogin={handleQuickLogin}
+            onOpenEmergency={() => setIsEmergencyOpen(true)}
+          />
+
           {activeTab === 'dashboard' && user?.role === 'admin' && (
             <DashboardView
               user={user}
               setActiveTab={setActiveTab}
               onOpenBookModal={() => setIsBookOpen(true)}
+              onOpenEmergency={() => setIsEmergencyOpen(true)}
             />
           )}
 
@@ -361,6 +373,13 @@ export default function App() {
           triggerDataRefresh();
           setActiveTab('prescriptions');
         }}
+      />
+
+      <EmergencySOSModal
+        isOpen={isEmergencyOpen}
+        onClose={() => setIsEmergencyOpen(false)}
+        hospitalInfo={hospitalInfo}
+        user={user}
       />
 
       {/* Mobile Bottom Navigation Bar (Smartphones <= 768px) */}

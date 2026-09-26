@@ -11,16 +11,33 @@ import {
   CheckCircle2, 
   Clock,
   Building2,
-  ChevronRight
+  ChevronRight,
+  ShieldAlert,
+  ArrowRight,
+  ShieldCheck,
+  QrCode,
+  PhoneCall,
+  Flame,
+  Zap,
+  Radio,
+  Tv
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function DashboardView({ user, setActiveTab, onOpenBookModal }) {
+export default function DashboardView({ user, setActiveTab, onOpenBookModal, onOpenEmergency }) {
   const { t } = useLanguage();
   const [overview, setOverview] = useState(null);
   const [todayAppointments, setTodayAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Live Hospital Telemetry Events Feed
+  const [recentEvents] = useState([
+    { id: 1, time: '2m ago', text: 'Dr. Sarah Chen generated NMC-stamped Digital Rx with QR for Token #103', badge: 'Digital Rx', color: '#06b6d4' },
+    { id: 2, time: '7m ago', text: 'Bed #ICU-03 reserved for Post-Op Critical Observation (Cardiology)', badge: 'ICU Telemetry', color: '#f59e0b' },
+    { id: 3, time: '14m ago', text: 'Token #104 checked into OPD Room 408 with Dr. Arjun Mehta', badge: 'Live OPD', color: '#10b981' },
+    { id: 4, time: '22m ago', text: '24x7 Emergency Ambulance Dispatch Center: All 4 ALS Units on Standby', badge: 'SOS 108', color: '#f43f5e' }
+  ]);
 
   useEffect(() => {
     loadDashboardData();
@@ -81,21 +98,52 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.2s ease-out' }}>
       {/* Top Hero Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(139, 92, 246, 0.05) 100%)',
-        border: '1px solid rgba(6, 182, 212, 0.25)',
+        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(139, 92, 246, 0.08) 100%)',
+        border: '1px solid rgba(6, 182, 212, 0.3)',
+        borderTop: '1px solid rgba(6, 182, 212, 0.5)',
         borderRadius: 'var(--radius-lg)',
         padding: '28px 32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.3)'
       }}>
-        <div style={{ zIndex: 2, maxWidth: '640px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 10px', background: 'rgba(6, 182, 212, 0.15)', borderRadius: '20px', color: '#38bdf8', fontSize: '0.75rem', fontWeight: '600', marginBottom: '12px' }}>
-            <Activity size={14} className="heartbeat-icon" /> {t('dashboard.platformBadge', 'AI-DRIVEN CLINICAL OPERATIONS PLATFORM')}
+        <div style={{ zIndex: 2, maxWidth: '680px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              background: 'rgba(6, 182, 212, 0.18)',
+              border: '1px solid rgba(6, 182, 212, 0.4)',
+              borderRadius: '20px',
+              color: '#38bdf8',
+              fontSize: '0.75rem',
+              fontWeight: '700'
+            }}>
+              <Activity size={14} className="heartbeat-icon" /> {t('dashboard.platformBadge', 'AI CLINICAL COMMAND CENTER')}
+            </div>
+
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              borderRadius: '20px',
+              color: '#34d399',
+              fontSize: '0.72rem',
+              fontWeight: '700'
+            }}>
+              <span className="telemetry-beacon-live" /> NABH LEVEL-1 ACCREDITED • 100% UPTIME
+            </div>
           </div>
-          <h1 style={{ fontSize: '1.85rem', fontFamily: 'var(--font-display)', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '8px' }}>
+
+          <h1 style={{ fontSize: '1.95rem', fontFamily: 'var(--font-display)', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '8px' }}>
             {t('dashboard.welcome', 'Welcome back,')} {user?.fullName || t('dashboard.clinician', 'Clinician')}
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: '1.5' }}>
@@ -103,13 +151,13 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', zIndex: 2 }}>
+        <div style={{ display: 'flex', gap: '12px', zIndex: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button
             onClick={() => setActiveTab('ai-triage')}
             className="btn btn-outline"
-            style={{ borderColor: 'rgba(139, 92, 246, 0.4)', color: '#c084fc' }}
+            style={{ borderColor: 'rgba(139, 92, 246, 0.4)', color: '#c084fc', background: 'rgba(139, 92, 246, 0.1)' }}
           >
-            <Sparkles size={16} /> {t('dashboard.aiTriageBtn', 'AI Triage Assistant')}
+            <Sparkles size={16} /> {t('dashboard.aiTriageBtn', 'AI Triage')}
           </button>
           <button
             onClick={onOpenBookModal}
@@ -124,101 +172,181 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal }) {
           position: 'absolute',
           right: '-50px',
           top: '-50px',
-          width: '280px',
-          height: '280px',
+          width: '300px',
+          height: '300px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%)',
-          filter: 'blur(30px)',
+          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%)',
+          filter: 'blur(35px)',
           zIndex: 1
         }} />
       </div>
 
-      {/* KPI Metrics */}
-      <div className="stats-grid">
-        {/* Total Patients */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {t('dashboard.totalPatients', 'Total Patients')}
-            </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa' }}>
-              <Users size={20} />
-            </div>
+      {/* Quick Action Executive Command Dock */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '12px'
+      }}>
+        <button
+          onClick={() => setActiveTab('appointments')}
+          className="glass-card"
+          style={{
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            border: '1px solid rgba(6, 182, 212, 0.25)',
+            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+          }}
+        >
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.2)', color: '#38bdf8' }}>
+            <Stethoscope size={18} />
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-            {overview?.totalPatients || '14'}
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Doctor Station</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Live OPD Consultations</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#34d399', marginTop: '6px' }}>
-            <ArrowUpRight size={14} /> {t('dashboard.monthGrowth', '+12% this month')}
-          </div>
-        </div>
+        </button>
 
-        {/* Doctors on Duty */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {t('dashboard.doctorsOnDuty', 'Doctors On Duty')}
-            </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.1)', color: '#38bdf8' }}>
-              <Stethoscope size={20} />
-            </div>
+        <button
+          onClick={() => setActiveTab('beds')}
+          className="glass-card"
+          style={{
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+          }}
+        >
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24' }}>
+            <BedDouble size={18} />
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-            {overview?.doctorsOnDuty || 3} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>/ {overview?.totalDoctors || 4}</span>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Ward & ICU Beds</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Live Bed Allocator</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '6px' }}>
-            {t('dashboard.deptsCovered', 'All 5 clinical departments covered')}
-          </div>
-        </div>
+        </button>
 
-        {/* Today's Appointments */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {t('dashboard.appointmentsToday', "Today's Appointments")}
-            </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#34d399' }}>
-              <Calendar size={20} />
-            </div>
+        <button
+          onClick={() => setActiveTab('live-queue')}
+          className="glass-card"
+          style={{
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+          }}
+        >
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>
+            <Tv size={18} />
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-            {overview?.appointmentsToday || 3}
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>OPD Queue TV</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Waiting Room Display</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#34d399', marginTop: '6px' }}>
-            {t('dashboard.tokenQueueRunning', 'Active token queue running')}
-          </div>
-        </div>
+        </button>
 
-        {/* Bed Occupancy Rate */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {t('dashboard.bedOccupancy', 'Bed Occupancy')}
-            </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24' }}>
-              <BedDouble size={20} />
+        <button
+          onClick={() => setActiveTab('prescriptions')}
+          className="glass-card"
+          style={{
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+          }}
+        >
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}>
+            <QrCode size={18} />
+          </div>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Digital Rx & QR</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>WhatsApp Rx Sender</div>
+          </div>
+        </button>
+
+        {onOpenEmergency && (
+          <button
+            onClick={onOpenEmergency}
+            className="glass-card"
+            style={{
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              textAlign: 'left',
+              cursor: 'pointer',
+              border: '1px solid rgba(244, 63, 94, 0.35)',
+              background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%)'
+            }}
+          >
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(244, 63, 94, 0.25)', color: '#fb7185' }}>
+              <Flame size={18} />
             </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-              {overview?.occupancyRate || 44}%
+            <div>
+              <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#fb7185' }}>SOS 108 Center</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Code Red Dispatch</div>
             </div>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              ({overview?.occupiedBeds || 8} / {overview?.totalBeds || 18} {t('dashboard.bedsAvailable', 'beds')})
-            </span>
-          </div>
-          
-          {/* Progress bar */}
-          <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '3px', marginTop: '10px', overflow: 'hidden' }}>
-            <div style={{
-              width: `${overview?.occupancyRate || 44}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #10b981 0%, #f59e0b 80%, #f43f5e 100%)',
-              borderRadius: '3px'
-            }} />
-          </div>
-        </div>
+          </button>
+        )}
       </div>
+
+      {/* Security Notice: Pending Doctor Registrations */}
+      {overview?.pendingDoctorsCount > 0 && user?.role === 'admin' && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.04) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          borderRadius: 'var(--radius-md)',
+          padding: '14px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              padding: '8px',
+              borderRadius: '8px',
+              background: 'rgba(245, 158, 11, 0.2)',
+              color: '#fbbf24'
+            }}>
+              <ShieldAlert size={22} />
+            </div>
+            <div>
+              <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.94rem' }}>
+                सुरक्षा सूचना: {overview.pendingDoctorsCount} नवीन डॉक्टर नोंदणी मंजुरी प्रलंबित!
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                New physician registrations await administrative review before being allowed to access patient data and clinical workstations.
+              </div>
+            </div>
+          </div>
+          {setActiveTab && (
+            <button
+              onClick={() => setActiveTab('doctors')}
+              className="btn btn-warning btn-sm"
+              style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              पडताळणी करा (Review & Approve) <ArrowRight size={14} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Main 2-Column Section: Appointments Queue + Department Bed Distribution */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px' }}>
@@ -401,6 +529,159 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal }) {
             >
               {t('dashboard.aiTriageBtn', 'Start AI Triage')}
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Enterprise Hospital Advantage Showcase (High-Converting Sales Pitch Section) */}
+      <div className="glass-card" style={{
+        marginTop: '10px',
+        padding: '28px 32px',
+        border: '1px solid rgba(6, 182, 212, 0.3)',
+        background: 'linear-gradient(135deg, rgba(13, 21, 36, 0.95) 0%, rgba(18, 28, 46, 0.9) 100%)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', fontWeight: '800', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+              <ShieldCheck size={14} /> Hospital Trust & Doctor Advantage
+            </div>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+              Why Doctors & Multispecialty Hospitals Choose MedTech OS
+            </h3>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', fontWeight: '700' }}>
+              ✓ NABH & ABDM Ready
+            </span>
+            <span style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', fontWeight: '700' }}>
+              ✓ 256-Bit Encrypted
+            </span>
+          </div>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '18px'
+        }}>
+          {/* Feature 1: Digital Rx & WhatsApp */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '18px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.05))',
+              color: '#38bdf8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <QrCode size={22} />
+            </div>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+              1-Click WhatsApp & QR Digital Rx
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Doctors generate official digital prescriptions stamped with their NMC/MMC registration and verifiable SVG QR code, deliverable instantly to patient WhatsApp in 1 click.
+            </div>
+          </div>
+
+          {/* Feature 2: 2FA & Doctor Verification */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '18px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.05))',
+              color: '#34d399',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <ShieldCheck size={22} />
+            </div>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+              2FA Security & Admin Approval
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Eliminates fake registrations and quacks. Every registering physician undergoes OTP verification and requires administrative approval before gaining access to hospital data.
+            </div>
+          </div>
+
+          {/* Feature 3: Smart Bed & Ward Telemetry */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '18px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.05))',
+              color: '#fbbf24',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <BedDouble size={22} />
+            </div>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+              Live Ward & ICU Bed Telemetry
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Zero bed confusion. Real-time ward telemetry across ICU, Cardiology, and General beds prevents double allocations and gives hospital directors live revenue metrics.
+            </div>
+          </div>
+
+          {/* Feature 4: Emergency SOS & AI Triage */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '18px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.25), rgba(244, 63, 94, 0.05))',
+              color: '#fb7185',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Flame size={22} />
+            </div>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+              24x7 SOS 108 & AI Clinical Triage
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Immediate emergency patient handling with direct 108 ambulance hotline, Code Red ICU broadcast, and clinical AI symptom triage routing patients to the right specialist.
+            </div>
           </div>
         </div>
       </div>

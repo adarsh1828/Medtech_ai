@@ -36,6 +36,17 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
   const [error, setError] = useState('');
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [doctorPendingApproval, setDoctorPendingApproval] = useState(false);
+  const [registeredDoctorEmail, setRegisteredDoctorEmail] = useState('');
+
+  // 2FA OTP state for Doctor Registration
+  const [docOtp, setDocOtp] = useState('');
+  const [docOtpSent, setDocOtpSent] = useState(false);
+  const [docOtpVerified, setDocOtpVerified] = useState(false);
+  const [sendingDocOtp, setSendingDocOtp] = useState(false);
+  const [verifyingDocOtp, setVerifyingDocOtp] = useState(false);
+  const [docOtpHint, setDocOtpHint] = useState('');
+  const [docOtpTimer, setDocOtpTimer] = useState(0);
 
   // Patient Registration state
   const [regForm, setRegForm] = useState({
@@ -132,6 +143,54 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     }
   };
 
+  useEffect(() => {
+    let interval = null;
+    if (docOtpTimer > 0) {
+      interval = setInterval(() => {
+        setDocOtpTimer(t => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [docOtpTimer]);
+
+  const handleSendDocOtp = async () => {
+    if (!docForm.email || !docForm.email.includes('@')) {
+      setError('Please enter a valid professional email address first.');
+      return;
+    }
+    setSendingDocOtp(true);
+    setError('');
+    try {
+      const res = await api.sendOtp(docForm.email, 'doctor_registration');
+      setDocOtpSent(true);
+      setDocOtpVerified(false);
+      setDocOtpHint(res.demoOtp || '');
+      setDocOtpTimer(60);
+    } catch (err) {
+      setError(err.message || 'Failed to dispatch verification OTP.');
+    } finally {
+      setSendingDocOtp(false);
+    }
+  };
+
+  const handleVerifyDocOtp = async () => {
+    if (!docOtp || docOtp.trim().length !== 6) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setVerifyingDocOtp(true);
+    setError('');
+    try {
+      await api.verifyOtp(docForm.email, docOtp.trim(), 'doctor_registration');
+      setDocOtpVerified(true);
+      setDocOtpHint('');
+    } catch (err) {
+      setError(err.message || 'Invalid or expired OTP code.');
+    } finally {
+      setVerifyingDocOtp(false);
+    }
+  };
+
   const handleRegisterDoctor = async (e) => {
     e.preventDefault();
     if (!docForm.full_name || !docForm.email || !docForm.password || !docForm.qualification || !docForm.specialization) {
@@ -139,10 +198,20 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       return;
     }
 
+    if (!docOtpVerified) {
+      setError('सुरक्षा पडताळणी आवश्यक: कृपया नोंदणी सबमिट करण्यापूर्वी ईमेलवर पाठवलेला 6-अंकी OTP व्हेरिफाय करा.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
-      const res = await api.registerDoctor(docForm);
+      const res = await api.registerDoctor({ ...docForm, otp: docOtp.trim() });
+      if (res.pendingApproval) {
+        setDoctorPendingApproval(true);
+        setRegisteredDoctorEmail(docForm.email);
+        return;
+      }
       setStoredToken(res.token);
       setStoredUser(res.user);
       onLoginSuccess(res.user);
@@ -808,6 +877,68 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
 
             {/* 3. Doctor Registration Tab */}
             {tab === 'doctor_register' && (
+              doctorPendingApproval ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '32px 20px',
+                  background: 'rgba(6, 182, 212, 0.05)',
+                  border: '1px solid rgba(6, 182, 212, 0.25)',
+                  borderRadius: '12px',
+                  animation: 'fadeIn 0.3s ease'
+                }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '50%',
+                    background: 'rgba(6, 182, 212, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    color: '#38bdf8'
+                  }}>
+                    <Shield size={32} />
+                  </div>
+
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                    नोंदणी अर्ज सुरक्षित दाखल झाला!
+                  </h3>
+                  <p style={{ fontSize: '0.88rem', color: '#38bdf8', fontWeight: '600', marginBottom: '14px' }}>
+                    Awaiting Hospital Administrator Approval
+                  </p>
+                  
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.6', maxWidth: '420px', margin: '0 auto 20px' }}>
+                    सुरक्षेच्या कारणास्तव आणि रुग्णांच्या डेटा सुरक्षिततेसाठी, ॲडमिन कडून तुमच्या प्रमाणपत्रांची व माहितीची पडताळणी झाल्यानंतरच डॉक्टर पोर्टल सक्रिय केले जाईल.
+                  </p>
+
+                  <div style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '0.82rem',
+                    color: 'var(--text-muted)',
+                    marginBottom: '20px'
+                  }}>
+                    नोंदणीकृत ईमेल: <strong style={{ color: 'var(--text-primary)' }}>{registeredDoctorEmail}</strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDoctorPendingApproval(false);
+                      setTab('login');
+                      setEmail(registeredDoctorEmail);
+                      setPassword('');
+                      setError('');
+                    }}
+                    className="btn btn-primary"
+                    style={{ width: '100%', padding: '12px' }}
+                  >
+                    लॉगिन पृष्ठावर जा (Go to Login)
+                  </button>
+                </div>
+              ) : (
               <form onSubmit={handleRegisterDoctor}>
                 <div style={{
                   background: 'rgba(6, 182, 212, 0.06)',
@@ -819,9 +950,9 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   alignItems: 'center',
                   gap: '10px'
                 }}>
-                  <Award size={20} color="#38bdf8" />
+                  <Shield size={20} color="#38bdf8" />
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                    Register as a clinical physician. You will have full access to OPD queues, electronic prescriptions, and drug interaction checkers.
+                    <strong>सुरक्षा सूचना:</strong> नवीन नोंदणीकृत डॉक्टरांचे खाते हॉस्पिटल ॲडमिनच्या मंजुरीनंतरच (Approval) सक्रिय होईल.
                   </div>
                 </div>
 
@@ -838,16 +969,85 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Professional Email *</label>
-                    <input
-                      type="email"
-                      required
-                      className="form-input"
-                      placeholder="dr.rajesh@medtech.ai"
-                      value={docForm.email}
-                      onChange={(e) => setDocForm({ ...docForm, email: e.target.value })}
-                    />
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <label className="form-label" style={{ marginBottom: 0 }}>Professional Email (2FA Verified) *</label>
+                      {docOtpVerified && (
+                        <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <CheckCircle2 size={13} /> Email Verified
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input
+                        type="email"
+                        required
+                        disabled={docOtpVerified}
+                        className="form-input"
+                        placeholder="dr.rajesh@medtech.ai"
+                        value={docForm.email}
+                        onChange={(e) => {
+                          setDocForm({ ...docForm, email: e.target.value });
+                          setDocOtpVerified(false);
+                          setDocOtpSent(false);
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                      {!docOtpVerified && (
+                        <button
+                          type="button"
+                          disabled={sendingDocOtp || docOtpTimer > 0 || !docForm.email}
+                          onClick={handleSendDocOtp}
+                          className="btn btn-outline"
+                          style={{ whiteSpace: 'nowrap', fontSize: '0.8rem', padding: '0 14px' }}
+                        >
+                          {sendingDocOtp ? 'Sending...' : docOtpTimer > 0 ? `Resend (${docOtpTimer}s)` : docOtpSent ? 'Resend OTP' : 'Send 2FA OTP'}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* 2FA OTP Input Section */}
+                    {docOtpSent && !docOtpVerified && (
+                      <div style={{
+                        marginTop: '10px',
+                        padding: '12px',
+                        background: 'rgba(6, 182, 212, 0.06)',
+                        border: '1px solid rgba(6, 182, 212, 0.25)',
+                        borderRadius: '8px',
+                        animation: 'fadeIn 0.2s ease'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                            Enter the 6-digit verification code sent to <strong>{docForm.email}</strong>
+                          </span>
+                          {docOtpHint && (
+                            <span style={{ fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>
+                              Demo OTP: {docOtpHint}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <input
+                            type="text"
+                            maxLength={6}
+                            placeholder="Enter 6-digit OTP"
+                            value={docOtp}
+                            onChange={(e) => setDocOtp(e.target.value.replace(/\D/g, ''))}
+                            className="form-input"
+                            style={{ maxWidth: '180px', letterSpacing: '3px', fontWeight: '700', fontSize: '1rem', textAlign: 'center' }}
+                          />
+                          <button
+                            type="button"
+                            disabled={verifyingDocOtp || docOtp.trim().length !== 6}
+                            onClick={handleVerifyDocOtp}
+                            className="btn btn-emerald btn-sm"
+                            style={{ fontWeight: '700' }}
+                          >
+                            {verifyingDocOtp ? 'Verifying...' : 'Verify OTP'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group">
@@ -942,9 +1142,10 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   className="btn btn-cyan"
                   style={{ width: '100%', marginTop: '16px', padding: '12px' }}
                 >
-                  {loading ? 'Onboarding Doctor...' : 'Register Physician & Open Workstation'}
+                  {loading ? 'Submitting Application...' : 'Submit Physician Application for Admin Review'}
                 </button>
               </form>
+              )
             )}
 
             {/* 4. Administrator Registration Tab */}

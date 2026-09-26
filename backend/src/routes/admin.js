@@ -27,13 +27,17 @@ router.get('/overview', async (req, res) => {
       [today]
     );
 
-    // Doctors On Duty & Total Doctors
+    // Doctors On Duty & Total Doctors (Approved only)
     const doctorStats = await getOne(
       `SELECT 
          COUNT(*) as total_doctors,
          SUM(CASE WHEN is_on_duty = 1 THEN 1 ELSE 0 END) as doctors_on_duty
-       FROM Doctors`
+       FROM Doctors WHERE status = 'approved' OR status IS NULL`
     );
+
+    // Pending Doctor Approvals
+    const pendingDocsRow = await getOne(`SELECT COUNT(*) as count FROM Doctors WHERE status = 'pending'`);
+    const pendingDoctorsCount = pendingDocsRow?.count || 0;
 
     // Bed Occupancy
     const bedStats = await getOne(
@@ -52,7 +56,7 @@ router.get('/overview', async (req, res) => {
     // Department Distribution
     const departmentStats = await query(`
       SELECT d.name, d.code,
-        (SELECT COUNT(*) FROM Doctors WHERE department_id = d.id) as doctors_count,
+        (SELECT COUNT(*) FROM Doctors WHERE department_id = d.id AND (status = 'approved' OR status IS NULL)) as doctors_count,
         (SELECT COUNT(*) FROM Appointments WHERE department_id = d.id AND appointment_date = '${today}') as appointments_today,
         (SELECT COUNT(*) FROM Beds WHERE department_id = d.id) as beds_count,
         (SELECT COUNT(*) FROM Beds WHERE department_id = d.id AND status = 'occupied') as beds_occupied
@@ -80,6 +84,7 @@ router.get('/overview', async (req, res) => {
         totalRegisteredPatients: totalPatients,
         doctorsOnDuty: doctorStats?.doctors_on_duty || 0,
         totalDoctors: doctorStats?.total_doctors || 0,
+        pendingDoctorsCount,
         totalBeds,
         occupiedBeds,
         availableBeds: bedStats?.available_beds || 0,
@@ -134,8 +139,8 @@ router.post('/doctors', async (req, res) => {
     );
 
     const docResult = await run(
-      `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+      `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee, status, approved_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 'approved', CURRENT_TIMESTAMP)`,
       [
         userResult.lastID,
         full_name.trim(),
@@ -182,6 +187,86 @@ router.delete('/doctors/:id', async (req, res) => {
   } catch (err) {
     console.error('Error removing doctor:', err);
     res.status(500).json({ error: 'Failed to delete doctor.' });
+  }
+});
+
+// GET all pending doctor registration requests
+router.get('/pending-doctors', async (req, res) => {
+  try {
+    const pendingDoctors = await query(`
+      SELECT d.*, dep.name as department_name, dep.code as department_code, u.email, u.phone, u.created_at as registered_at
+      FROM Doctors d
+      JOIN Departments dep ON d.department_id = dep.id
+      JOIN Users u ON d.user_id = u.id
+      WHERE d.status = 'pending'
+      ORDER BY d.id DESC
+    `);
+    res.json({ pendingDoctors });
+  } catch (err) {
+    console.error('Error fetching pending doctors:', err);
+    res.status(500).json({ error: 'Failed to retrieve pending doctor applications.' });
+  }
+});
+
+// PUT Approve doctor registration
+router.put('/doctors/:id/approve', async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    const doc = await getOne('SELECT id, user_id, full_name, status FROM Doctors WHERE id = ?', [doctorId]);
+    if (!doc) {
+      return res.status(404).json({ error: 'Doctor application not found.' });
+    }
+
+    await run(
+      `UPDATE Doctors 
+       SET status = 'approved', approved_at = CURRENT_TIMESTAMP, is_on_duty = 1 
+       WHERE id = ?`,
+      [doctorId]
+    );
+
+    const updatedDoc = await getOne(
+      `SELECT d.*, dep.name as department_name, u.email, u.phone
+       FROM Doctors d
+       JOIN Departments dep ON d.department_id = dep.id
+       JOIN Users u ON d.user_id = u.id
+       WHERE d.id = ?`,
+      [doctorId]
+    );
+
+    res.json({
+      message: `Physician Dr. ${doc.full_name} approved successfully! Their clinical portal access is now active.`,
+      doctor: updatedDoc,
+      doctorId: Number(doctorId),
+      status: 'approved'
+    });
+  } catch (err) {
+    console.error('Error approving doctor:', err);
+    res.status(500).json({ error: 'Failed to approve doctor application.' });
+  }
+});
+
+// PUT Reject doctor registration
+router.put('/doctors/:id/reject', async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    const doc = await getOne('SELECT id, user_id, full_name FROM Doctors WHERE id = ?', [doctorId]);
+    if (!doc) {
+      return res.status(404).json({ error: 'Doctor application not found.' });
+    }
+
+    await run(
+      `UPDATE Doctors SET status = 'rejected', is_on_duty = 0 WHERE id = ?`,
+      [doctorId]
+    );
+
+    res.json({
+      message: `Registration application for Dr. ${doc.full_name} has been rejected.`,
+      doctorId: Number(doctorId),
+      status: 'rejected'
+    });
+  } catch (err) {
+    console.error('Error rejecting doctor:', err);
+    res.status(500).json({ error: 'Failed to reject doctor application.' });
   }
 });
 

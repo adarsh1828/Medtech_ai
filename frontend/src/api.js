@@ -61,6 +61,14 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(payload)
   }),
+  sendOtp: (email, purpose = 'doctor_registration') => request('/auth/send-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, purpose })
+  }),
+  verifyOtp: (email, otp, purpose = 'doctor_registration') => request('/auth/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, otp, purpose })
+  }),
   getMe: () => request('/auth/me'),
 
 
@@ -79,6 +87,14 @@ export const api = {
   }),
   deleteDoctor: (id) => request(`/admin/doctors/${id}`, {
     method: 'DELETE'
+  }),
+  getPendingDoctors: () => request('/admin/pending-doctors'),
+  approveDoctor: (id) => request(`/admin/doctors/${id}/approve`, {
+    method: 'PUT'
+  }),
+  rejectDoctor: (id, reason = '') => request(`/admin/doctors/${id}/reject`, {
+    method: 'PUT',
+    body: JSON.stringify({ reason })
   }),
 
 

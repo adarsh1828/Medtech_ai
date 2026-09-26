@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const departments = await query(`
       SELECT d.*, 
-        (SELECT COUNT(*) FROM Doctors WHERE department_id = d.id) as doctor_count,
+        (SELECT COUNT(*) FROM Doctors WHERE department_id = d.id AND (status = 'approved' OR status IS NULL)) as doctor_count,
         (SELECT COUNT(*) FROM Beds WHERE department_id = d.id) as bed_count
       FROM Departments d
       ORDER BY d.name ASC
@@ -28,7 +28,10 @@ router.get('/:id', async (req, res) => {
     if (!department) {
       return res.status(404).json({ error: 'Department not found.' });
     }
-    const doctors = await query('SELECT * FROM Doctors WHERE department_id = ?', [req.params.id]);
+    const doctors = await query(
+      "SELECT * FROM Doctors WHERE department_id = ? AND (status = 'approved' OR status IS NULL)",
+      [req.params.id]
+    );
     res.json({ department, doctors });
   } catch (err) {
     res.status(500).json({ error: 'Failed to load department details.' });

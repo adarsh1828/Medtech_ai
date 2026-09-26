@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
       FROM Doctors d
       JOIN Departments dep ON d.department_id = dep.id
       JOIN Users u ON d.user_id = u.id
-      WHERE 1=1
+      WHERE (d.status = 'approved' OR d.status IS NULL)
     `;
     const params = [];
 
@@ -44,12 +44,12 @@ router.get('/:id', async (req, res) => {
        FROM Doctors d
        JOIN Departments dep ON d.department_id = dep.id
        JOIN Users u ON d.user_id = u.id
-       WHERE d.id = ?`,
+       WHERE d.id = ? AND (d.status = 'approved' OR d.status IS NULL)`,
       [req.params.id]
     );
 
     if (!doctor) {
-      return res.status(404).json({ error: 'Doctor not found.' });
+      return res.status(404).json({ error: 'Doctor not found or pending administrative approval.' });
     }
 
     res.json({ doctor });
@@ -66,6 +66,10 @@ router.patch('/:id/toggle-duty', authenticateToken, async (req, res) => {
 
     if (!doctor) {
       return res.status(404).json({ error: 'Doctor record not found.' });
+    }
+
+    if (doctor.status && doctor.status !== 'approved') {
+      return res.status(403).json({ error: 'Unapproved doctors cannot change duty status.' });
     }
 
     // Check authorization: must be the doctor themself or an admin

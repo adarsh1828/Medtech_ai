@@ -68,7 +68,88 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Register Doctor (Self-Registration)
+// POST Send OTP for 2FA Email Verification
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { email, purpose = 'doctor_registration' } = req.body;
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'A valid email address is required to receive OTP.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Check if account already exists when registering
+    if (purpose === 'doctor_registration' || purpose === 'registration') {
+      const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+      if (existingUser) {
+        return res.status(409).json({ error: 'An account with this email address already exists. Please sign in instead.' });
+      }
+    }
+
+    // Generate secure 6-digit numeric OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiryTimestamp = Math.floor((Date.now() + 10 * 60 * 1000) / 1000); // 10 minutes
+
+    // Delete any old OTP requests for this email and purpose
+    await run('DELETE FROM OtpVerifications WHERE email = ? AND purpose = ?', [cleanEmail, purpose]);
+
+    // Insert new OTP record
+    await run(
+      'INSERT INTO OtpVerifications (email, otp_code, purpose, expires_at) VALUES (?, ?, ?, datetime(?, "unixepoch"))',
+      [cleanEmail, otpCode, purpose, expiryTimestamp]
+    );
+
+    console.log(`[2FA OTP] Verification code generated for ${cleanEmail}: ${otpCode}`);
+
+    res.json({
+      success: true,
+      message: `6-digit security code sent to ${cleanEmail}. Valid for 10 minutes.`,
+      email: cleanEmail,
+      demoOtp: otpCode // Provided in response for easy testing in live demo
+    });
+  } catch (err) {
+    console.error('Error sending OTP:', err);
+    res.status(500).json({ error: 'Failed to dispatch verification OTP.' });
+  }
+});
+
+// POST Verify OTP
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp, purpose = 'doctor_registration' } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ error: 'Email and 6-digit verification code are required.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = otp.toString().trim();
+
+    const record = await getOne(
+      `SELECT * FROM OtpVerifications 
+       WHERE email = ? AND purpose = ? AND otp_code = ? AND expires_at > datetime('now')
+       ORDER BY id DESC LIMIT 1`,
+      [cleanEmail, purpose, cleanOtp]
+    );
+
+    if (!record) {
+      return res.status(400).json({ error: 'Invalid or expired verification code. Please check and try again.' });
+    }
+
+    await run('UPDATE OtpVerifications SET verified_at = CURRENT_TIMESTAMP WHERE id = ?', [record.id]);
+
+    res.json({
+      success: true,
+      message: 'Email address verified successfully! You may now proceed with registration.'
+    });
+  } catch (err) {
+    console.error('Error verifying OTP:', err);
+    res.status(500).json({ error: 'Failed to verify OTP.' });
+  }
+});
+
+// Register Doctor (Self-Registration with 2FA Email Verification)
 router.post('/register-doctor', async (req, res) => {
   try {
     const {
@@ -82,7 +163,8 @@ router.post('/register-doctor', async (req, res) => {
       experience_years,
       room_number,
       shift_timings,
-      consultation_fee
+      consultation_fee,
+      otp
     } = req.body;
 
     if (!full_name || !email || !password || !department_id || !qualification || !specialization) {
@@ -91,7 +173,24 @@ router.post('/register-doctor', async (req, res) => {
       });
     }
 
-    const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [email.toLowerCase().trim()]);
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Verify 2FA OTP requirement
+    const verifiedOtp = await getOne(
+      `SELECT * FROM OtpVerifications 
+       WHERE email = ? AND purpose = 'doctor_registration' 
+         AND (verified_at IS NOT NULL OR (otp_code = ? AND expires_at > datetime('now')))
+       ORDER BY id DESC LIMIT 1`,
+      [cleanEmail, otp ? otp.toString().trim() : '']
+    );
+
+    if (!verifiedOtp) {
+      return res.status(400).json({ 
+        error: 'Security verification required: Please verify your professional email with the 6-digit OTP code before submitting.' 
+      });
+    }
+
+    const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
     if (existingUser) {
       return res.status(409).json({ error: 'An account with this email address already exists.' });
     }
@@ -101,12 +200,12 @@ router.post('/register-doctor', async (req, res) => {
 
     const userResult = await run(
       "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'doctor', ?, ?)",
-      [email.toLowerCase().trim(), password_hash, full_name.trim(), phone || null]
+      [cleanEmail, password_hash, full_name.trim(), phone || null]
     );
 
     const docResult = await run(
-      `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+      `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 'pending')`,
       [
         userResult.lastID,
         full_name.trim(),
@@ -116,36 +215,24 @@ router.post('/register-doctor', async (req, res) => {
         Number(experience_years) || 3,
         room_number?.trim() || 'Room 102',
         shift_timings || '09:00 AM - 05:00 PM',
-        Number(consultation_fee) || 50.0
+        Number(consultation_fee) || 500.0
       ]
     );
 
-    const dept = await getOne('SELECT name FROM Departments WHERE id = ?', [department_id]);
+    // Clean up OTP record
+    await run('DELETE FROM OtpVerifications WHERE id = ?', [verifiedOtp.id]);
 
-    const tokenPayload = {
-      userId: userResult.lastID,
-      role: 'doctor',
-      doctorId: docResult.lastID,
-      email: email.toLowerCase().trim(),
-      fullName: full_name.trim(),
-      specialization: specialization.trim(),
-      departmentName: dept ? dept.name : 'Clinical Specialist',
-      roomNumber: room_number?.trim() || 'Room 102',
-      isOnDuty: true
-    };
-
-    const token = generateToken(tokenPayload);
-
+    // SECURITY: Self-registered doctors are NOT auto-logged in.
+    // They must wait for hospital administrator verification before logging in.
     res.status(201).json({
-      message: 'Doctor account registered successfully!',
-      token,
+      message: 'Physician application submitted successfully! Your account is pending administrator verification. Once approved, you will be able to log in.',
+      pendingApproval: true,
       user: {
         id: userResult.lastID,
         email: email.toLowerCase().trim(),
         role: 'doctor',
         fullName: full_name.trim(),
-        phone: phone || null,
-        ...tokenPayload
+        status: 'pending'
       }
     });
   } catch (err) {
@@ -256,19 +343,39 @@ router.post('/login', async (req, res) => {
       }
     } else if (user.role === 'doctor') {
       const doctor = await getOne(
-        `SELECT d.id, d.specialization, d.room_number, d.is_on_duty, dep.name as department_name
+        `SELECT d.id, d.specialization, d.room_number, d.is_on_duty, d.status, dep.name as department_name
          FROM Doctors d
          LEFT JOIN Departments dep ON d.department_id = dep.id
          WHERE d.user_id = ?`,
         [user.id]
       );
-      if (doctor) {
-        extraData.doctorId = doctor.id;
-        extraData.specialization = doctor.specialization;
-        extraData.departmentName = doctor.department_name;
-        extraData.roomNumber = doctor.room_number;
-        extraData.isOnDuty = !!doctor.is_on_duty;
+      if (!doctor) {
+        return res.status(401).json({ error: 'Doctor profile record not found.' });
       }
+
+      // Check approval status: Pending or Rejected doctors cannot log in
+      const docStatus = doctor.status || 'approved';
+      if (docStatus === 'pending') {
+        return res.status(403).json({
+          error: 'Your doctor registration is pending administrator approval. Please wait until the hospital administrator verifies and activates your credentials.',
+          pendingApproval: true,
+          status: 'pending'
+        });
+      }
+
+      if (docStatus === 'rejected') {
+        return res.status(403).json({
+          error: 'Your doctor registration application was declined by the hospital administration. Please contact management.',
+          status: 'rejected'
+        });
+      }
+
+      extraData.doctorId = doctor.id;
+      extraData.specialization = doctor.specialization;
+      extraData.departmentName = doctor.department_name;
+      extraData.roomNumber = doctor.room_number;
+      extraData.isOnDuty = !!doctor.is_on_duty;
+      extraData.status = docStatus;
     }
 
     const tokenPayload = {
@@ -319,6 +426,9 @@ router.get('/me', authenticateToken, async (req, res) => {
          WHERE d.user_id = ?`,
         [user.id]
       );
+      if (doctor && doctor.status && doctor.status !== 'approved') {
+        return res.status(403).json({ error: 'Your doctor account is pending administrator approval.', pendingApproval: true });
+      }
       profile.doctor = doctor;
     }
 

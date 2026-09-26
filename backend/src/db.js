@@ -139,6 +139,8 @@ export async function initializeDatabase() {
       shift_timings TEXT DEFAULT '09:00 AM - 05:00 PM',
       is_on_duty INTEGER DEFAULT 1,
       consultation_fee REAL DEFAULT 50.00,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
+      approved_at DATETIME,
       FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
       FOREIGN KEY (department_id) REFERENCES Departments(id)
     )
@@ -339,6 +341,19 @@ export async function initializeDatabase() {
     )
   `);
 
+  // 14. OtpVerifications (Email 2FA Verification)
+  await run(`
+    CREATE TABLE IF NOT EXISTS OtpVerifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL,
+      otp_code TEXT NOT NULL,
+      purpose TEXT DEFAULT 'doctor_registration',
+      expires_at DATETIME NOT NULL,
+      verified_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
   try {
     await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");
@@ -387,6 +402,17 @@ export async function initializeDatabase() {
     console.error('Error migrating Appointments status CHECK constraint:', err);
   }
 
+  // Auto-migration for Doctors table: ensure status and approved_at columns exist
+  try {
+    await run("ALTER TABLE Doctors ADD COLUMN status TEXT DEFAULT 'approved'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE Doctors ADD COLUMN approved_at DATETIME");
+  } catch (e) {}
+  try {
+    await run("UPDATE Doctors SET status = 'approved' WHERE status IS NULL OR status = ''");
+  } catch (e) {}
+
   console.log('Database tables verified.');
 
   // Seed default clinical data if empty
@@ -421,8 +447,8 @@ async function getOrInsertDoctor(userId, fullName, deptId, qualification, specia
   const existing = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [userId]);
   if (existing) return existing.id;
   const res = await run(
-    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee, status, approved_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', CURRENT_TIMESTAMP)`,
     [userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee]
   );
   return res.lastID;
