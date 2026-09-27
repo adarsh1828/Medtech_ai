@@ -705,7 +705,7 @@ async function getOrInsertLabTest(name, code, category, normalRange, units, desc
 }
 
 async function seedDefaultData() {
-  console.log('Verifying and ensuring core accounts and default clinical data idempotently...');
+  console.log('Verifying core system accounts and clinical data...');
   const salt = await bcrypt.genSalt(10);
   const adminHash = await bcrypt.hash('admin123', salt);
   const doctorHash = await bcrypt.hash('doctor123', salt);
@@ -713,6 +713,7 @@ async function seedDefaultData() {
 
   // 1. Seed Users (idempotent - guaranteed presence on Local SQLite and Cloud LibSQL)
   const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Dr. Arthur Pendelton', '+1 (555) 019-2831');
+  await getOrInsertUser('adarsh@medtech.ai', adminHash, 'admin', 'Adarsh Surya (Chief Administrator)', '+91 8668351191');
   
   // Seed custom admin accounts from local database
   await getOrInsertUser('karaningole@gmail.com', '$2a$10$ro52bhx.4IjvzrXr3amt5OK7CBT/Ic2wUsomMMLjP4DlyUI6.r42G', 'admin', 'Karan Sadashiv Ingole (Medical Director & Chief Executive)', '+91 98200 11223');
@@ -739,6 +740,9 @@ async function seedDefaultData() {
   await getOrInsertUser('rameshgsurya@gmail.com', '$2a$10$wOshkuC2O9fxYdjFn7mCn.GeAM66B4qV8c96mRjEKEevd4K5NQxDC', 'doctor', 'Dr. Ramesh Ganeshrao Surya', '+91 7875723205');
   await getOrInsertUser('shravangaikwad388@gmail.com', '$2a$10$CuXOKoAthKbyBYwGdrCNoO9A.gewnJNOSht.G3CoWsyOcRRxe8dWS', 'patient', 'Shravan Gaikwad', '+91 8766023102');
 
+  const docRajeshUserId = await getOrInsertUser('dr.rajesh@medtech.ai', doctorHash, 'doctor', 'Dr. Rajesh Deshmukh, MD', '+91 98201 55667');
+  const patientRahulUserId = await getOrInsertUser('rahul@medtech.ai', patientHash, 'patient', 'Rahul Patil', '+91 98202 33445');
+
   const doc1UserId = await getOrInsertUser('dr.sarah@medtech.ai', doctorHash, 'doctor', 'Dr. Sarah Chen, MD', '+1 (555) 302-8812');
   const doc2UserId = await getOrInsertUser('dr.arjun@medtech.ai', doctorHash, 'doctor', 'Dr. Arjun Mehta, DM', '+1 (555) 441-9923');
   const doc3UserId = await getOrInsertUser('dr.emily@medtech.ai', doctorHash, 'doctor', 'Dr. Emily Vance, MS', '+1 (555) 872-1144');
@@ -756,6 +760,7 @@ async function seedDefaultData() {
   const deptGenMedId = await getOrInsertDepartment('General Medicine', 'GENM', 'Primary ambulatory care, acute illness assessment, and chronic disease management', 1, 'Dr. Arthur Pendelton', 'Stethoscope');
 
   // 3. Seed Doctors (idempotent)
+  await getOrInsertDoctor(docRajeshUserId, 'Dr. Rajesh Deshmukh, MD', deptCardioId, 'MD (Cardiology), DM', 'Interventional Cardiology & Preventive Health', 14, 'Room 301', '09:00 AM - 05:00 PM', 1, 650.00);
   const doc1Id = await getOrInsertDoctor(doc1UserId, 'Dr. Sarah Chen, MD', deptCardioId, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302', '09:00 AM - 05:00 PM', 1, 650.00);
   const doc2Id = await getOrInsertDoctor(doc2UserId, 'Dr. Arjun Mehta, DM', deptNeuroId, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408', '09:00 AM - 05:00 PM', 1, 750.00);
   const doc3Id = await getOrInsertDoctor(doc3UserId, 'Dr. Emily Vance, MS', deptOrthoId, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214', '09:00 AM - 05:00 PM', 1, 550.00);
@@ -799,6 +804,19 @@ async function seedDefaultData() {
     '45 Pine Needle Court, Seattle',
     'None reported',
     'No major prior hospitalizations'
+  );
+
+  await getOrInsertPatient(
+    patientRahulUserId,
+    'Rahul Patil',
+    '1992-05-18',
+    'Male',
+    'B+',
+    '+91 98202 33445',
+    'Sunita Patil (Spouse) - +91 98202 33446',
+    'Flat 402, Shivajinagar, Pune',
+    'None reported',
+    'Annual corporate health checkup, mild borderline blood pressure'
   );
 
   // 5. Seed Lab Tests (idempotent)

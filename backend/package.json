@@ -1,7 +1,8 @@
 {
-  "name": "medtech-ai-backend",
+  "name": "medtech-api-server",
   "version": "1.0.0",
-  "description": "Hospital Management System Backend API",
+  "description": "RESTful API Server for MedTech Hospital Management System",
+  "author": "Adarsh Surya <adarshvsurya@gmail.com>",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

@@ -751,7 +751,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   {/* Patient Demo */}
                   <button
                     type="button"
-                    onClick={() => handleSelectPreset('patient', 'elena@medtech.ai', 'patient123')}
+                    onClick={() => handleSelectPreset('patient', 'rahul@medtech.ai', 'patient123')}
                     className="btn btn-outline"
                     style={{
                       padding: '10px 6px',
@@ -771,14 +771,14 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       👤 Patient
                     </span>
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      Elena R.
+                      Rahul P.
                     </span>
                   </button>
 
                   {/* Doctor Demo */}
                   <button
                     type="button"
-                    onClick={() => handleSelectPreset('doctor', 'dr.sarah@medtech.ai', 'doctor123')}
+                    onClick={() => handleSelectPreset('doctor', 'dr.rajesh@medtech.ai', 'doctor123')}
                     className="btn btn-outline"
                     style={{
                       padding: '10px 6px',
@@ -798,7 +798,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       🩺 Doctor
                     </span>
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      Dr. Sarah
+                      Dr. Rajesh
                     </span>
                   </button>
 
@@ -886,7 +886,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   {/* Admin Demo */}
                   <button
                     type="button"
-                    onClick={() => handleSelectPreset('admin', 'admin@medtech.ai', 'admin123')}
+                    onClick={() => handleSelectPreset('admin', 'adarsh@medtech.ai', 'admin123')}
                     className="btn btn-outline"
                     style={{
                       padding: '10px 6px',
@@ -906,7 +906,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       🛡️ Admin
                     </span>
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      Arthur P.
+                      Adarsh S.
                     </span>
                   </button>
                 </div>
@@ -926,12 +926,12 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   }}>
                     <CheckCircle2 size={15} color="#38bdf8" />
                     <span>
-                      {selectedRole === 'patient' && '👤 Elena Rodriguez (Patient) चे क्रेडेंशियल्स भरले आहेत.'}
-                      {selectedRole === 'doctor' && '🩺 Dr. Sarah Chen (Doctor) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'patient' && '👤 Rahul Patil (Patient) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'doctor' && '🩺 Dr. Rajesh Deshmukh (Doctor) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'nurse' && '👩‍⚕️ Sister Sunita Sharma (Staff Nurse) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'cleaning' && '🧹 Ramesh Shinde (Sanitation Staff) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'staff' && '🏢 Priya Deshmukh (Hospital Staff & Reception) चे क्रेडेंशियल्स भरले आहेत.'}
-                      {selectedRole === 'admin' && '🛡️ Arthur Pendelton (Admin) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'admin' && '🛡️ Adarsh Surya (Admin & Medical Director) चे क्रेडेंशियल्स भरले आहेत.'}
                       {' '}लॉगिन करण्यासाठी खालील <strong>"Sign In to Hospital Portal"</strong> बटण दाबा.
                     </span>
                   </div>

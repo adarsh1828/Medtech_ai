@@ -1,7 +1,9 @@
 {
-  "name": "frontend",
+  "name": "medtech-hospital-portal",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Frontend Web Application for Clinical Hospital Management System",
+  "author": "Adarsh Surya <adarshvsurya@gmail.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",
