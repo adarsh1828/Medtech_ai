@@ -52,6 +52,18 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
   const [docOtpHint, setDocOtpHint] = useState('');
   const [docOtpTimer, setDocOtpTimer] = useState(0);
 
+  // Forgot Password / Reset state
+  const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtp, setForgotOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [forgotOtpTimer, setForgotOtpTimer] = useState(0);
+  const [forgotOtpHint, setForgotOtpHint] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+
   // Patient Registration state
   const [regForm, setRegForm] = useState({
     full_name: '',
@@ -188,6 +200,16 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     }
     return () => clearInterval(interval);
   }, [docOtpTimer]);
+
+  useEffect(() => {
+    let interval = null;
+    if (forgotOtpTimer > 0) {
+      interval = setInterval(() => {
+        setForgotOtpTimer(t => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [forgotOtpTimer]);
 
   const handleSendDocOtp = async () => {
     if (!docForm.email || !docForm.email.includes('@')) {
@@ -336,6 +358,80 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       setError(err.message || 'Hospital staff registration failed.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendForgotOtp = async (e) => {
+    if (e) e.preventDefault();
+    if (!forgotEmail || !forgotEmail.includes('@')) {
+      setError('Please enter a valid registered email address.');
+      return;
+    }
+    setForgotLoading(true);
+    setError('');
+    setForgotSuccess('');
+    try {
+      const res = await api.sendOtp(forgotEmail.trim(), 'forgot_password');
+      setForgotStep(2);
+      setForgotOtpTimer(60);
+      setForgotOtpHint(res.demoOtp || '');
+    } catch (err) {
+      setError(err.message || 'Failed to send verification code. Please check email address.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleVerifyForgotOtp = async (e) => {
+    if (e) e.preventDefault();
+    if (!forgotOtp || forgotOtp.trim().length !== 6) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setForgotLoading(true);
+    setError('');
+    try {
+      await api.verifyOtp(forgotEmail.trim(), forgotOtp.trim(), 'forgot_password');
+      setForgotStep(3);
+    } catch (err) {
+      setError(err.message || 'Invalid or expired OTP code.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setError('New password must be at least 6 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match. Please verify both fields.');
+      return;
+    }
+    setForgotLoading(true);
+    setError('');
+    try {
+      const res = await api.resetPassword({
+        email: forgotEmail.trim(),
+        otp: forgotOtp.trim(),
+        new_password: newPassword
+      });
+      setForgotSuccess(res.message || 'Password reset successfully!');
+      setEmail(forgotEmail.trim());
+      setPassword('');
+      setTimeout(() => {
+        setTab('login');
+        setForgotStep(1);
+        setForgotOtp('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }, 1800);
+    } catch (err) {
+      setError(err.message || 'Failed to reset password. Please try again.');
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -527,29 +623,54 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
         }}>
           {/* Main Card */}
           <div className="glass-card auth-card-wrapper">
-            {/* Header / Lock Badge */}
-            <div style={{ textAlign: 'center', marginBottom: '22px' }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '52px',
-                height: '52px',
-                borderRadius: '14px',
-                background: 'rgba(6, 182, 212, 0.1)',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
-                color: 'var(--primary)',
-                marginBottom: '12px'
-              }}>
-                <Lock size={26} />
+            {/* Header / Lock or Key Badge */}
+            {tab === 'forgot_password' ? (
+              <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '14px',
+                  background: 'rgba(56, 189, 248, 0.1)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  color: '#38bdf8',
+                  marginBottom: '12px'
+                }}>
+                  <KeyRound size={26} />
+                </div>
+                <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '700', color: 'var(--text-primary)' }}>
+                  Password Recovery / पासवर्ड रीसेट
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px' }}>
+                  Secure 3-step verification to reset your medical portal password
+                </p>
               </div>
-              <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '700', color: 'var(--text-primary)' }}>
-                {t('auth.portalAccess', 'Hospital Portal Authentication')}
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px' }}>
-                {t('auth.loginSubtitle', 'Select your role or enter your credentials to open your medical dashboard')}
-              </p>
-            </div>
+            ) : (
+              <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '14px',
+                  background: 'rgba(6, 182, 212, 0.1)',
+                  border: '1px solid rgba(6, 182, 212, 0.3)',
+                  color: 'var(--primary)',
+                  marginBottom: '12px'
+                }}>
+                  <Lock size={26} />
+                </div>
+                <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '700', color: 'var(--text-primary)' }}>
+                  {t('auth.portalAccess', 'Hospital Portal Authentication')}
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px' }}>
+                  {t('auth.loginSubtitle', 'Select your role or enter your credentials to open your medical dashboard')}
+                </p>
+              </div>
+            )}
 
             {/* Instant 1-Click Demo Login Cards */}
             {tab === 'login' && (
@@ -772,32 +893,97 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
               </div>
             )}
 
-            {/* Navigation Tabs */}
-            <div style={{
-              display: 'flex',
-              borderBottom: '1px solid var(--border-subtle)',
-              marginBottom: '20px',
-              overflowX: 'auto',
-              gap: '4px'
-            }}>
-              <button
-                type="button"
-                onClick={() => { setTab('login'); setError(''); }}
-                style={{
-                  flex: 1,
-                  padding: '10px 8px',
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: tab === 'login' ? '2px solid var(--primary)' : '2px solid transparent',
-                  color: tab === 'login' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: tab === 'login' ? '700' : '500',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {t('auth.signIn', 'Sign In')}
-              </button>
+            {/* Navigation Tabs or Forgot Password Flow Header */}
+            {tab === 'forgot_password' ? (
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setTab('login'); setError(''); setForgotSuccess(''); }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#38bdf8',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    ← Back to Sign In / लॉगिनकडे परत जा
+                  </button>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Step {forgotStep} of 3
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <div style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    fontSize: '0.74rem',
+                    fontWeight: '700',
+                    background: forgotStep >= 1 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                    border: forgotStep >= 1 ? '1px solid #38bdf8' : '1px solid var(--border-subtle)',
+                    color: forgotStep >= 1 ? '#38bdf8' : 'var(--text-muted)'
+                  }}>
+                    1. Email
+                  </div>
+                  <div style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    fontSize: '0.74rem',
+                    fontWeight: '700',
+                    background: forgotStep >= 2 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                    border: forgotStep >= 2 ? '1px solid #38bdf8' : '1px solid var(--border-subtle)',
+                    color: forgotStep >= 2 ? '#38bdf8' : 'var(--text-muted)'
+                  }}>
+                    2. 6-Digit OTP
+                  </div>
+                  <div style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    fontSize: '0.74rem',
+                    fontWeight: '700',
+                    background: forgotStep >= 3 ? 'rgba(52, 211, 153, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                    border: forgotStep >= 3 ? '1px solid #34d399' : '1px solid var(--border-subtle)',
+                    color: forgotStep >= 3 ? '#34d399' : 'var(--text-muted)'
+                  }}>
+                    3. New Password
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                borderBottom: '1px solid var(--border-subtle)',
+                marginBottom: '20px',
+                overflowX: 'auto',
+                gap: '4px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => { setTab('login'); setError(''); setForgotSuccess(''); }}
+                  style={{
+                    flex: 1,
+                    padding: '10px 8px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: tab === 'login' ? '2px solid var(--primary)' : '2px solid transparent',
+                    color: tab === 'login' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontWeight: tab === 'login' ? '700' : '500',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {t('auth.signIn', 'Sign In')}
+                </button>
               <button
                 type="button"
                 onClick={() => { setTab('register'); setError(''); }}
@@ -907,6 +1093,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                 🛡️ Admin
               </button>
             </div>
+          )}
 
             {/* Error Banner */}
             {error && (
@@ -982,6 +1169,33 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTab('forgot_password');
+                        setForgotStep(1);
+                        setForgotEmail(email || '');
+                        setError('');
+                        setForgotSuccess('');
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#38bdf8',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        padding: '4px 0',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <KeyRound size={13} /> Forgot Password? / पासवर्ड विसरलात?
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -1007,6 +1221,254 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   )}
                 </button>
               </form>
+            )}
+
+            {/* Success Banner (for reset password & other actions) */}
+            {forgotSuccess && (
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                color: '#34d399',
+                fontSize: '0.85rem',
+                marginBottom: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <CheckCircle2 size={16} color="#34d399" />
+                <span>{forgotSuccess}</span>
+              </div>
+            )}
+
+            {/* Forgot Password 3-Step Wizard */}
+            {tab === 'forgot_password' && (
+              <div>
+                {/* STEP 1: Enter Registered Email */}
+                {forgotStep === 1 && (
+                  <form onSubmit={handleSendForgotOtp}>
+                    <div style={{
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      background: 'rgba(56, 189, 248, 0.08)',
+                      border: '1px solid rgba(56, 189, 248, 0.2)',
+                      fontSize: '0.82rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '16px'
+                    }}>
+                      नोंदणीकृत ईमेल प्रविष्ट करा. पासवर्ड रीसेट करण्यासाठी आम्ही ६-अंकी व्हेरिफिकेशन OTP पाठवू.
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '16px' }}>
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Mail size={14} color="var(--primary)" /> Registered Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        className="form-input"
+                        placeholder="e.g. staff@medtech.ai or doctor@medtech.ai"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        style={{ height: '42px' }}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="btn btn-primary"
+                      style={{ width: '100%', padding: '12px', fontSize: '0.92rem', fontWeight: '600' }}
+                    >
+                      {forgotLoading ? 'Checking & Sending OTP...' : 'Send Verification OTP Code →'}
+                    </button>
+                  </form>
+                )}
+
+                {/* STEP 2: Verify 6-digit OTP */}
+                {forgotStep === 2 && (
+                  <form onSubmit={handleVerifyForgotOtp}>
+                    <div style={{
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      background: 'rgba(56, 189, 248, 0.08)',
+                      border: '1px solid rgba(56, 189, 248, 0.2)',
+                      fontSize: '0.82rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '16px'
+                    }}>
+                      ६-अंकी कोड <strong>{forgotEmail}</strong> वर पाठवला आहे. (Valid for 10 minutes)
+                    </div>
+
+                    {forgotOtpHint && (
+                      <div
+                        onClick={() => setForgotOtp(forgotOtpHint)}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          background: 'rgba(245, 158, 11, 0.12)',
+                          border: '1px dashed #fbbf24',
+                          color: '#fbbf24',
+                          fontSize: '0.78rem',
+                          marginBottom: '14px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <span>⚡ <strong>Instant Demo OTP:</strong> {forgotOtpHint}</span>
+                        <span style={{ textDecoration: 'underline' }}>Auto-Fill</span>
+                      </div>
+                    )}
+
+                    <div className="form-group" style={{ marginBottom: '14px' }}>
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <KeyRound size={14} color="var(--primary)" /> 6-Digit OTP Code *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        className="form-input"
+                        placeholder="123456"
+                        value={forgotOtp}
+                        onChange={(e) => setForgotOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                        style={{
+                          height: '46px',
+                          fontSize: '1.25rem',
+                          fontFamily: 'var(--font-mono)',
+                          textAlign: 'center',
+                          letterSpacing: '0.3em'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setForgotStep(1)}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}
+                      >
+                        Change Email ID
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSendForgotOtp}
+                        disabled={forgotOtpTimer > 0 || forgotLoading}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: forgotOtpTimer > 0 ? 'var(--text-muted)' : '#38bdf8',
+                          fontSize: '0.78rem',
+                          fontWeight: '600',
+                          cursor: forgotOtpTimer > 0 ? 'default' : 'pointer'
+                        }}
+                      >
+                        {forgotOtpTimer > 0 ? `Resend Code in ${forgotOtpTimer}s` : 'Resend Code'}
+                      </button>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="btn btn-primary"
+                      style={{ width: '100%', padding: '12px', fontSize: '0.92rem', fontWeight: '600' }}
+                    >
+                      {forgotLoading ? 'Verifying OTP...' : 'Verify Code & Set New Password →'}
+                    </button>
+                  </form>
+                )}
+
+                {/* STEP 3: Set New Password */}
+                {forgotStep === 3 && (
+                  <form onSubmit={handleResetPasswordSubmit}>
+                    <div style={{
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      background: 'rgba(16, 185, 129, 0.08)',
+                      border: '1px solid rgba(16, 185, 129, 0.25)',
+                      fontSize: '0.82rem',
+                      color: '#34d399',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <CheckCircle2 size={16} />
+                      <span>OTP Verified! Enter a new secure password for <strong>{forgotEmail}</strong>.</span>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '14px' }}>
+                      <label className="form-label">New Password (नवीन पासवर्ड) *</label>
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type={showForgotNewPassword ? 'text' : 'password'}
+                          required
+                          minLength={6}
+                          className="form-input"
+                          placeholder="Min. 6 characters"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          style={{ height: '42px', paddingRight: '42px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                          style={{
+                            position: 'absolute',
+                            right: '8px',
+                            background: 'transparent',
+                            border: 'none',
+                            color: showForgotNewPassword ? 'var(--primary)' : 'var(--text-muted)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '6px'
+                          }}
+                        >
+                          {showForgotNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '18px' }}>
+                      <label className="form-label">Confirm New Password (पासवर्डची पुन्हा खात्री करा) *</label>
+                      <input
+                        type={showForgotNewPassword ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        className="form-input"
+                        placeholder="Re-enter new password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        style={{ height: '42px' }}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: '#059669',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '0.95rem',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {forgotLoading ? 'Updating Password...' : 'Save & Reset Password'}
+                    </button>
+                  </form>
+                )}
+              </div>
             )}
 
             {/* 2. Patient Register Tab */}

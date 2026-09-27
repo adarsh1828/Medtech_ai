@@ -85,6 +85,11 @@ router.post('/send-otp', async (req, res) => {
       if (existingUser) {
         return res.status(409).json({ error: 'An account with this email address already exists. Please sign in instead.' });
       }
+    } else if (purpose === 'forgot_password') {
+      const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+      if (!existingUser) {
+        return res.status(404).json({ error: 'No hospital account found with this email address. Please check the spelling or register.' });
+      }
     }
 
     // Generate secure 6-digit numeric OTP
@@ -100,7 +105,7 @@ router.post('/send-otp', async (req, res) => {
       [cleanEmail, otpCode, purpose, expiryTimestamp]
     );
 
-    console.log(`[2FA OTP] Verification code generated for ${cleanEmail}: ${otpCode}`);
+    console.log(`[2FA OTP] Verification code generated for ${cleanEmail} (${purpose}): ${otpCode}`);
 
     res.json({
       success: true,
@@ -141,7 +146,63 @@ router.post('/verify-otp', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Email address verified successfully! You may now proceed with registration.'
+      message: 'Email address verified successfully! You may now proceed.'
+    });
+  } catch (err) {
+    console.error('Error verifying OTP:', err);
+    res.status(500).json({ error: 'Failed to verify OTP code.' });
+  }
+});
+
+// POST Reset Password (Forgot Password flow)
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, otp, new_password } = req.body;
+
+    if (!email || !otp || !new_password) {
+      return res.status(400).json({ error: 'Email, verification OTP code, and new password are required.' });
+    }
+
+    if (new_password.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = otp.toString().trim();
+
+    // Verify OTP record exists, matches, and has not expired
+    const record = await getOne(
+      `SELECT * FROM OtpVerifications 
+       WHERE email = ? AND purpose = 'forgot_password' AND otp_code = ? AND expires_at > datetime('now')
+       ORDER BY id DESC LIMIT 1`,
+      [cleanEmail, cleanOtp]
+    );
+
+    if (!record) {
+      return res.status(400).json({ error: 'Invalid or expired verification code. Please request a new OTP.' });
+    }
+
+    // Verify user exists in Users table
+    const user = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+    if (!user) {
+      return res.status(404).json({ error: 'Account not found with this email.' });
+    }
+
+    // Hash the new password with bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(new_password, salt);
+
+    // Update user password in database
+    await run('UPDATE Users SET password_hash = ? WHERE id = ?', [password_hash, user.id]);
+
+    // Clean up OTP entries for this email and purpose to prevent replay
+    await run("DELETE FROM OtpVerifications WHERE email = ? AND purpose = 'forgot_password'", [cleanEmail]);
+
+    console.log(`[Auth] Password successfully reset for user ${cleanEmail}`);
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully! Please sign in with your new password.'
     });
   } catch (err) {
     console.error('Error verifying OTP:', err);
