@@ -12,7 +12,6 @@ import AITriageView from './components/AITriageView';
 import BillingView from './components/BillingView';
 import LiveQueueView from './components/LiveQueueView';
 import GlobalSearchModal from './components/GlobalSearchModal';
-import LoginModal from './components/LoginModal';
 import BookAppointmentModal from './components/BookAppointmentModal';
 import ConsultationModal from './components/ConsultationModal';
 import OnboardDoctorModal from './components/OnboardDoctorModal';
@@ -69,7 +68,6 @@ export default function App() {
   };
 
   // Modals state
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isOnboardDoctorOpen, setIsOnboardDoctorOpen] = useState(false);
@@ -310,7 +308,6 @@ export default function App() {
           user={user}
           onQuickLogin={handleQuickLogin}
           onLogout={handleLogout}
-          onOpenLogin={() => setIsLoginOpen(true)}
           onOpenHospitalSettings={() => setIsHospitalSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenEmergency={() => setIsEmergencyOpen(true)}
@@ -412,14 +409,6 @@ export default function App() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onNavigate={(tab) => setActiveTab(tab)}
-      />
-
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        onLoginSuccess={(loggedUser, hospital) => {
-          handleLoginSuccess(loggedUser, hospital);
-        }}
       />
 
       <HospitalSettingsModal
