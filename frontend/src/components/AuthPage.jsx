@@ -492,25 +492,25 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       overflowX: 'hidden'
     }}>
       {/* Background glowing gradients */}
-      <div style={{
+      <div className="ambient-orb-cyan" style={{
         position: 'absolute',
-        top: '-15%',
-        left: '-10%',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(0, 0, 0, 0) 70%)',
-        filter: 'blur(60px)',
+        top: '-12%',
+        left: '-8%',
+        width: '650px',
+        height: '650px',
+        background: 'radial-gradient(circle, rgba(6, 182, 212, 0.16) 0%, rgba(0, 0, 0, 0) 70%)',
+        filter: 'blur(75px)',
         pointerEvents: 'none',
         zIndex: 0
       }} />
-      <div style={{
+      <div className="ambient-orb-purple" style={{
         position: 'absolute',
-        bottom: '-15%',
-        right: '-10%',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(0, 0, 0, 0) 70%)',
-        filter: 'blur(60px)',
+        bottom: '-12%',
+        right: '-8%',
+        width: '650px',
+        height: '650px',
+        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, rgba(0, 0, 0, 0) 70%)',
+        filter: 'blur(75px)',
         pointerEvents: 'none',
         zIndex: 0
       }} />
@@ -661,14 +661,184 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       </header>
 
       {/* Main Container */}
-      <main className="auth-main-container">
-        <div style={{
-          width: '100%',
-          maxWidth: tab === 'login' ? '540px' : '680px',
-          transition: 'max-width 0.25s ease'
-        }}>
-          {/* Main Card */}
-          <div className="glass-card auth-card-wrapper">
+      <main className="auth-main-container" style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px 16px',
+        flex: 1,
+        zIndex: 2
+      }}>
+        <div className="auth-split-layout">
+          {/* Left Hero Telemetry Panel (Visible on Desktop >= 1024px) */}
+          <div className="hide-on-mobile" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+            paddingRight: '12px'
+          }}>
+            {/* Live Hospital Telemetry Badge */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              background: 'rgba(6, 182, 212, 0.1)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              width: 'fit-content'
+            }}>
+              <span className="telemetry-beacon-live" />
+              <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#38bdf8', letterSpacing: '0.05em' }}>
+                🟢 24/7 CLINICAL OS • NABH LEVEL-1 ACCREDITED
+              </span>
+            </div>
+
+            {/* Futuristic Hero Title */}
+            <div>
+              <h1 style={{
+                fontSize: '2.5rem',
+                fontFamily: 'var(--font-display)',
+                fontWeight: '800',
+                color: 'var(--text-primary)',
+                lineHeight: 1.15,
+                letterSpacing: '-0.02em',
+                marginBottom: '12px'
+              }}>
+                Smart Clinical <br />
+                <span style={{
+                  background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  Hospital Operating System
+                </span>
+              </h1>
+              <p style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.92rem',
+                lineHeight: 1.6,
+                maxWidth: '480px'
+              }}>
+                A paperless, enterprise-grade clinical management ecosystem featuring AI symptom triage, digital e-prescriptions with drug-drug contraindication shields, and live OPD queue broadcasting.
+              </p>
+            </div>
+
+            {/* Live Cardiac Waveform Display Card */}
+            <div className="glass-card-futuristic" style={{
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <HeartPulse size={22} color="#10b981" className="heartbeat-icon" />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#10b981' }}>
+                    PATIENT CARE TELEMETRY
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Active Vitals Monitoring & OPD Tokens
+                  </div>
+                </div>
+              </div>
+
+              {/* Animated ECG Waveform */}
+              <svg width="120" height="28" viewBox="0 0 120 28" fill="none" style={{ overflow: 'visible' }}>
+                <path
+                  d="M0 14 H30 L36 3 L44 25 L52 2 L60 26 L66 10 L72 14 H120"
+                  stroke="#10b981"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ecg-monitor-line"
+                />
+              </svg>
+            </div>
+
+            {/* 4 Feature Telemetry Micro-Cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '14px',
+              maxWidth: '490px'
+            }}>
+              <div className="glass-card-futuristic" style={{ padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <Sparkles size={16} color="#38bdf8" />
+                  <span style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    AI Clinical Triage
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  Automated symptom severity analysis & drug contraindication warnings.
+                </div>
+              </div>
+
+              <div className="glass-card-futuristic" style={{ padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <Activity size={16} color="#34d399" />
+                  <span style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    Zero-Wait Queue
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  Live waiting hall token broadcasting with Web Audio chimes.
+                </div>
+              </div>
+
+              <div className="glass-card-futuristic" style={{ padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <Building2 size={16} color="#f59e0b" />
+                  <span style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    UPI QR Settlement
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  Instant digital payments in ₹ INR via PhonePe, GPay, Paytm.
+                </div>
+              </div>
+
+              <div className="glass-card-futuristic" style={{ padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <Shield size={16} color="#fb7185" />
+                  <span style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    Cyber Hardened
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  10-attempt lockout, audit logs & idle session auto-clearance.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Portal Authentication Card */}
+          <div style={{
+            width: '100%',
+            maxWidth: tab === 'login' ? '540px' : '680px',
+            margin: '0 auto',
+            transition: 'max-width 0.25s ease'
+          }}>
+            {/* Main Card */}
+            <div className="glass-card auth-card-wrapper" style={{
+              borderRadius: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderTop: '1px solid rgba(6, 182, 212, 0.45)',
+              boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.6), 0 0 30px rgba(6, 182, 212, 0.1)'
+            }}>
             {/* Header / Lock or Key Badge */}
             {tab === 'forgot_password' ? (
               <div style={{ textAlign: 'center', marginBottom: '22px' }}>
@@ -2631,6 +2801,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
             </span>
           </div>
         </div>
+      </div>
       </main>
     </div>
   );

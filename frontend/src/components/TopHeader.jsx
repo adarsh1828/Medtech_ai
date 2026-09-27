@@ -95,7 +95,7 @@ export default function TopHeader({
         </button>
 
         {/* Mobile Brand Title (visible only on mobile <= 768px) */}
-        <div className="show-on-mobile-flex" style={{ alignItems: 'center', gap: '6px' }}>
+        <div className="show-on-mobile-flex" style={{ alignItems: 'center', gap: '8px' }}>
           <HeartPulse size={18} color="var(--primary)" className="heartbeat-icon" />
           <span style={{
             fontWeight: '800',
@@ -108,6 +108,7 @@ export default function TopHeader({
           }}>
             MedTech AI
           </span>
+          <span className="telemetry-beacon-live" style={{ width: '7px', height: '7px' }} />
         </div>
 
         {/* Desktop Live Clock */}
@@ -128,21 +129,31 @@ export default function TopHeader({
           <span>{timeStr || t('header.liveClock', 'LIVE')}</span>
         </div>
 
-        {/* Desktop NABH Badge */}
+        {/* Desktop Animated ECG Monitor & NABH Badge */}
         <div className="hide-on-mobile" style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          padding: '4px 10px',
-          borderRadius: '6px',
+          gap: '10px',
+          padding: '4px 12px',
+          borderRadius: '8px',
           background: 'rgba(6, 182, 212, 0.08)',
-          border: '1px solid rgba(6, 182, 212, 0.2)',
+          border: '1px solid rgba(6, 182, 212, 0.25)',
           fontSize: '0.72rem',
           fontWeight: '700',
           color: '#38bdf8',
           letterSpacing: '0.03em'
         }}>
-          <span>NABH LEVEL-1 • 24x7 CLINICAL OPS</span>
+          <svg width="44" height="16" viewBox="0 0 44 16" fill="none" style={{ overflow: 'visible' }}>
+            <path
+              d="M0 8 H10 L13 2 L17 14 L21 1 L25 15 L28 6 L31 8 H44"
+              stroke="#06b6d4"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="ecg-monitor-line"
+            />
+          </svg>
+          <span>NABH LEVEL-1 • 24x7 CLINICAL NETWORK</span>
         </div>
       </div>
 

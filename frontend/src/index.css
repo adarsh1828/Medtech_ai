@@ -239,6 +239,89 @@ body {
   color: #06b6d4;
 }
 
+/* Futuristic Live Cardiac ECG Line Animation */
+@keyframes ecgPulseAnim {
+  0% {
+    stroke-dashoffset: 400;
+    opacity: 0.4;
+  }
+  35% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.4;
+  }
+}
+
+.ecg-monitor-line {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: ecgPulseAnim 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Ambient Floating Glow Orbs for Sci-Fi Background */
+@keyframes floatOrbSlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(25px, -18px) scale(1.06);
+  }
+}
+
+.ambient-orb-cyan {
+  animation: floatOrbSlow 12s ease-in-out infinite;
+}
+
+.ambient-orb-purple {
+  animation: floatOrbSlow 14s ease-in-out infinite reverse;
+}
+
+/* Futuristic Neon Glassmorphism Card 2.0 */
+.glass-card-futuristic {
+  background: linear-gradient(135deg, rgba(18, 28, 46, 0.75) 0%, rgba(13, 21, 36, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(6, 182, 212, 0.4);
+  border-left: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-futuristic:hover {
+  border-top-color: rgba(6, 182, 212, 0.7);
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(6, 182, 212, 0.16);
+  transform: translateY(-2px);
+}
+
+/* Split Screen Desktop Layout for Auth / Gateway */
+.auth-split-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  gap: 32px;
+  align-items: center;
+  padding: 20px 16px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 1024px) {
+  .auth-split-layout {
+    grid-template-columns: 1.12fr 1fr;
+    gap: 48px;
+    padding: 36px 28px;
+  }
+}
+
 /* Layout Utilities */
 .app-container {
   display: flex;
@@ -910,26 +993,29 @@ body {
     }
   }
 
-  /* Mobile Bottom Navigation Bar */
+  /* Mobile Bottom Navigation Bar (Futuristic App Shell) */
   .mobile-bottom-nav {
     display: flex;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 64px;
-    background: rgba(10, 15, 29, 0.95);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border-subtle);
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
+    background: rgba(10, 15, 29, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(6, 182, 212, 0.25);
     z-index: 40;
     align-items: center;
     justify-content: space-around;
-    padding: 0 6px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding: 0 4px;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 4px);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45);
   }
 
   .mobile-nav-item {
     flex: 1;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -941,8 +1027,9 @@ body {
     font-size: 0.68rem;
     font-weight: 500;
     cursor: pointer;
-    padding: 6px 2px;
-    transition: all 0.15s ease;
+    padding: 8px 2px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-nav-item.active {
@@ -950,9 +1037,21 @@ body {
     font-weight: 700;
   }
 
+  .mobile-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg, #06b6d4, #38bdf8);
+    box-shadow: 0 0 10px #38bdf8;
+  }
+
   .mobile-nav-item.active svg {
     color: #38bdf8;
-    filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.6));
+    filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.7));
+    transform: translateY(-1px);
   }
 
   /* Buttons & Touch targets */
