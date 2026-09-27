@@ -555,7 +555,6 @@ router.post('/register-staff', async (req, res) => {
 // Login
 
 router.post('/login', async (req, res) => {
-
   try {
     const { email, password } = req.body;
 
@@ -563,15 +562,111 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    const user = await getOne('SELECT * FROM Users WHERE email = ?', [email.toLowerCase().trim()]);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password. Please verify your credentials.' });
+    const cleanEmail = email.toLowerCase().trim();
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || '127.0.0.1';
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const nowIso = new Date().toISOString();
+
+    // 1. Check if IP or Account is temporarily locked
+    const activeLock = await getOne(
+      `SELECT * FROM FailedLoginAttempts 
+       WHERE (identifier = ? OR ip_address = ?) 
+         AND locked_until IS NOT NULL 
+         AND locked_until > ? 
+       ORDER BY id DESC LIMIT 1`,
+      [cleanEmail, clientIp, nowIso]
+    );
+
+    if (activeLock) {
+      const lockUntilStr = activeLock.locked_until.endsWith('Z') ? activeLock.locked_until : activeLock.locked_until + 'Z';
+      const lockUntilMs = new Date(lockUntilStr).getTime();
+      const minutesLeft = Math.max(1, Math.ceil((lockUntilMs - Date.now()) / (60 * 1000)));
+      return res.status(429).json({
+        error: `सुरक्षा ब्लॉक: सलग १० वेळा चुकीचा पासवर्ड टाकल्यामुळे तुमचा IP ॲड्रेस तात्पुरता ब्लॉक करण्यात आला आहे. कृपया ${minutesLeft} मिनिटांनी पुन्हा प्रयत्न करा किंवा 'Forgot Password' वापरा.`,
+        isLocked: true,
+        lockedMinutes: minutesLeft,
+        remainingAttempts: 0
+      });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password. Please verify your credentials.' });
+    const user = await getOne('SELECT * FROM Users WHERE email = ?', [cleanEmail]);
+    const isMatch = user ? await bcrypt.compare(password, user.password_hash) : false;
+
+    if (!user || !isMatch) {
+      // Find or create failed attempt record
+      const existingAttempt = await getOne(
+        `SELECT * FROM FailedLoginAttempts WHERE identifier = ? OR ip_address = ? ORDER BY id DESC LIMIT 1`,
+        [cleanEmail, clientIp]
+      );
+
+      const count = existingAttempt ? Number(existingAttempt.attempt_count || 0) + 1 : 1;
+
+      if (count >= 10) {
+        const lockedUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        if (existingAttempt) {
+          await run(
+            `UPDATE FailedLoginAttempts SET attempt_count = ?, last_failed_at = CURRENT_TIMESTAMP, locked_until = ? WHERE id = ?`,
+            [count, lockedUntil, existingAttempt.id]
+          );
+        } else {
+          await run(
+            `INSERT INTO FailedLoginAttempts (identifier, ip_address, attempt_count, locked_until) VALUES (?, ?, ?, ?)`,
+            [cleanEmail, clientIp, count, lockedUntil]
+          );
+        }
+
+        // Security Audit Log
+        try {
+          await run(
+            `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, 'ACCOUNT_LOCKED_BRUTE_FORCE', ?, ?, 'Temporary 15m lockout after 10 failed login attempts')`,
+            [user?.id || null, cleanEmail, clientIp, userAgent]
+          );
+        } catch (e) {}
+
+        return res.status(429).json({
+          error: 'सुरक्षा इशारा: सलग १० वेळा चुकीचा पासवर्ड टाकल्यामुळे तुमचा IP ॲड्रेस १५ मिनिटांसाठी तात्पुरता ब्लॉक करण्यात आला आहे. कृपया १५ मिनिटांनी पुन्हा प्रयत्न करा किंवा पासवर्ड रीसेट करा.',
+          isLocked: true,
+          lockedMinutes: 15,
+          remainingAttempts: 0
+        });
+      } else {
+        const remaining = 10 - count;
+        if (existingAttempt) {
+          await run(
+            `UPDATE FailedLoginAttempts SET attempt_count = ?, last_failed_at = CURRENT_TIMESTAMP WHERE id = ?`,
+            [count, existingAttempt.id]
+          );
+        } else {
+          await run(
+            `INSERT INTO FailedLoginAttempts (identifier, ip_address, attempt_count) VALUES (?, ?, ?)`,
+            [cleanEmail, clientIp, count]
+          );
+        }
+
+        // Security Audit Log
+        try {
+          await run(
+            `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, 'LOGIN_FAILED', ?, ?, ?)`,
+            [user?.id || null, cleanEmail, clientIp, userAgent, `Failed login attempt ${count}/10`]
+          );
+        } catch (e) {}
+
+        return res.status(401).json({
+          error: `चुकीचा ईमेल किंवा पासवर्ड! सुरक्षेसाठी तुमच्याकडे अजून ${remaining} प्रयत्न शिल्लक आहेत, अन्यथा सायबर सुरक्षेसाठी तुमचा IP तात्पुरता ब्लॉक केला जाईल.`,
+          remainingAttempts: remaining,
+          attemptCount: count
+        });
+      }
     }
+
+    // Login Succeeded: Clear any failed login attempt tracking
+    try {
+      await run(`DELETE FROM FailedLoginAttempts WHERE identifier = ? OR ip_address = ?`, [cleanEmail, clientIp]);
+      await run(
+        `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, 'LOGIN_SUCCESS', ?, ?, 'Successful user session established')`,
+        [user.id, cleanEmail, clientIp, userAgent]
+      );
+    } catch (e) {}
 
     let extraData = {};
     if (user.role === 'patient') {

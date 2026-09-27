@@ -32,7 +32,9 @@ import {
   Tv, 
   Stethoscope,
   HeartPulse,
-  QrCode
+  QrCode,
+  ShieldAlert,
+  Clock
 } from 'lucide-react';
 
 export default function App() {
@@ -83,6 +85,11 @@ export default function App() {
 
   // Key refresh trigger for data synchronization
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Security Hardening: Inactivity Auto-Logout (15 mins total, 14 mins warning)
+  const [showIdleWarning, setShowIdleWarning] = useState(false);
+  const [idleSecondsRemaining, setIdleSecondsRemaining] = useState(60);
+  const lastActiveTimeRef = React.useRef(Date.now());
 
   useEffect(() => {
     loadHospitalInfo();
@@ -197,8 +204,55 @@ export default function App() {
     removeStoredToken();
     removeStoredUser();
     setUser(null);
+    setShowIdleWarning(false);
     setActiveTab('dashboard');
   };
+
+  const handleExtendSession = () => {
+    lastActiveTimeRef.current = Date.now();
+    setShowIdleWarning(false);
+  };
+
+  // Inactivity Auto-Logout Hook
+  useEffect(() => {
+    if (!user) return;
+
+    lastActiveTimeRef.current = Date.now();
+
+    const handleUserActivity = () => {
+      // If warning modal is not displayed, register activity
+      if (!showIdleWarning) {
+        lastActiveTimeRef.current = Date.now();
+      }
+    };
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach(evt => window.addEventListener(evt, handleUserActivity, { passive: true }));
+
+    const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 mins
+    const WARNING_TIMEOUT = 14 * 60 * 1000;    // 14 mins
+
+    const checkInterval = setInterval(() => {
+      const idleTime = Date.now() - lastActiveTimeRef.current;
+      if (idleTime >= INACTIVITY_TIMEOUT) {
+        setShowIdleWarning(false);
+        handleLogout();
+      } else if (idleTime >= WARNING_TIMEOUT) {
+        setShowIdleWarning(true);
+        const remainingSecs = Math.max(0, Math.ceil((INACTIVITY_TIMEOUT - idleTime) / 1000));
+        setIdleSecondsRemaining(remainingSecs);
+      } else {
+        if (showIdleWarning) {
+          setShowIdleWarning(false);
+        }
+      }
+    }, 1000);
+
+    return () => {
+      events.forEach(evt => window.removeEventListener(evt, handleUserActivity));
+      clearInterval(checkInterval);
+    };
+  }, [user, showIdleWarning]);
 
   const handleOpenConsultation = (appt) => {
     setActiveConsultationAppt(appt);
@@ -418,6 +472,106 @@ export default function App() {
         hospitalInfo={hospitalInfo}
         user={user}
       />
+
+      {/* Inactivity Auto-Logout Security Modal */}
+      {showIdleWarning && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            background: '#0d1527',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            borderRadius: '16px',
+            padding: '28px',
+            maxWidth: '460px',
+            width: '100%',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.25)',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '2px solid rgba(245, 158, 11, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Clock size={32} color="#fbbf24" />
+            </div>
+
+            <div>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', color: '#fbbf24', fontWeight: '800' }}>
+                सत्र सुरक्षा चेतावणी (Auto-Logout Warning)
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                सुरक्षा कारणास्तव, १४ मिनिटांपासून कोणतीही हालचाल नसल्याने तुमचे सत्र आपोआप बंद (Auto-Logout) होणार आहे.
+              </p>
+            </div>
+
+            <div style={{
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              borderRadius: '12px',
+              padding: '12px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <ShieldAlert size={20} color="#fbbf24" />
+              <span style={{ fontSize: '0.92rem', color: '#fef08a', fontWeight: '700' }}>
+                सत्र बंद होण्यास उर्वरित वेळ: {idleSecondsRemaining} सेकंद
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '8px' }}>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="btn btn-outline"
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  borderColor: 'rgba(244, 63, 94, 0.4)',
+                  color: '#fb7185'
+                }}
+              >
+                लॉगआउट करा
+              </button>
+              <button
+                type="button"
+                onClick={handleExtendSession}
+                className="btn btn-primary"
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  fontWeight: '700'
+                }}
+              >
+                सत्र सुरू ठेवा
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Navigation Bar (Smartphones <= 768px) */}
       <nav className="mobile-bottom-nav">

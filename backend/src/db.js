@@ -499,6 +499,32 @@ export async function initializeDatabase() {
     )
   `);
 
+  // 23. FailedLoginAttempts (Brute-Force & Rate Limiting Defense with 10-Attempt Lockout)
+  await run(`
+    CREATE TABLE IF NOT EXISTS FailedLoginAttempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      identifier TEXT NOT NULL,
+      ip_address TEXT NOT NULL,
+      attempt_count INTEGER DEFAULT 1,
+      last_failed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      locked_until DATETIME
+    )
+  `);
+
+  // 24. SecurityAuditLogs (HIPAA & NABH Compliant Audit Trail)
+  await run(`
+    CREATE TABLE IF NOT EXISTS SecurityAuditLogs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      email TEXT,
+      action TEXT NOT NULL,
+      ip_address TEXT,
+      user_agent TEXT,
+      details TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
   try {
     await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");

@@ -20,7 +20,9 @@ import {
   Sparkles,
   KeyRound,
   Eye,
-  EyeOff
+  EyeOff,
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
 import { api, setStoredToken, setStoredUser } from '../api';
 import { useLanguage } from '../context/LanguageContext';
@@ -43,6 +45,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
   const [doctorPendingApproval, setDoctorPendingApproval] = useState(false);
   const [registeredDoctorEmail, setRegisteredDoctorEmail] = useState('');
   const [pendingApprovalNotice, setPendingApprovalNotice] = useState(null);
+  const [loginSecurityInfo, setLoginSecurityInfo] = useState(null); // { remainingAttempts, isLocked, lockedMinutes, attemptCount }
 
   // 2FA OTP state for Doctor Registration
   const [docOtp, setDocOtp] = useState('');
@@ -157,6 +160,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     if (e) e.preventDefault();
     setLoading(true);
     setError('');
+    setLoginSecurityInfo(null);
     try {
       const res = await api.login(email, password);
       setStoredToken(res.token);
@@ -170,6 +174,16 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
           email: email
         });
       } else {
+        if (err.data && (err.data.remainingAttempts !== undefined || err.data.isLocked)) {
+          setLoginSecurityInfo({
+            remainingAttempts: err.data.remainingAttempts,
+            attemptCount: err.data.attemptCount,
+            isLocked: err.data.isLocked,
+            lockedMinutes: err.data.lockedMinutes || 15
+          });
+        } else {
+          setLoginSecurityInfo(null);
+        }
         setError(err.message || 'Login failed. Please verify your credentials.');
       }
     } finally {
@@ -182,6 +196,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     setEmail(demoEmail);
     setPassword(demoPassword);
     setError('');
+    setLoginSecurityInfo(null);
   };
 
   const handleRegisterPatient = async (e) => {
@@ -1155,22 +1170,109 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
               </div>
             )}
 
-            {/* Error Banner */}
+            {/* Error Banner with Brute-Force Rate Limiting Countdown & IP Block Warning */}
             {error && (
               <div style={{
-                background: 'rgba(244, 63, 94, 0.12)',
-                border: '1px solid rgba(244, 63, 94, 0.35)',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                color: '#fb7185',
+                background: loginSecurityInfo?.isLocked ? 'rgba(239, 68, 68, 0.14)' : 'rgba(244, 63, 94, 0.12)',
+                border: loginSecurityInfo?.isLocked ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(244, 63, 94, 0.35)',
+                borderRadius: '10px',
+                padding: '14px 16px',
+                color: loginSecurityInfo?.isLocked ? '#fca5a5' : '#fb7185',
                 fontSize: '0.85rem',
                 marginBottom: '18px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                flexDirection: 'column',
+                gap: '10px',
+                boxShadow: loginSecurityInfo?.isLocked ? '0 0 20px rgba(239, 68, 68, 0.2)' : 'none'
               }}>
-                <Lock size={16} />
-                <span>{error}</span>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <ShieldAlert size={20} color={loginSecurityInfo?.isLocked ? '#ef4444' : '#f43f5e'} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', lineHeight: '1.45' }}>{error}</div>
+
+                    {/* Warning countdown badge when remaining attempts < 10 */}
+                    {loginSecurityInfo && !loginSecurityInfo.isLocked && loginSecurityInfo.remainingAttempts !== undefined && (
+                      <div style={{
+                        marginTop: '10px',
+                        padding: '10px 14px',
+                        background: 'rgba(245, 158, 11, 0.12)',
+                        border: '1px solid rgba(245, 158, 11, 0.35)',
+                        borderRadius: '8px',
+                        color: '#fbbf24',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: '700', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <AlertTriangle size={15} />
+                            ⚠️ चेतावणी: तुमच्याकडे अजून {loginSecurityInfo.remainingAttempts} प्रयत्न शिल्लक आहेत!
+                          </span>
+                          <span style={{
+                            fontSize: '0.72rem',
+                            fontWeight: '800',
+                            padding: '2px 8px',
+                            borderRadius: '10px',
+                            background: 'rgba(245, 158, 11, 0.25)',
+                            color: '#fef08a'
+                          }}>
+                            {loginSecurityInfo.remainingAttempts}/10 संधी
+                          </span>
+                        </div>
+
+                        {/* Attempt dots indicator */}
+                        <div style={{ display: 'flex', gap: '4px', margin: '4px 0' }}>
+                          {[...Array(10)].map((_, idx) => {
+                            const isFailed = idx < (10 - loginSecurityInfo.remainingAttempts);
+                            return (
+                              <div
+                                key={idx}
+                                style={{
+                                  flex: 1,
+                                  height: '5px',
+                                  borderRadius: '3px',
+                                  background: isFailed ? '#ef4444' : 'rgba(255, 255, 255, 0.18)',
+                                  boxShadow: isFailed ? '0 0 6px rgba(239, 68, 68, 0.6)' : 'none',
+                                  transition: 'all 0.3s ease'
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+
+                        <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                          🔒 <strong>सायबर सुरक्षा नियम:</strong> १० वेळा चुकीचा पासवर्ड प्रविष्ट केल्यास तुमचा IP ॲड्रेस १५ मिनिटांसाठी ब्लॉक केला जाईल.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Account / IP Locked Badge */}
+                    {loginSecurityInfo?.isLocked && (
+                      <div style={{
+                        marginTop: '10px',
+                        padding: '10px 14px',
+                        background: 'rgba(220, 38, 38, 0.22)',
+                        border: '1px solid rgba(239, 68, 68, 0.5)',
+                        borderRadius: '8px',
+                        color: '#fca5a5',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px'
+                      }}>
+                        <div style={{ fontWeight: '800', fontSize: '0.85rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <ShieldAlert size={16} color="#ef4444" />
+                          🚫 सायबर सुरक्षा: IP ॲड्रेस तात्पुरता ब्लॉक केला आहे!
+                        </div>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: '1.45' }}>
+                          सलग १० वेळा चुकीचा पासवर्ड टाकल्यामुळे सायबर सुरक्षेसाठी तुमचा IP पुढील <strong>{loginSecurityInfo.lockedMinutes || 15} मिनिटांसाठी</strong> ब्लॉक करण्यात आला आहे.
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#38bdf8', marginTop: '4px' }}>
+                          💡 पासवर्ड आठवत नसल्यास खालील <strong>"पासवर्ड विसरलात का? (Forgot Password)"</strong> वर क्लिक करून OTP द्वारे त्वरित रीसेट करू शकता.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

@@ -254,23 +254,41 @@ router.post('/approve-staff', async (req, res) => {
     const onDuty = action === 'approve' ? 1 : 0;
 
     if (staffType === 'doctor') {
-      const doc = await getOne('SELECT id, full_name FROM Doctors WHERE id = ?', [id]);
+      const doc = await getOne('SELECT id, full_name, user_id FROM Doctors WHERE id = ?', [id]);
       if (!doc) return res.status(404).json({ error: 'Doctor not found.' });
       await run('UPDATE Doctors SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      try {
+        await run(
+          `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, ?, ?, ?, ?)`,
+          [req.user?.id || null, req.user?.email || 'admin', action === 'approve' ? 'STAFF_APPROVED' : 'STAFF_REJECTED', req.ip || '127.0.0.1', req.headers['user-agent'] || 'System', `Admin updated doctor ${doc.full_name} status to ${newStatus}`]
+        );
+      } catch (e) {}
       return res.json({ message: `Doctor Dr. ${doc.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
     }
 
     if (staffType === 'nurse') {
-      const nurse = await getOne('SELECT id, full_name FROM Nurses WHERE id = ?', [id]);
+      const nurse = await getOne('SELECT id, full_name, user_id FROM Nurses WHERE id = ?', [id]);
       if (!nurse) return res.status(404).json({ error: 'Nurse not found.' });
       await run('UPDATE Nurses SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      try {
+        await run(
+          `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, ?, ?, ?, ?)`,
+          [req.user?.id || null, req.user?.email || 'admin', action === 'approve' ? 'STAFF_APPROVED' : 'STAFF_REJECTED', req.ip || '127.0.0.1', req.headers['user-agent'] || 'System', `Admin updated nurse ${nurse.full_name} status to ${newStatus}`]
+        );
+      } catch (e) {}
       return res.json({ message: `Staff Nurse ${nurse.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
     }
 
     if (staffType === 'cleaning') {
-      const cleaner = await getOne('SELECT id, full_name FROM HousekeepingStaff WHERE id = ?', [id]);
+      const cleaner = await getOne('SELECT id, full_name, user_id FROM HousekeepingStaff WHERE id = ?', [id]);
       if (!cleaner) return res.status(404).json({ error: 'Sanitation staff not found.' });
       await run('UPDATE HousekeepingStaff SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      try {
+        await run(
+          `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, ?, ?, ?, ?)`,
+          [req.user?.id || null, req.user?.email || 'admin', action === 'approve' ? 'STAFF_APPROVED' : 'STAFF_REJECTED', req.ip || '127.0.0.1', req.headers['user-agent'] || 'System', `Admin updated cleaner ${cleaner.full_name} status to ${newStatus}`]
+        );
+      } catch (e) {}
       return res.json({ message: `Sanitation staff ${cleaner.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
     }
 
