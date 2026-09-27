@@ -50,8 +50,8 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// POST record new lab test result (Doctor or Admin)
-router.post('/', authenticateToken, requireRole(['doctor', 'admin']), async (req, res) => {
+// POST record new lab test result (Doctor, Admin, Nurse, or Staff)
+router.post('/', authenticateToken, requireRole(['doctor', 'admin', 'nurse', 'staff']), async (req, res) => {
   try {
     const { patient_id, test_id, test_date, status, result_value, reference_range, remarks } = req.body;
 

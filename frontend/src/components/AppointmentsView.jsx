@@ -22,10 +22,6 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
-  useEffect(() => {
-    loadAppointments();
-  }, [user]);
-
   const loadAppointments = async () => {
     setLoading(true);
     try {
@@ -37,6 +33,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadAppointments();
+  }, [user]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     setActionLoading(id);
@@ -156,7 +156,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
         <div className="appointments-grid">
           {filteredAppointments.map((appt) => {
             const isDoctor = user?.role === 'doctor';
-            const isAdmin = user?.role === 'admin';
+            const isAdmin = user?.role === 'admin' || user?.role === 'staff';
             return (
               <div
                 key={appt.id}

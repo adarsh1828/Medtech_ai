@@ -121,8 +121,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// POST generate new invoice (Doctor or Admin)
-router.post('/', authenticateToken, requireRole(['doctor', 'admin']), async (req, res) => {
+// POST generate new invoice (Doctor, Admin, or Staff)
+router.post('/', authenticateToken, requireRole(['doctor', 'admin', 'staff']), async (req, res) => {
   try {
     const {
       patient_id,

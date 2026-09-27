@@ -33,7 +33,7 @@ router.get('/', authenticateToken, async (req, res) => {
       if (!doctor) return res.json({ prescriptions: [] });
       sql += ' AND pr.doctor_id = ?';
       params.push(doctor.id);
-    } else if (req.user.role === 'admin') {
+    } else if (req.user.role === 'admin' || req.user.role === 'nurse' || req.user.role === 'staff') {
       if (patient_id) {
         sql += ' AND pr.patient_id = ?';
         params.push(patient_id);

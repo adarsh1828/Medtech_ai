@@ -439,6 +439,72 @@ router.post('/register-cleaning', async (req, res) => {
   }
 });
 
+// Register General Hospital Staff (Reception, Lab, Pharmacy, Operations)
+router.post('/register-staff', async (req, res) => {
+  try {
+    const { full_name, email, password, phone, designation, department, shift_timings } = req.body;
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ error: 'Please provide full name, email, and password.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await getOne('SELECT id FROM Users WHERE email = ?', [cleanEmail]);
+    if (existingUser) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Please sign in.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    const userResult = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES (?, ?, 'staff', ?, ?)",
+      [cleanEmail, password_hash, full_name.trim(), phone || null]
+    );
+
+    const staffResult = await run(
+      `INSERT INTO HospitalStaff (user_id, full_name, designation, department, shift_timings, phone, is_on_duty)
+       VALUES (?, ?, ?, ?, ?, ?, 1)`,
+      [
+        userResult.lastID,
+        full_name.trim(),
+        designation || 'Front Desk & Patient Services',
+        department || 'General Administration',
+        shift_timings || '09:00 AM - 05:00 PM',
+        phone || null
+      ]
+    );
+
+    const token = generateToken({
+      userId: userResult.lastID,
+      role: 'staff',
+      staffId: staffResult.lastID,
+      email: cleanEmail,
+      fullName: full_name.trim(),
+      designation: designation || 'Front Desk & Patient Services',
+      department: department || 'General Administration'
+    });
+
+    res.status(201).json({
+      message: 'Hospital Staff account registered successfully!',
+      token,
+      user: {
+        id: userResult.lastID,
+        email: cleanEmail,
+        role: 'staff',
+        fullName: full_name.trim(),
+        staffId: staffResult.lastID,
+        designation: designation || 'Front Desk & Patient Services',
+        department: department || 'General Administration',
+        shiftTimings: shift_timings || '09:00 AM - 05:00 PM'
+      }
+    });
+  } catch (err) {
+    console.error('Hospital staff registration error:', err);
+    res.status(500).json({ error: 'Failed to complete hospital staff registration. Please try again.' });
+  }
+});
+
 // Login
 
 router.post('/login', async (req, res) => {
@@ -529,6 +595,18 @@ router.post('/login', async (req, res) => {
         extraData.shiftTimings = cleaner.shift_timings;
         extraData.isOnDuty = !!cleaner.is_on_duty;
       }
+    } else if (user.role === 'staff') {
+      const staffMember = await getOne(
+        `SELECT id, designation, department, shift_timings, is_on_duty FROM HospitalStaff WHERE user_id = ?`,
+        [user.id]
+      );
+      if (staffMember) {
+        extraData.staffId = staffMember.id;
+        extraData.designation = staffMember.designation;
+        extraData.department = staffMember.department;
+        extraData.shiftTimings = staffMember.shift_timings;
+        extraData.isOnDuty = !!staffMember.is_on_duty;
+      }
     }
 
     const tokenPayload = {
@@ -583,6 +661,41 @@ router.get('/me', authenticateToken, async (req, res) => {
         return res.status(403).json({ error: 'Your doctor account is pending administrator approval.', pendingApproval: true });
       }
       profile.doctor = doctor;
+    } else if (user.role === 'nurse') {
+      const nurse = await getOne(
+        `SELECT id, assigned_ward, qualification, shift_timings, is_on_duty FROM Nurses WHERE user_id = ?`,
+        [user.id]
+      );
+      if (nurse) {
+        profile.nurseId = nurse.id;
+        profile.assignedWard = nurse.assigned_ward;
+        profile.qualification = nurse.qualification;
+        profile.shiftTimings = nurse.shift_timings;
+        profile.isOnDuty = !!nurse.is_on_duty;
+      }
+    } else if (user.role === 'cleaning') {
+      const cleaner = await getOne(
+        `SELECT id, assigned_area, shift_timings, is_on_duty FROM CleaningStaff WHERE user_id = ?`,
+        [user.id]
+      );
+      if (cleaner) {
+        profile.cleanerId = cleaner.id;
+        profile.assignedArea = cleaner.assigned_area;
+        profile.shiftTimings = cleaner.shift_timings;
+        profile.isOnDuty = !!cleaner.is_on_duty;
+      }
+    } else if (user.role === 'staff') {
+      const staffMember = await getOne(
+        `SELECT id, designation, department, shift_timings, is_on_duty FROM HospitalStaff WHERE user_id = ?`,
+        [user.id]
+      );
+      if (staffMember) {
+        profile.staffId = staffMember.id;
+        profile.designation = staffMember.designation;
+        profile.department = staffMember.department;
+        profile.shiftTimings = staffMember.shift_timings;
+        profile.isOnDuty = !!staffMember.is_on_duty;
+      }
     }
 
     res.json({ user: profile });
@@ -616,6 +729,27 @@ router.get('/demo-accounts', (req, res) => {
         email: 'dr.arjun@medtech.ai',
         password: 'doctor123',
         description: 'Neuro-consultation schedule, patient EHR history, and diagnosis record notes.'
+      },
+      {
+        role: 'nurse',
+        label: 'Staff Nurse',
+        email: 'nurse@medtech.ai',
+        password: 'nurse123',
+        description: 'Vitals tracking, bed rounds, IV fluid monitoring, and doctor call assist.'
+      },
+      {
+        role: 'cleaning',
+        label: 'Sanitation & Hygiene',
+        email: 'cleaner@medtech.ai',
+        password: 'cleaner123',
+        description: 'QR checklist verification, infection control zones, and overdue cleaning alerts.'
+      },
+      {
+        role: 'staff',
+        label: 'Front Desk & Reception Staff',
+        email: 'staff@medtech.ai',
+        password: 'staff123',
+        description: 'Patient admissions, appointment scheduling, billing invoices, and OPD queue.'
       },
       {
         role: 'patient',

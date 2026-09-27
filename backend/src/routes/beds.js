@@ -60,8 +60,8 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// PATCH update bed status / allocation (Admin or Doctor)
-router.patch('/:id', authenticateToken, requireRole(['admin', 'doctor']), async (req, res) => {
+// PATCH update bed status / allocation (Admin, Doctor, Nurse, or Staff)
+router.patch('/:id', authenticateToken, requireRole(['admin', 'doctor', 'nurse', 'staff']), async (req, res) => {
   try {
     const { status, patient_id, notes } = req.body;
     const bedId = req.params.id;

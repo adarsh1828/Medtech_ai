@@ -69,6 +69,10 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(payload)
   }),
+  registerStaff: (payload) => request('/auth/register-staff', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
   sendOtp: (email, purpose = 'doctor_registration') => request('/auth/send-otp', {
     method: 'POST',
     body: JSON.stringify({ email, purpose })

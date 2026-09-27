@@ -66,8 +66,8 @@ router.put('/me', authenticateToken, requireRole(['patient']), async (req, res) 
   }
 });
 
-// GET patient details and full history by ID (Accessible by Doctor or Admin)
-router.get('/:id', authenticateToken, requireRole(['doctor', 'admin']), async (req, res) => {
+// GET patient details and full history by ID (Accessible by Doctor, Admin, Nurse, or Staff)
+router.get('/:id', authenticateToken, requireRole(['doctor', 'admin', 'nurse', 'staff']), async (req, res) => {
   try {
     const patient = await getOne(
       `SELECT p.*, u.email
@@ -132,8 +132,8 @@ router.get('/:id', authenticateToken, requireRole(['doctor', 'admin']), async (r
   }
 });
 
-// GET all patients list (Admin and Doctors)
-router.get('/', authenticateToken, requireRole(['doctor', 'admin']), async (req, res) => {
+// GET all patients list (Admin, Doctors, Nurses, and Staff)
+router.get('/', authenticateToken, requireRole(['doctor', 'admin', 'nurse', 'staff']), async (req, res) => {
   try {
     const { search } = req.query;
     let sql = `

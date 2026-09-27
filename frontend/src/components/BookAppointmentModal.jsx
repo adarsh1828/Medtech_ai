@@ -50,8 +50,8 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
         setDepartmentId(deptRes.departments[0].id);
       }
 
-      // If admin, load patients list
-      if (user?.role === 'admin' || user?.role === 'doctor') {
+      // If admin, doctor, or staff, load patients list
+      if (user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'staff') {
         const patsRes = await api.getPatients().catch(() => ({ patients: [] }));
         setPatients(patsRes.patients || []);
         if (patsRes.patients?.length > 0) {
@@ -91,7 +91,7 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
         reason_for_visit: reason.trim()
       };
 
-      if ((user?.role === 'admin' || user?.role === 'doctor') && patientId) {
+      if ((user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'staff') && patientId) {
         payload.patient_id = Number(patientId);
       }
 
@@ -166,8 +166,8 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Patient Selector for Admin / Doctor */}
-          {(user?.role === 'admin' || user?.role === 'doctor') && (
+          {/* Patient Selector for Admin / Doctor / Staff */}
+          {(user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'staff') && (
             <div className="form-group">
               <label className="form-label">Consulting Patient</label>
               <select

@@ -480,6 +480,22 @@ export async function initializeDatabase() {
     )
   `);
 
+  // 22. HospitalStaff (General Operations, Reception, Pharmacy, Lab Tech & Support Staff)
+  await run(`
+    CREATE TABLE IF NOT EXISTS HospitalStaff (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER UNIQUE NOT NULL,
+      full_name TEXT NOT NULL,
+      designation TEXT NOT NULL,
+      department TEXT DEFAULT 'Front Desk & Patient Services',
+      shift_timings TEXT DEFAULT '09:00 AM - 05:00 PM',
+      phone TEXT,
+      is_on_duty INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+    )
+  `);
+
   // Calibrate doctor fees to realistic Indian Rupee amounts (e.g. 65 -> 650)
   try {
     await run("UPDATE Doctors SET consultation_fee = consultation_fee * 10 WHERE consultation_fee > 0 AND consultation_fee < 100");
@@ -531,8 +547,8 @@ export async function initializeDatabase() {
   // Auto-migration for Users role to allow 'nurse', 'cleaning', 'staff' in CHECK constraint
   try {
     const userMaster = await getOne("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Users'");
-    if (userMaster && userMaster.sql && !userMaster.sql.includes("'nurse'")) {
-      console.log('Migrating Users table to allow nurse and cleaning roles...');
+    if (userMaster && userMaster.sql && userMaster.sql.includes('CHECK') && (!userMaster.sql.includes("'nurse'") || !userMaster.sql.includes("'staff'"))) {
+      console.log('Migrating Users table to allow nurse, cleaning, and staff roles...');
       await run('PRAGMA foreign_keys = OFF');
       await run('DROP TABLE IF EXISTS Users_migration');
       await run(`
@@ -976,7 +992,23 @@ async function seedStaffAndSanitation() {
     console.log('Default cleaning staff account seeded: cleaner@medtech.ai / cleaner123');
   }
 
-  // 3. Seed Cleaning Tasks (QR-coded Hygiene Areas)
+  // 3. Seed Default Hospital Operations / Reception Staff (Priya Deshmukh)
+  const existingStaff = await getOne("SELECT id FROM Users WHERE email = 'staff@medtech.ai'");
+  if (!existingStaff) {
+    const staffHash = await bcrypt.hash('staff123', salt);
+    const staffUser = await run(
+      "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES ('staff@medtech.ai', ?, 'staff', 'Priya Deshmukh', '+91 98200 66773')",
+      [staffHash]
+    );
+    await run(
+      `INSERT INTO HospitalStaff (user_id, full_name, designation, department, shift_timings, phone, is_on_duty)
+       VALUES (?, 'Priya Deshmukh', 'Reception & Patient Coordinator', 'Front Desk & Patient Services', '09:00 AM - 05:00 PM', '+91 98200 66773', 1)`,
+      [staffUser.lastID]
+    );
+    console.log('Default hospital staff account seeded: staff@medtech.ai / staff123');
+  }
+
+  // 4. Seed Cleaning Tasks (QR-coded Hygiene Areas)
   const taskCount = await getOne('SELECT COUNT(*) as count FROM CleaningTasks');
   if (!taskCount || taskCount.count === 0) {
     console.log('Seeding hospital sanitation QR zones and cleaning tasks...');

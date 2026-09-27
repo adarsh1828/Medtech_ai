@@ -24,10 +24,6 @@ export default function PrescriptionsView({ user, selectedPrescriptionId, hospit
   const [search, setSearch] = useState('');
   const [activePrintRx, setActivePrintRx] = useState(null);
 
-  useEffect(() => {
-    loadPrescriptions();
-  }, [user]);
-
   const loadPrescriptions = async () => {
     setLoading(true);
     try {
@@ -43,6 +39,10 @@ export default function PrescriptionsView({ user, selectedPrescriptionId, hospit
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadPrescriptions();
+  }, [user]);
 
   const handleShareWhatsApp = (rx) => {
     const medList = rx.medicines?.map((m, i) => `${i + 1}. *${m.medicine_name}* (${m.dosage}) - ${m.frequency} for ${m.duration} (${m.instructions || ''})`).join('\n') || 'None';

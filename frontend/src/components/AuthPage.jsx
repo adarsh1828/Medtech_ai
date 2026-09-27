@@ -112,9 +112,16 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     shift_timings: '07:00 AM - 03:00 PM'
   });
 
-  useEffect(() => {
-    loadDepartments();
-  }, []);
+  // Hospital Staff Registration state
+  const [staffForm, setStaffForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    phone: '',
+    designation: 'Reception & Patient Coordinator',
+    department: 'Front Desk & Patient Services',
+    shift_timings: '09:00 AM - 05:00 PM'
+  });
 
   const loadDepartments = async () => {
     try {
@@ -128,6 +135,10 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       console.error('Failed to load departments in AuthPage:', err);
     }
   };
+
+  useEffect(() => {
+    loadDepartments();
+  }, []);
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -303,6 +314,26 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       onLoginSuccess(res.user);
     } catch (err) {
       setError(err.message || 'Cleaning staff registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterStaff = async (e) => {
+    e.preventDefault();
+    if (!staffForm.full_name || !staffForm.email || !staffForm.password) {
+      setError('Please fill in all mandatory hospital staff fields.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.registerStaff(staffForm);
+      setStoredToken(res.token);
+      setStoredUser(res.user);
+      onLoginSuccess(res.user);
+    } catch (err) {
+      setError(err.message || 'Hospital staff registration failed.');
     } finally {
       setLoading(false);
     }
@@ -658,6 +689,33 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     </span>
                   </button>
 
+                  {/* Staff Demo */}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPreset('staff', 'staff@medtech.ai', 'staff123')}
+                    className="btn btn-outline"
+                    style={{
+                      padding: '10px 6px',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      borderRadius: '10px',
+                      border: selectedRole === 'staff' ? '2px solid #f97316' : '1px solid rgba(249, 115, 22, 0.3)',
+                      background: selectedRole === 'staff' ? 'rgba(249, 115, 22, 0.15)' : 'rgba(249, 115, 22, 0.04)',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedRole === 'staff' ? '0 0 12px rgba(249, 115, 22, 0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Building2 size={18} color="#f97316" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#f97316' }}>
+                      🏢 Staff
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      Priya D.
+                    </span>
+                  </button>
+
                   {/* Admin Demo */}
                   <button
                     type="button"
@@ -705,6 +763,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       {selectedRole === 'doctor' && '🩺 Dr. Sarah Chen (Doctor) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'nurse' && '👩‍⚕️ Sister Sunita Sharma (Staff Nurse) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'cleaning' && '🧹 Ramesh Shinde (Sanitation Staff) चे क्रेडेंशियल्स भरले आहेत.'}
+                      {selectedRole === 'staff' && '🏢 Priya Deshmukh (Hospital Staff & Reception) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'admin' && '🛡️ Arthur Pendelton (Admin) चे क्रेडेंशियल्स भरले आहेत.'}
                       {' '}लॉगिन करण्यासाठी खालील <strong>"Sign In to Hospital Portal"</strong> बटण दाबा.
                     </span>
@@ -810,6 +869,24 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                 }}
               >
                 🧹 Cleaning
+              </button>
+              <button
+                type="button"
+                onClick={() => { setTab('staff_register'); setError(''); }}
+                style={{
+                  flex: 1,
+                  padding: '10px 8px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: tab === 'staff_register' ? '2px solid #f97316' : '2px solid transparent',
+                  color: tab === 'staff_register' ? '#f97316' : 'var(--text-secondary)',
+                  fontWeight: tab === 'staff_register' ? '700' : '500',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                🏢 Staff
               </button>
               <button
                 type="button"
@@ -1759,6 +1836,149 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   style={{ width: '100%', marginTop: '16px', padding: '12px', background: '#d97706', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
                 >
                   {loading ? 'Registering Cleaning Staff...' : 'Register Cleaning Staff & Start QR Audits'}
+                </button>
+              </form>
+            )}
+
+            {/* Staff Registration Form */}
+            {tab === 'staff_register' && (
+              <form onSubmit={handleRegisterStaff}>
+                <div style={{
+                  padding: '12px 16px',
+                  background: 'rgba(249, 115, 22, 0.1)',
+                  border: '1px solid rgba(249, 115, 22, 0.25)',
+                  borderRadius: '10px',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <Building2 size={20} color="#f97316" />
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                    Hospital Front Desk & Operational Staff • Reception, Patient Queue, Ward Beds & Billing Invoices.
+                  </div>
+                </div>
+
+                <div className="responsive-two-col">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="form-input"
+                      placeholder="e.g. Priya Deshmukh"
+                      value={staffForm.full_name}
+                      onChange={(e) => setStaffForm({ ...staffForm, full_name: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Staff Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      className="form-input"
+                      placeholder="priya.staff@medtech.ai"
+                      value={staffForm.email}
+                      onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Password *</label>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={staffForm.password}
+                        onChange={(e) => setStaffForm({ ...staffForm, password: e.target.value })}
+                        style={{ paddingRight: '42px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: showRegPassword ? 'var(--primary)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px'
+                        }}
+                      >
+                        {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Contact Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="+91 98200 66773"
+                      value={staffForm.phone}
+                      onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Designation / Role *</label>
+                    <select
+                      className="form-select"
+                      value={staffForm.designation}
+                      onChange={(e) => setStaffForm({ ...staffForm, designation: e.target.value })}
+                    >
+                      <option value="Reception & Patient Coordinator">Reception & Patient Coordinator</option>
+                      <option value="Billing & Discharge Executive">Billing & Discharge Executive</option>
+                      <option value="OPD Desk Officer">OPD Desk Officer</option>
+                      <option value="Diagnostic Lab Assistant">Diagnostic Lab Assistant</option>
+                      <option value="Hospital Operations Assistant">Hospital Operations Assistant</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Hospital Department *</label>
+                    <select
+                      className="form-select"
+                      value={staffForm.department}
+                      onChange={(e) => setStaffForm({ ...staffForm, department: e.target.value })}
+                    >
+                      <option value="Front Desk & Patient Services">Front Desk & Patient Services</option>
+                      <option value="Accounts & Billing Department">Accounts & Billing Department</option>
+                      <option value="Outpatient (OPD) Desk">Outpatient (OPD) Desk</option>
+                      <option value="Central Registration">Central Registration</option>
+                      <option value="General Administration">General Administration</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Assigned Shift</label>
+                    <select
+                      className="form-select"
+                      value={staffForm.shift_timings}
+                      onChange={(e) => setStaffForm({ ...staffForm, shift_timings: e.target.value })}
+                    >
+                      <option value="Morning Shift (08:00 AM - 04:00 PM)">Morning Shift (08:00 AM - 04:00 PM)</option>
+                      <option value="Regular Shift (09:00 AM - 05:00 PM)">Regular Shift (09:00 AM - 05:00 PM)</option>
+                      <option value="Evening Shift (01:00 PM - 09:00 PM)">Evening Shift (01:00 PM - 09:00 PM)</option>
+                      <option value="Night Shift (09:00 PM - 07:00 AM)">Night Shift (09:00 PM - 07:00 AM)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{ width: '100%', marginTop: '16px', padding: '12px', background: '#ea580c', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  {loading ? 'Registering Staff Member...' : 'Register Hospital Staff Account'}
                 </button>
               </form>
             )}

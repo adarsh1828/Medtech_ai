@@ -34,7 +34,7 @@ router.get('/', authenticateToken, async (req, res) => {
       if (!doctor) return res.json({ appointments: [] });
       sql += ' AND a.doctor_id = ?';
       params.push(doctor.id);
-    } else if (req.user.role === 'admin') {
+    } else if (req.user.role === 'admin' || req.user.role === 'staff') {
       if (doctor_id) {
         sql += ' AND a.doctor_id = ?';
         params.push(doctor_id);
@@ -104,7 +104,7 @@ router.post('/book', authenticateToken, async (req, res) => {
         return res.status(400).json({ error: 'Patient profile does not exist. Please complete your registration.' });
       }
       patient_id = patient.id;
-    } else if (req.user.role === 'admin') {
+    } else if (req.user.role === 'admin' || req.user.role === 'staff') {
       if (!patient_id) {
         return res.status(400).json({ error: 'Please specify the patient for this appointment.' });
       }
