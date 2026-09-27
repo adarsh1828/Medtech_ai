@@ -654,21 +654,26 @@ async function getOrInsertLabTest(name, code, category, normalRange, units, desc
 }
 
 async function seedDefaultData() {
-  const existingDoctors = await getOne('SELECT COUNT(*) as count FROM Doctors');
-  const docCount = existingDoctors ? (existingDoctors.count ?? existingDoctors['count'] ?? 0) : 0;
-  if (Number(docCount) > 0) {
-    console.log('Database already has doctor records. Skipping default seed.');
-    return;
-  }
-
-  console.log('Seeding initial clinical and hospital data idempotently...');
+  console.log('Verifying and ensuring core accounts and default clinical data idempotently...');
   const salt = await bcrypt.genSalt(10);
   const adminHash = await bcrypt.hash('admin123', salt);
   const doctorHash = await bcrypt.hash('doctor123', salt);
   const patientHash = await bcrypt.hash('patient123', salt);
 
-  // 1. Seed Users (idempotent)
+  // 1. Seed Users (idempotent - guaranteed presence on Local SQLite and Cloud LibSQL)
   const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Dr. Arthur Pendelton', '+1 (555) 019-2831');
+  
+  // Seed custom admin accounts from local database
+  await getOrInsertUser('karaningole@gmail.com', '$2a$10$ro52bhx.4IjvzrXr3amt5OK7CBT/Ic2wUsomMMLjP4DlyUI6.r42G', 'admin', 'Karan Sadashiv Ingole (Medical Director & Chief Executive)', '+91 98200 11223');
+  await getOrInsertUser('director@anandhospital.com', '$2a$10$EuP5UTospl/oEQBJzf47COY5bzOJUdRoahxqbaK3siGVefaVfQ5Za', 'admin', 'Dr. Kabir Anand (Medical Director & Founder)', '+1 555-9088');
+  await getOrInsertUser('sneha@deshmukhhospital.com', '$2a$10$u0Fq8FdygisJ8pmIxfxaFey6ddo6IhryPnR.NKebGLUPGBjRWc/yq', 'admin', 'Dr. Sneha Deshmukh (Managing Director & CEO)', '+1 (555) 987-6543');
+
+  // Seed custom doctors and patients from local database
+  await getOrInsertUser('dr.vikram@medtech.ai', '$2a$10$2D/ClilAxiuXfHXt5pe3UeLgjKcqaTuUHQ58tClq/r0J6rZgcz0LW', 'doctor', 'Dr. Vikram Malhotra, MS', '+1 555-0988');
+  await getOrInsertUser('rameshgsurya@gmail.com', '$2a$10$wOshkuC2O9fxYdjFn7mCn.GeAM66B4qV8c96mRjEKEevd4K5NQxDC', 'doctor', 'Dr. Ramesh Ganeshrao Surya', '+91 7875723205');
+  await getOrInsertUser('adarshvsurya@gmail.com', '$2a$10$yGHt2QSEe7d30dORIKFAdODTDDvSvX0arJOBtUJtRayFBFtRD4iYK', 'patient', 'Adarsh Vijayrao Surye', '+91 8668351191');
+  await getOrInsertUser('shravangaikwad388@gmail.com', '$2a$10$CuXOKoAthKbyBYwGdrCNoO9A.gewnJNOSht.G3CoWsyOcRRxe8dWS', 'patient', 'Shravan Gaikwad', '+91 8766023102');
+
   const doc1UserId = await getOrInsertUser('dr.sarah@medtech.ai', doctorHash, 'doctor', 'Dr. Sarah Chen, MD', '+1 (555) 302-8812');
   const doc2UserId = await getOrInsertUser('dr.arjun@medtech.ai', doctorHash, 'doctor', 'Dr. Arjun Mehta, DM', '+1 (555) 441-9923');
   const doc3UserId = await getOrInsertUser('dr.emily@medtech.ai', doctorHash, 'doctor', 'Dr. Emily Vance, MS', '+1 (555) 872-1144');

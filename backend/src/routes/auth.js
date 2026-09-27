@@ -94,15 +94,15 @@ router.post('/send-otp', async (req, res) => {
 
     // Generate secure 6-digit numeric OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiryTimestamp = Math.floor((Date.now() + 10 * 60 * 1000) / 1000); // 10 minutes
+    const expiryIso = new Date(Date.now() + 10 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19);
 
     // Delete any old OTP requests for this email and purpose
     await run('DELETE FROM OtpVerifications WHERE email = ? AND purpose = ?', [cleanEmail, purpose]);
 
-    // Insert new OTP record
+    // Insert new OTP record (universal ISO timestamp for SQLite and LibSQL/Turso)
     await run(
-      'INSERT INTO OtpVerifications (email, otp_code, purpose, expires_at) VALUES (?, ?, ?, datetime(?, "unixepoch"))',
-      [cleanEmail, otpCode, purpose, expiryTimestamp]
+      'INSERT INTO OtpVerifications (email, otp_code, purpose, expires_at) VALUES (?, ?, ?, ?)',
+      [cleanEmail, otpCode, purpose, expiryIso]
     );
 
     console.log(`[2FA OTP] Verification code generated for ${cleanEmail} (${purpose}): ${otpCode}`);
