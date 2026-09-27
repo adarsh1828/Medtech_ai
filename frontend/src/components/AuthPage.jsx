@@ -42,6 +42,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
   const [selectedRole, setSelectedRole] = useState(null);
   const [doctorPendingApproval, setDoctorPendingApproval] = useState(false);
   const [registeredDoctorEmail, setRegisteredDoctorEmail] = useState('');
+  const [pendingApprovalNotice, setPendingApprovalNotice] = useState(null);
 
   // 2FA OTP state for Doctor Registration
   const [docOtp, setDocOtp] = useState('');
@@ -162,7 +163,15 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       setStoredUser(res.user);
       onLoginSuccess(res.user);
     } catch (err) {
-      setError(err.message || 'Login failed. Please verify your credentials.');
+      if (err.pendingApproval || err.status === 'pending') {
+        setPendingApprovalNotice({
+          title: 'अर्ज प्रशासकीय मान्यतेसाठी प्रलंबित आहे (Pending Approval)',
+          message: err.message || 'तुमचा अर्ज हॉस्पिटल प्रशासकाच्या मान्यतेसाठी प्रलंबित आहे. ॲडमिनने मान्यता दिल्यानंतरच तुम्ही लॉगिन करू शकाल.',
+          email: email
+        });
+      } else {
+        setError(err.message || 'Login failed. Please verify your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -266,8 +275,12 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     try {
       const res = await api.registerDoctor({ ...docForm, otp: docOtp.trim() });
       if (res.pendingApproval) {
-        setDoctorPendingApproval(true);
-        setRegisteredDoctorEmail(docForm.email);
+        setPendingApprovalNotice({
+          title: 'डॉक्टर नोंदणी अर्ज दाखल झाला! (Physician Application Submitted)',
+          message: 'तुमचा डॉक्टर अर्ज प्रशासकीय पडताळणीसाठी पाठवण्यात आला आहे. हॉस्पिटल ॲडमिनिस्ट्रेटरने मंजुरी दिल्यावर तुमचे लॉगिन सुरू होईल.',
+          email: docForm.email
+        });
+        setTab('login');
         return;
       }
       setStoredToken(res.token);
@@ -311,6 +324,15 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     setError('');
     try {
       const res = await api.registerNurse(nurseForm);
+      if (res.pendingApproval) {
+        setPendingApprovalNotice({
+          title: 'परिचारिका (Nurse) नोंदणी अर्ज दाखल झाला!',
+          message: 'तुमचा स्टाफ नर्स अर्ज प्रशासकीय पडताळणीसाठी पाठवण्यात आला आहे. हॉस्पिटल ॲडमिनिस्ट्रेटरने मंजुरी दिल्यावर तुमचे लॉगिन सुरू होईल.',
+          email: nurseForm.email
+        });
+        setTab('login');
+        return;
+      }
       setStoredToken(res.token);
       setStoredUser(res.user);
       onLoginSuccess(res.user);
@@ -331,6 +353,15 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
     setError('');
     try {
       const res = await api.registerCleaning(cleanerForm);
+      if (res.pendingApproval) {
+        setPendingApprovalNotice({
+          title: 'स्वच्छता कर्मचारी नोंदणी अर्ज दाखल झाला!',
+          message: 'तुमचा स्वच्छता कर्मचारी अर्ज प्रशासकीय पडताळणीसाठी पाठवण्यात आला आहे. हॉस्पिटल ॲडमिनिस्ट्रेटरने मंजुरी दिल्यावर तुमचे लॉगिन सुरू होईल.',
+          email: cleanerForm.email
+        });
+        setTab('login');
+        return;
+      }
       setStoredToken(res.token);
       setStoredUser(res.user);
       onLoginSuccess(res.user);
@@ -1094,6 +1125,35 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
               </button>
             </div>
           )}
+
+            {/* Pending Approval Notice Banner */}
+            {pendingApprovalNotice && (
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.12)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '10px',
+                padding: '14px',
+                marginBottom: '18px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <ShieldAlert size={22} color="#fbbf24" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#fbbf24', marginBottom: '4px' }}>
+                    {pendingApprovalNotice.title}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                    {pendingApprovalNotice.message}
+                  </div>
+                  {pendingApprovalNotice.email && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                      नोंदणीकृत ईमेल: <strong>{pendingApprovalNotice.email}</strong>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Error Banner */}
             {error && (

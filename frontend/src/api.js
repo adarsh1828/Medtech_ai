@@ -104,13 +104,35 @@ export const api = {
   deleteDoctor: (id) => request(`/admin/doctors/${id}`, {
     method: 'DELETE'
   }),
-  getPendingDoctors: () => request('/admin/pending-doctors'),
-  approveDoctor: (id) => request(`/admin/doctors/${id}/approve`, {
-    method: 'PUT'
+  getPendingDoctors: () => request('/admin/pending-staff').then(res => ({ pendingDoctors: res.pendingDoctors || [] })),
+  getPendingStaff: () => request('/admin/pending-staff'),
+  approveStaff: (staffType, id, action) => request('/admin/approve-staff', {
+    method: 'POST',
+    body: JSON.stringify({ staffType, id, action })
   }),
-  rejectDoctor: (id, reason = '') => request(`/admin/doctors/${id}/reject`, {
-    method: 'PUT',
-    body: JSON.stringify({ reason })
+  approveDoctor: (id) => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'doctor', id, action: 'approve' })
+  }),
+  rejectDoctor: (id, reason = '') => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'doctor', id, action: 'reject' })
+  }),
+  approveNurse: (id) => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'nurse', id, action: 'approve' })
+  }),
+  rejectNurse: (id) => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'nurse', id, action: 'reject' })
+  }),
+  approveCleaner: (id) => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'cleaning', id, action: 'approve' })
+  }),
+  rejectCleaner: (id) => request(`/admin/approve-staff`, {
+    method: 'POST',
+    body: JSON.stringify({ staffType: 'cleaning', id, action: 'reject' })
   }),
 
 

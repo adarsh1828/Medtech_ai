@@ -367,6 +367,7 @@ export async function initializeDatabase() {
       phone TEXT,
       is_on_duty INTEGER DEFAULT 1,
       status TEXT DEFAULT 'approved',
+      approved_at DATETIME,
       FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
       FOREIGN KEY (department_id) REFERENCES Departments(id)
     )
@@ -382,6 +383,8 @@ export async function initializeDatabase() {
       shift_timings TEXT DEFAULT '07:00 AM - 03:00 PM',
       phone TEXT,
       is_on_duty INTEGER DEFAULT 1,
+      status TEXT DEFAULT 'approved',
+      approved_at DATETIME,
       FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
     )
   `);
@@ -581,6 +584,28 @@ export async function initializeDatabase() {
   } catch (e) {}
   try {
     await run("UPDATE Doctors SET status = 'approved' WHERE status IS NULL OR status = ''");
+  } catch (e) {}
+
+  // Auto-migration for Nurses table: ensure status and approved_at columns exist
+  try {
+    await run("ALTER TABLE Nurses ADD COLUMN status TEXT DEFAULT 'approved'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE Nurses ADD COLUMN approved_at DATETIME");
+  } catch (e) {}
+  try {
+    await run("UPDATE Nurses SET status = 'approved' WHERE status IS NULL OR status = ''");
+  } catch (e) {}
+
+  // Auto-migration for HousekeepingStaff table: ensure status and approved_at columns exist
+  try {
+    await run("ALTER TABLE HousekeepingStaff ADD COLUMN status TEXT DEFAULT 'approved'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE HousekeepingStaff ADD COLUMN approved_at DATETIME");
+  } catch (e) {}
+  try {
+    await run("UPDATE HousekeepingStaff SET status = 'approved' WHERE status IS NULL OR status = ''");
   } catch (e) {}
 
   console.log('Database tables verified.');
@@ -988,8 +1013,8 @@ async function seedStaffAndSanitation() {
       [nurseHash]
     );
     await run(
-      `INSERT INTO Nurses (user_id, full_name, department_id, shift_timings, assigned_ward, qualification, phone, is_on_duty)
-       VALUES (?, 'Sister Sunita Sharma', 1, '08:00 AM - 04:00 PM', 'General Ward & ICU', 'B.Sc Nursing (Critical Care & Vitals)', '+91 98200 44551', 1)`,
+      `INSERT INTO Nurses (user_id, full_name, department_id, shift_timings, assigned_ward, qualification, phone, is_on_duty, status, approved_at)
+       VALUES (?, 'Sister Sunita Sharma', 1, '08:00 AM - 04:00 PM', 'General Ward & ICU', 'B.Sc Nursing (Critical Care & Vitals)', '+91 98200 44551', 1, 'approved', CURRENT_TIMESTAMP)`,
       [nurseUser.lastID]
     );
     console.log('Default nurse account seeded: nurse@medtech.ai / nurse123');
@@ -1004,8 +1029,8 @@ async function seedStaffAndSanitation() {
       [cleanerHash]
     );
     await run(
-      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty)
-       VALUES (?, 'Ramesh Shinde', 'General Ward, ICU & Restrooms', '07:00 AM - 03:00 PM', '+91 98200 77882', 1)`,
+      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty, status, approved_at)
+       VALUES (?, 'Ramesh Shinde', 'General Ward, ICU & Restrooms', '07:00 AM - 03:00 PM', '+91 98200 77882', 1, 'approved', CURRENT_TIMESTAMP)`,
       [cleanerUser.lastID]
     );
     console.log('Default cleaning staff account seeded: cleaner@medtech.ai / cleaner123');

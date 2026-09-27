@@ -35,9 +35,17 @@ router.get('/overview', async (req, res) => {
        FROM Doctors WHERE status = 'approved' OR status IS NULL`
     );
 
-    // Pending Doctor Approvals
+    // Pending Staff Approvals (Doctors, Nurses, Cleaning Staff)
     const pendingDocsRow = await getOne(`SELECT COUNT(*) as count FROM Doctors WHERE status = 'pending'`);
     const pendingDoctorsCount = pendingDocsRow?.count || 0;
+
+    const pendingNursesRow = await getOne(`SELECT COUNT(*) as count FROM Nurses WHERE status = 'pending'`);
+    const pendingNursesCount = pendingNursesRow?.count || 0;
+
+    const pendingCleanersRow = await getOne(`SELECT COUNT(*) as count FROM HousekeepingStaff WHERE status = 'pending'`);
+    const pendingCleanersCount = pendingCleanersRow?.count || 0;
+
+    const totalPendingStaff = pendingDoctorsCount + pendingNursesCount + pendingCleanersCount;
 
     // Bed Occupancy
     const bedStats = await getOne(
@@ -85,6 +93,9 @@ router.get('/overview', async (req, res) => {
         doctorsOnDuty: doctorStats?.doctors_on_duty || 0,
         totalDoctors: doctorStats?.total_doctors || 0,
         pendingDoctorsCount,
+        pendingNursesCount,
+        pendingCleanersCount,
+        totalPendingStaff,
         totalBeds,
         occupiedBeds,
         availableBeds: bedStats?.available_beds || 0,
@@ -190,83 +201,143 @@ router.delete('/doctors/:id', async (req, res) => {
   }
 });
 
-// GET all pending doctor registration requests
-router.get('/pending-doctors', async (req, res) => {
+// GET all pending staff registration requests (Doctors, Nurses, Cleaning Staff)
+router.get('/pending-staff', async (req, res) => {
   try {
     const pendingDoctors = await query(`
       SELECT d.*, dep.name as department_name, dep.code as department_code, u.email, u.phone, u.created_at as registered_at
       FROM Doctors d
-      JOIN Departments dep ON d.department_id = dep.id
+      LEFT JOIN Departments dep ON d.department_id = dep.id
       JOIN Users u ON d.user_id = u.id
       WHERE d.status = 'pending'
       ORDER BY d.id DESC
     `);
-    res.json({ pendingDoctors });
+
+    const pendingNurses = await query(`
+      SELECT n.*, dep.name as department_name, u.email, u.phone, u.created_at as registered_at
+      FROM Nurses n
+      LEFT JOIN Departments dep ON n.department_id = dep.id
+      JOIN Users u ON n.user_id = u.id
+      WHERE n.status = 'pending'
+      ORDER BY n.id DESC
+    `);
+
+    const pendingCleaners = await query(`
+      SELECT h.*, u.email, u.phone, u.created_at as registered_at
+      FROM HousekeepingStaff h
+      JOIN Users u ON h.user_id = u.id
+      WHERE h.status = 'pending'
+      ORDER BY h.id DESC
+    `);
+
+    res.json({
+      pendingDoctors: pendingDoctors || [],
+      pendingNurses: pendingNurses || [],
+      pendingCleaners: pendingCleaners || [],
+      totalPending: (pendingDoctors?.length || 0) + (pendingNurses?.length || 0) + (pendingCleaners?.length || 0)
+    });
   } catch (err) {
-    console.error('Error fetching pending doctors:', err);
-    res.status(500).json({ error: 'Failed to retrieve pending doctor applications.' });
+    console.error('Error fetching pending staff:', err);
+    res.status(500).json({ error: 'Failed to retrieve pending staff applications.' });
   }
 });
 
-// PUT Approve doctor registration
-router.put('/doctors/:id/approve', async (req, res) => {
+// POST Approve or Reject any staff member (Doctor, Nurse, Cleaner)
+router.post('/approve-staff', async (req, res) => {
   try {
-    const doctorId = req.params.id;
-    const doc = await getOne('SELECT id, user_id, full_name, status FROM Doctors WHERE id = ?', [doctorId]);
-    if (!doc) {
-      return res.status(404).json({ error: 'Doctor application not found.' });
+    const { staffType, id, action } = req.body;
+    if (!staffType || !id || !['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ error: 'Valid staffType, id, and action (approve/reject) are required.' });
     }
 
-    await run(
-      `UPDATE Doctors 
-       SET status = 'approved', approved_at = CURRENT_TIMESTAMP, is_on_duty = 1 
-       WHERE id = ?`,
-      [doctorId]
-    );
+    const newStatus = action === 'approve' ? 'approved' : 'rejected';
+    const onDuty = action === 'approve' ? 1 : 0;
 
-    const updatedDoc = await getOne(
-      `SELECT d.*, dep.name as department_name, u.email, u.phone
-       FROM Doctors d
-       JOIN Departments dep ON d.department_id = dep.id
-       JOIN Users u ON d.user_id = u.id
-       WHERE d.id = ?`,
-      [doctorId]
-    );
+    if (staffType === 'doctor') {
+      const doc = await getOne('SELECT id, full_name FROM Doctors WHERE id = ?', [id]);
+      if (!doc) return res.status(404).json({ error: 'Doctor not found.' });
+      await run('UPDATE Doctors SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      return res.json({ message: `Doctor Dr. ${doc.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
+    }
 
-    res.json({
-      message: `Physician Dr. ${doc.full_name} approved successfully! Their clinical portal access is now active.`,
-      doctor: updatedDoc,
-      doctorId: Number(doctorId),
-      status: 'approved'
-    });
+    if (staffType === 'nurse') {
+      const nurse = await getOne('SELECT id, full_name FROM Nurses WHERE id = ?', [id]);
+      if (!nurse) return res.status(404).json({ error: 'Nurse not found.' });
+      await run('UPDATE Nurses SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      return res.json({ message: `Staff Nurse ${nurse.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
+    }
+
+    if (staffType === 'cleaning') {
+      const cleaner = await getOne('SELECT id, full_name FROM HousekeepingStaff WHERE id = ?', [id]);
+      if (!cleaner) return res.status(404).json({ error: 'Sanitation staff not found.' });
+      await run('UPDATE HousekeepingStaff SET status = ?, approved_at = CURRENT_TIMESTAMP, is_on_duty = ? WHERE id = ?', [newStatus, onDuty, id]);
+      return res.json({ message: `Sanitation staff ${cleaner.full_name} has been ${newStatus}.`, staffType, id, status: newStatus });
+    }
+
+    return res.status(400).json({ error: 'Unknown staffType.' });
   } catch (err) {
-    console.error('Error approving doctor:', err);
-    res.status(500).json({ error: 'Failed to approve doctor application.' });
+    console.error('Error approving staff:', err);
+    res.status(500).json({ error: 'Failed to process staff approval.' });
   }
 });
 
-// PUT Reject doctor registration
-router.put('/doctors/:id/reject', async (req, res) => {
+// PUT Approve nurse registration
+router.put('/nurses/:id/approve', async (req, res) => {
   try {
-    const doctorId = req.params.id;
-    const doc = await getOne('SELECT id, user_id, full_name FROM Doctors WHERE id = ?', [doctorId]);
-    if (!doc) {
-      return res.status(404).json({ error: 'Doctor application not found.' });
-    }
+    const nurseId = req.params.id;
+    const nurse = await getOne('SELECT id, full_name FROM Nurses WHERE id = ?', [nurseId]);
+    if (!nurse) return res.status(404).json({ error: 'Nurse application not found.' });
 
-    await run(
-      `UPDATE Doctors SET status = 'rejected', is_on_duty = 0 WHERE id = ?`,
-      [doctorId]
-    );
-
-    res.json({
-      message: `Registration application for Dr. ${doc.full_name} has been rejected.`,
-      doctorId: Number(doctorId),
-      status: 'rejected'
-    });
+    await run("UPDATE Nurses SET status = 'approved', approved_at = CURRENT_TIMESTAMP, is_on_duty = 1 WHERE id = ?", [nurseId]);
+    res.json({ message: `Staff Nurse ${nurse.full_name} approved successfully!`, status: 'approved' });
   } catch (err) {
-    console.error('Error rejecting doctor:', err);
-    res.status(500).json({ error: 'Failed to reject doctor application.' });
+    console.error('Error approving nurse:', err);
+    res.status(500).json({ error: 'Failed to approve nurse.' });
+  }
+});
+
+// PUT Reject nurse registration
+router.put('/nurses/:id/reject', async (req, res) => {
+  try {
+    const nurseId = req.params.id;
+    const nurse = await getOne('SELECT id, full_name FROM Nurses WHERE id = ?', [nurseId]);
+    if (!nurse) return res.status(404).json({ error: 'Nurse application not found.' });
+
+    await run("UPDATE Nurses SET status = 'rejected', is_on_duty = 0 WHERE id = ?", [nurseId]);
+    res.json({ message: `Staff Nurse ${nurse.full_name} application rejected.`, status: 'rejected' });
+  } catch (err) {
+    console.error('Error rejecting nurse:', err);
+    res.status(500).json({ error: 'Failed to reject nurse.' });
+  }
+});
+
+// PUT Approve cleaning staff registration
+router.put('/cleaning/:id/approve', async (req, res) => {
+  try {
+    const cleanerId = req.params.id;
+    const cleaner = await getOne('SELECT id, full_name FROM HousekeepingStaff WHERE id = ?', [cleanerId]);
+    if (!cleaner) return res.status(404).json({ error: 'Sanitation staff not found.' });
+
+    await run("UPDATE HousekeepingStaff SET status = 'approved', approved_at = CURRENT_TIMESTAMP, is_on_duty = 1 WHERE id = ?", [cleanerId]);
+    res.json({ message: `Sanitation staff ${cleaner.full_name} approved successfully!`, status: 'approved' });
+  } catch (err) {
+    console.error('Error approving cleaning staff:', err);
+    res.status(500).json({ error: 'Failed to approve sanitation staff.' });
+  }
+});
+
+// PUT Reject cleaning staff registration
+router.put('/cleaning/:id/reject', async (req, res) => {
+  try {
+    const cleanerId = req.params.id;
+    const cleaner = await getOne('SELECT id, full_name FROM HousekeepingStaff WHERE id = ?', [cleanerId]);
+    if (!cleaner) return res.status(404).json({ error: 'Sanitation staff not found.' });
+
+    await run("UPDATE HousekeepingStaff SET status = 'rejected', is_on_duty = 0 WHERE id = ?", [cleanerId]);
+    res.json({ message: `Sanitation staff ${cleaner.full_name} application rejected.`, status: 'rejected' });
+  } catch (err) {
+    console.error('Error rejecting cleaning staff:', err);
+    res.status(500).json({ error: 'Failed to reject sanitation staff.' });
   }
 });
 

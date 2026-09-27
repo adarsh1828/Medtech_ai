@@ -399,7 +399,7 @@ router.post('/register-nurse', async (req, res) => {
 
     const nurseResult = await run(
       `INSERT INTO Nurses (user_id, full_name, department_id, shift_timings, assigned_ward, qualification, phone, is_on_duty, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'approved')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, 'pending')`,
       [
         userResult.lastID,
         full_name.trim(),
@@ -411,17 +411,9 @@ router.post('/register-nurse', async (req, res) => {
       ]
     );
 
-    const token = generateToken({
-      userId: userResult.lastID,
-      role: 'nurse',
-      nurseId: nurseResult.lastID,
-      email: cleanEmail,
-      fullName: full_name.trim()
-    });
-
     res.status(201).json({
-      message: 'Staff Nurse account registered successfully!',
-      token,
+      message: 'Staff Nurse application submitted successfully! Your account is pending administrator verification. Once approved, you will be able to log in.',
+      pendingApproval: true,
       user: {
         id: userResult.lastID,
         email: cleanEmail,
@@ -429,7 +421,8 @@ router.post('/register-nurse', async (req, res) => {
         fullName: full_name.trim(),
         nurseId: nurseResult.lastID,
         assignedWard: assigned_ward || 'General Ward & ICU',
-        shiftTimings: shift_timings || '08:00 AM - 04:00 PM'
+        shiftTimings: shift_timings || '08:00 AM - 04:00 PM',
+        status: 'pending'
       }
     });
   } catch (err) {
@@ -462,8 +455,8 @@ router.post('/register-cleaning', async (req, res) => {
     );
 
     const cleanerResult = await run(
-      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty)
-       VALUES (?, ?, ?, ?, ?, 1)`,
+      `INSERT INTO HousekeepingStaff (user_id, full_name, assigned_area, shift_timings, phone, is_on_duty, status)
+       VALUES (?, ?, ?, ?, ?, 0, 'pending')`,
       [
         userResult.lastID,
         full_name.trim(),
@@ -473,17 +466,9 @@ router.post('/register-cleaning', async (req, res) => {
       ]
     );
 
-    const token = generateToken({
-      userId: userResult.lastID,
-      role: 'cleaning',
-      cleanerId: cleanerResult.lastID,
-      email: cleanEmail,
-      fullName: full_name.trim()
-    });
-
     res.status(201).json({
-      message: 'Housekeeping & Sanitation account registered successfully!',
-      token,
+      message: 'Housekeeping & sanitation application submitted successfully! Your account is pending administrator verification. Once approved, you will be able to log in.',
+      pendingApproval: true,
       user: {
         id: userResult.lastID,
         email: cleanEmail,
@@ -491,7 +476,8 @@ router.post('/register-cleaning', async (req, res) => {
         fullName: full_name.trim(),
         cleanerId: cleanerResult.lastID,
         assignedArea: assigned_area || 'General Ward, ICU & Restrooms',
-        shiftTimings: shift_timings || '07:00 AM - 03:00 PM'
+        shiftTimings: shift_timings || '07:00 AM - 03:00 PM',
+        status: 'pending'
       }
     });
   } catch (err) {
@@ -638,23 +624,53 @@ router.post('/login', async (req, res) => {
         [user.id]
       );
       if (nurse) {
+        const nurseStatus = nurse.status || 'approved';
+        if (nurseStatus === 'pending') {
+          return res.status(403).json({
+            error: 'Your nurse registration is pending administrator approval. Please wait until the hospital administrator verifies and activates your account.',
+            pendingApproval: true,
+            status: 'pending'
+          });
+        }
+        if (nurseStatus === 'rejected') {
+          return res.status(403).json({
+            error: 'Your nurse registration application was declined by hospital administration.',
+            status: 'rejected'
+          });
+        }
         extraData.nurseId = nurse.id;
         extraData.assignedWard = nurse.assigned_ward;
         extraData.shiftTimings = nurse.shift_timings;
         extraData.qualification = nurse.qualification;
         extraData.isOnDuty = !!nurse.is_on_duty;
         extraData.departmentName = nurse.department_name;
+        extraData.status = nurseStatus;
       }
     } else if (user.role === 'cleaning') {
       const cleaner = await getOne(
-        `SELECT id, assigned_area, shift_timings, is_on_duty FROM HousekeepingStaff WHERE user_id = ?`,
+        `SELECT id, assigned_area, shift_timings, is_on_duty, status FROM HousekeepingStaff WHERE user_id = ?`,
         [user.id]
       );
       if (cleaner) {
+        const cleanerStatus = cleaner.status || 'approved';
+        if (cleanerStatus === 'pending') {
+          return res.status(403).json({
+            error: 'Your sanitation staff registration is pending administrator approval. Please wait until verified by hospital administration.',
+            pendingApproval: true,
+            status: 'pending'
+          });
+        }
+        if (cleanerStatus === 'rejected') {
+          return res.status(403).json({
+            error: 'Your sanitation staff registration was declined by hospital administration.',
+            status: 'rejected'
+          });
+        }
         extraData.cleanerId = cleaner.id;
         extraData.assignedArea = cleaner.assigned_area;
         extraData.shiftTimings = cleaner.shift_timings;
         extraData.isOnDuty = !!cleaner.is_on_duty;
+        extraData.status = cleanerStatus;
       }
     } else if (user.role === 'staff') {
       const staffMember = await getOne(
