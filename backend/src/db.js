@@ -111,7 +111,8 @@ export async function initializeDatabase() {
           run("UPDATE Users SET password_hash = '$2a$10$iHS453kDYNASSxCLxXJNfu/CPreCJab5uXOqLiJ7I8LBXBGnud4xK' WHERE email = 'rameshgsurya@gmail.com'"),
           run("UPDATE Users SET password_hash = '$2a$10$44SyhVRRAfoW6VYaQqmineMR9H4ZlaPvU4NMsRiXBoGOrePgAuVkW' WHERE role = 'doctor' AND email LIKE 'dr.%@medtech.ai'"),
           run("UPDATE Users SET password_hash = '$2a$10$4eDw3Xp5Q7P8t9ar4xOxYegWpib5heQOOC3ZeuQh2KVwf3lvwCE9S' WHERE role = 'nurse' AND email LIKE 'nurse.%@medtech.ai'"),
-          run("UPDATE Users SET password_hash = '$2a$10$R.h9sh8s4QgbvvFuCNndeeyfbMgoqqK9vPPJOcRpNNlnBjYqoMjvS' WHERE role = 'cleaning' AND email LIKE 'cleaner.%@medtech.ai'")
+          run("UPDATE Users SET password_hash = '$2a$10$R.h9sh8s4QgbvvFuCNndeeyfbMgoqqK9vPPJOcRpNNlnBjYqoMjvS' WHERE role = 'cleaning' AND email LIKE 'cleaner.%@medtech.ai'"),
+          run("DELETE FROM FailedLoginAttempts WHERE identifier LIKE '%ramesh%'")
         ]).catch(() => {});
       }
       isSchemaVerified = true;

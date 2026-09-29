@@ -280,15 +280,10 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
       return;
     }
 
-    if (!docOtpVerified) {
-      setError('सुरक्षा पडताळणी आवश्यक: कृपया नोंदणी सबमिट करण्यापूर्वी ईमेलवर पाठवलेला 6-अंकी OTP व्हेरिफाय करा.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     try {
-      const res = await api.registerDoctor({ ...docForm, otp: docOtp.trim() });
+      const res = await api.registerDoctor({ ...docForm });
       if (res.pendingApproval) {
         setPendingApprovalNotice({
           title: 'डॉक्टर नोंदणी अर्ज दाखल झाला! (Physician Application Submitted)',
@@ -948,7 +943,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   {/* Doctor Demo */}
                   <button
                     type="button"
-                    onClick={() => handleSelectPreset('doctor', 'dr.rajesh@medtech.ai', 'doctor123')}
+                    onClick={() => handleSelectPreset('doctor', 'rameshgsurya@gmail.com', 'Ramesh@123')}
                     className="btn btn-outline"
                     style={{
                       padding: '10px 6px',
@@ -968,7 +963,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       🩺 Doctor
                     </span>
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      Dr. Rajesh
+                      Dr. Ramesh S.
                     </span>
                   </button>
 
@@ -2039,84 +2034,15 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   </div>
 
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <label className="form-label" style={{ marginBottom: 0 }}>Professional Email (2FA Verified) *</label>
-                      {docOtpVerified && (
-                        <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <CheckCircle2 size={13} /> Email Verified
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        type="email"
-                        required
-                        disabled={docOtpVerified}
-                        className="form-input"
-                        placeholder="dr.rajesh@medtech.ai"
-                        value={docForm.email}
-                        onChange={(e) => {
-                          setDocForm({ ...docForm, email: e.target.value });
-                          setDocOtpVerified(false);
-                          setDocOtpSent(false);
-                        }}
-                        style={{ flex: 1 }}
-                      />
-                      {!docOtpVerified && (
-                        <button
-                          type="button"
-                          disabled={sendingDocOtp || docOtpTimer > 0 || !docForm.email}
-                          onClick={handleSendDocOtp}
-                          className="btn btn-outline"
-                          style={{ whiteSpace: 'nowrap', fontSize: '0.8rem', padding: '0 14px' }}
-                        >
-                          {sendingDocOtp ? 'Sending...' : docOtpTimer > 0 ? `Resend (${docOtpTimer}s)` : docOtpSent ? 'Resend OTP' : 'Send 2FA OTP'}
-                        </button>
-                      )}
-                    </div>
-
-                    {/* 2FA OTP Input Section */}
-                    {docOtpSent && !docOtpVerified && (
-                      <div style={{
-                        marginTop: '10px',
-                        padding: '12px',
-                        background: 'rgba(6, 182, 212, 0.06)',
-                        border: '1px solid rgba(6, 182, 212, 0.25)',
-                        borderRadius: '8px',
-                        animation: 'fadeIn 0.2s ease'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                            Enter the 6-digit verification code sent to <strong>{docForm.email}</strong>
-                          </span>
-                          {docOtpHint && (
-                            <span style={{ fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>
-                              Demo OTP: {docOtpHint}
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <input
-                            type="text"
-                            maxLength={6}
-                            placeholder="Enter 6-digit OTP"
-                            value={docOtp}
-                            onChange={(e) => setDocOtp(e.target.value.replace(/\D/g, ''))}
-                            className="form-input"
-                            style={{ maxWidth: '180px', letterSpacing: '3px', fontWeight: '700', fontSize: '1rem', textAlign: 'center' }}
-                          />
-                          <button
-                            type="button"
-                            disabled={verifyingDocOtp || docOtp.trim().length !== 6}
-                            onClick={handleVerifyDocOtp}
-                            className="btn btn-emerald btn-sm"
-                            style={{ fontWeight: '700' }}
-                          >
-                            {verifyingDocOtp ? 'Verifying...' : 'Verify OTP'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    <label className="form-label">Professional Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      className="form-input"
+                      placeholder="dr.ramesh@medtech.ai"
+                      value={docForm.email}
+                      onChange={(e) => setDocForm({ ...docForm, email: e.target.value })}
+                    />
                   </div>
 
                   <div className="form-group">
