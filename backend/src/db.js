@@ -768,6 +768,12 @@ async function seedDefaultData() {
     deptMap[dep.code] = await getOrInsertDepartment(dep.name, dep.code, dep.description, dep.floor, dep.head, dep.icon);
   }
 
+  const deptCardioId = deptMap['CARD'];
+  const deptNeuroId = deptMap['NEUR'];
+  const deptOrthoId = deptMap['ORTH'];
+  const deptPediatricsId = deptMap['PED'];
+  const deptGenMedId = deptMap['GENM'];
+
   // 3. Seed 20 Indian Specialist Doctors (idempotent with pending approval status)
   const indianDoctorsList = [
     {
@@ -1074,51 +1080,13 @@ async function seedDefaultData() {
     }
   } catch (e) {}
 
-  await getOrInsertUser('shravangaikwad388@gmail.com', '$2a$10$CuXOKoAthKbyBYwGdrCNoO9A.gewnJNOSht.G3CoWsyOcRRxe8dWS', 'patient', 'Shravan Gaikwad', '+91 8766023102');
-  const patientRahulUserId = await getOrInsertUser('rahul@medtech.ai', patientHash, 'patient', 'Rahul Patil', '+91 98202 33445');
+  const patient1UserId = await getOrInsertUser('rahul@medtech.ai', patientHash, 'patient', 'Rahul Patil', '+91 98202 33445');
+  const patient2UserId = await getOrInsertUser('shravangaikwad388@gmail.com', '$2a$10$CuXOKoAthKbyBYwGdrCNoO9A.gewnJNOSht.G3CoWsyOcRRxe8dWS', 'patient', 'Shravan Gaikwad', '+91 8766023102');
+  const patient3UserId = await getOrInsertUser('sunita.patil@email.com', patientHash, 'patient', 'Sunita Patil', '+91 98202 33446');
 
   // 4. Seed Patients (idempotent)
   const pat1Id = await getOrInsertPatient(
     patient1UserId,
-    'Elena Rodriguez',
-    '1991-04-12',
-    'Female',
-    'O+',
-    '+1 (555) 672-9011',
-    'Carlos Rodriguez (Spouse) - +1 (555) 672-9019',
-    '742 Evergreen Terrace, Springfield',
-    'Penicillin, Aspirin',
-    'Mild hypertension diagnosed 2021; seasonal allergic rhinitis'
-  );
-
-  const pat2Id = await getOrInsertPatient(
-    patient2UserId,
-    'James Wilson',
-    '1983-09-24',
-    'Male',
-    'A-',
-    '+1 (555) 789-2234',
-    'Karen Wilson (Sister) - +1 (555) 789-2290',
-    '1284 Oakridge Lane, Metropolis',
-    'Sulfa drugs',
-    'Type 2 Diabetes Mellitus (HbA1c 6.8%), Left ACL reconstruction 2019'
-  );
-
-  const pat3Id = await getOrInsertPatient(
-    patient3UserId,
-    'Sophia Kim',
-    '1998-11-03',
-    'Female',
-    'B+',
-    '+1 (555) 234-9988',
-    'Hana Kim (Mother) - +1 (555) 234-9911',
-    '45 Pine Needle Court, Seattle',
-    'None reported',
-    'No major prior hospitalizations'
-  );
-
-  await getOrInsertPatient(
-    patientRahulUserId,
     'Rahul Patil',
     '1992-05-18',
     'Male',
@@ -1126,8 +1094,34 @@ async function seedDefaultData() {
     '+91 98202 33445',
     'Sunita Patil (Spouse) - +91 98202 33446',
     'Flat 402, Shivajinagar, Pune',
+    'Penicillin, Aspirin',
+    'Mild hypertension diagnosed 2021; seasonal allergic rhinitis'
+  );
+
+  const pat2Id = await getOrInsertPatient(
+    patient2UserId,
+    'Shravan Gaikwad',
+    '1995-09-24',
+    'Male',
+    'O+',
+    '+91 8766023102',
+    'Kavita Gaikwad (Mother) - +91 8766023103',
+    'Plot 12, Kothrud, Pune',
+    'Sulfa drugs',
+    'Annual corporate health checkup, mild migraine'
+  );
+
+  const pat3Id = await getOrInsertPatient(
+    patient3UserId,
+    'Sunita Patil',
+    '1996-11-03',
+    'Female',
+    'B+',
+    '+91 98202 33446',
+    'Rahul Patil (Spouse) - +91 98202 33445',
+    'Flat 402, Shivajinagar, Pune',
     'None reported',
-    'Annual corporate health checkup, mild borderline blood pressure'
+    'No major prior hospitalizations'
   );
 
   // 5. Seed Lab Tests (idempotent)
