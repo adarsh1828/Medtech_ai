@@ -93,10 +93,22 @@ app.use('/api/ai', aiRouter);
 app.use('/api/housekeeping', housekeepingRouter);
 app.use('/api/nurse', nurseRouter);
 
-// Public Hospital Info (White-labeling)
+// Public Hospital Info (White-labeling with fast in-memory cache)
+let cachedHospital = null;
+let lastHospitalFetch = 0;
+const HOSPITAL_CACHE_TTL = 60 * 1000;
+
 app.get('/api/hospital', async (req, res) => {
   try {
+    const now = Date.now();
+    if (cachedHospital && (now - lastHospitalFetch < HOSPITAL_CACHE_TTL)) {
+      return res.json({ hospital: cachedHospital });
+    }
     const hospital = await getOne('SELECT * FROM HospitalSettings WHERE id = 1');
+    if (hospital) {
+      cachedHospital = hospital;
+      lastHospitalFetch = now;
+    }
     res.json({ hospital });
   } catch (err) {
     console.error('Error fetching hospital info:', err);

@@ -567,15 +567,18 @@ router.post('/login', async (req, res) => {
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const nowIso = new Date().toISOString();
 
-    // 1. Check if IP or Account is temporarily locked
-    const activeLock = await getOne(
-      `SELECT * FROM FailedLoginAttempts 
-       WHERE (identifier = ? OR ip_address = ?) 
-         AND locked_until IS NOT NULL 
-         AND locked_until > ? 
-       ORDER BY id DESC LIMIT 1`,
-      [cleanEmail, clientIp, nowIso]
-    );
+    // 1. Check if IP or Account is temporarily locked and fetch user simultaneously
+    const [activeLock, user] = await Promise.all([
+      getOne(
+        `SELECT id, locked_until FROM FailedLoginAttempts 
+         WHERE (identifier = ? OR ip_address = ?) 
+           AND locked_until IS NOT NULL 
+           AND locked_until > ? 
+         ORDER BY id DESC LIMIT 1`,
+        [cleanEmail, clientIp, nowIso]
+      ),
+      getOne('SELECT * FROM Users WHERE email = ?', [cleanEmail])
+    ]);
 
     if (activeLock) {
       const lockUntilStr = activeLock.locked_until.endsWith('Z') ? activeLock.locked_until : activeLock.locked_until + 'Z';
@@ -589,7 +592,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const user = await getOne('SELECT * FROM Users WHERE email = ?', [cleanEmail]);
     const isMatch = user ? await bcrypt.compare(password, user.password_hash) : false;
 
     if (!user || !isMatch) {

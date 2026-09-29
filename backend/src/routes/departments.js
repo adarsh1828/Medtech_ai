@@ -4,9 +4,17 @@ import { authenticateToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
+let cachedDepartments = null;
+let lastDeptsFetch = 0;
+const DEPTS_CACHE_TTL = 30 * 1000;
+
 // GET all departments (public / authenticated)
 router.get('/', async (req, res) => {
   try {
+    const now = Date.now();
+    if (cachedDepartments && (now - lastDeptsFetch < DEPTS_CACHE_TTL)) {
+      return res.json({ departments: cachedDepartments });
+    }
     const departments = await query(`
       SELECT d.*, 
         (SELECT COUNT(*) FROM Doctors WHERE department_id = d.id AND (status = 'approved' OR status IS NULL)) as doctor_count,
@@ -14,6 +22,10 @@ router.get('/', async (req, res) => {
       FROM Departments d
       ORDER BY d.name ASC
     `);
+    if (departments) {
+      cachedDepartments = departments;
+      lastDeptsFetch = now;
+    }
     res.json({ departments });
   } catch (err) {
     console.error('Error fetching departments:', err);
