@@ -659,14 +659,12 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // Login Succeeded: Clear any failed login attempt tracking
-    try {
-      await run(`DELETE FROM FailedLoginAttempts WHERE identifier = ? OR ip_address = ?`, [cleanEmail, clientIp]);
-      await run(
-        `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, 'LOGIN_SUCCESS', ?, ?, 'Successful user session established')`,
-        [user.id, cleanEmail, clientIp, userAgent]
-      );
-    } catch (e) {}
+    // Login Succeeded: Non-blocking audit log and failed attempts cleanup
+    run(`DELETE FROM FailedLoginAttempts WHERE identifier = ? OR ip_address = ?`, [cleanEmail, clientIp]).catch(() => {});
+    run(
+      `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, 'LOGIN_SUCCESS', ?, ?, 'Successful user session established')`,
+      [user.id, cleanEmail, clientIp, userAgent]
+    ).catch(() => {});
 
     let extraData = {};
     if (user.role === 'patient') {
