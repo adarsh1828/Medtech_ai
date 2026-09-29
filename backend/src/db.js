@@ -94,8 +94,22 @@ export const run = async (sql, params = []) => {
   });
 };
 
+let isSchemaVerified = false;
+
 // Initialize schema and seed data
 export async function initializeDatabase() {
+  if (isSchemaVerified) return;
+
+  try {
+    const existingTable = await getOne("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'HospitalSettings'");
+    const isFullySeeded = await getOne("SELECT id FROM Users WHERE email = 'cleaner.baburao@medtech.ai'");
+    if (existingTable && isFullySeeded) {
+      isSchemaVerified = true;
+      console.log('⚡ Schema and clinical data verified. Instant startup bypass active.');
+      return;
+    }
+  } catch (e) {}
+
   console.log('Initializing database schema...');
 
   // 1. Users
