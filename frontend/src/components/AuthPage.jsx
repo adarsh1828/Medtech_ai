@@ -2268,7 +2268,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       type="text"
                       required
                       className="form-input"
-                      placeholder="e.g. Arthur Pendelton"
+                      placeholder="e.g. Dr. Ramesh Surye"
                       value={adminForm.full_name}
                       onChange={(e) => setAdminForm({ ...adminForm, full_name: e.target.value })}
                     />

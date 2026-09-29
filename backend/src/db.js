@@ -671,13 +671,13 @@ async function getOrInsertDepartment(name, code, description, floorNumber, headD
   return res.lastID;
 }
 
-async function getOrInsertDoctor(userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee) {
+async function getOrInsertDoctor(userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee, status = 'pending') {
   const existing = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [userId]);
   if (existing) return existing.id;
   const res = await run(
     `INSERT INTO Doctors (user_id, full_name, department_id, qualification, specialization, experience_years, room_number, shift_timings, is_on_duty, consultation_fee, status, approved_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', CURRENT_TIMESTAMP)`,
-    [userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee]
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, fullName, deptId, qualification, specialization, experienceYears, roomNumber, shiftTimings, isOnDuty, consultationFee, status, status === 'approved' ? new Date().toISOString() : null]
   );
   return res.lastID;
 }
@@ -712,7 +712,7 @@ async function seedDefaultData() {
   const patientHash = await bcrypt.hash('patient123', salt);
 
   // 1. Seed Users (idempotent - guaranteed presence on Local SQLite and Cloud LibSQL)
-  const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Dr. Arthur Pendelton', '+1 (555) 019-2831');
+  const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Chief Hospital Administrator', '+91 8668351191');
   await getOrInsertUser('adarsh@medtech.ai', adminHash, 'admin', 'Adarsh Surya (Chief Administrator)', '+91 8668351191');
   
   // Seed custom admin accounts from local database
@@ -735,36 +735,347 @@ async function seedDefaultData() {
     );
   }
 
-  // Seed custom doctors and patients from local database
-  await getOrInsertUser('dr.vikram@medtech.ai', '$2a$10$2D/ClilAxiuXfHXt5pe3UeLgjKcqaTuUHQ58tClq/r0J6rZgcz0LW', 'doctor', 'Dr. Vikram Malhotra, MS', '+1 555-0988');
-  await getOrInsertUser('rameshgsurya@gmail.com', '$2a$10$wOshkuC2O9fxYdjFn7mCn.GeAM66B4qV8c96mRjEKEevd4K5NQxDC', 'doctor', 'Dr. Ramesh Ganeshrao Surya', '+91 7875723205');
+  // Common passwords
+  const docUnifiedHash = await bcrypt.hash('Doctor@123', salt);
+  const rameshUnifiedHash = await bcrypt.hash('Ramesh@123', salt);
+
+  // 2. Seed 20 Departments (idempotent)
+  const departmentsSeed = [
+    { name: 'General Medicine', code: 'GENM', description: 'Primary ambulatory care, acute illness assessment, and chronic disease management', floor: 1, head: 'Dr. Ramesh Ganeshrao Surye', icon: 'Stethoscope' },
+    { name: 'Cardiology', code: 'CARD', description: 'Advanced cardiovascular diagnostics, interventions, and coronary care', floor: 3, head: 'Dr. Rajesh Deshmukh', icon: 'Heart' },
+    { name: 'Neurology', code: 'NEUR', description: 'Comprehensive brain, spinal cord, and neuro-muscular clinical care', floor: 4, head: 'Dr. Arjun Mehta', icon: 'Brain' },
+    { name: 'Orthopedics', code: 'ORTH', description: 'Joint replacements, trauma, sports medicine, and spinal stabilization', floor: 2, head: 'Dr. Vikram Malhotra', icon: 'Bone' },
+    { name: 'Gynecology & Obstetrics', code: 'GYN', description: 'Women healthcare, high-risk pregnancy, and advanced laparoscopic gynecology', floor: 2, head: 'Dr. Sunita Kulkarni', icon: 'Baby' },
+    { name: 'Pediatrics', code: 'PED', description: 'Infant, child, and adolescent healthcare with specialized neonatal support', floor: 1, head: 'Dr. Anand Joshi', icon: 'Baby' },
+    { name: 'Dermatology', code: 'DERM', description: 'Comprehensive clinical dermatology, trichology, and laser procedures', floor: 1, head: 'Dr. Pooja Sharma', icon: 'Sparkles' },
+    { name: 'General Surgery', code: 'SURG', description: 'Minimally invasive laparoscopic, GI, and emergency surgical interventions', floor: 3, head: 'Dr. Milind Patil', icon: 'Activity' },
+    { name: 'Ophthalmology', code: 'OPHT', description: 'Cataract, refractive surgery, glaucoma management, and retina clinic', floor: 1, head: 'Dr. Deepa Iyer', icon: 'Eye' },
+    { name: 'ENT', code: 'ENT', description: 'Advanced ear, nose, throat diagnostics, endoscopy, and head-neck surgeries', floor: 1, head: 'Dr. Sanjay Verma', icon: 'Volume2' },
+    { name: 'Endocrinology', code: 'ENDO', description: 'Specialized metabolic health, type 1 & 2 diabetes, and thyroid management', floor: 2, head: 'Dr. Neha Choudhary', icon: 'Activity' },
+    { name: 'Pulmonology', code: 'PULM', description: 'Asthma, COPD, sleep apnea, interventional bronchoscopy, and post-COVID care', floor: 2, head: 'Dr. Pradeep Jadhav', icon: 'Wind' },
+    { name: 'Nephrology', code: 'NEPH', description: 'Hemodialysis, acute kidney injury, chronic kidney disease, and transplant care', floor: 4, head: 'Dr. Snehal Gaikwad', icon: 'ShieldAlert' },
+    { name: 'Gastroenterology', code: 'GAST', description: 'Therapeutic endoscopy, colonoscopy, hepatology, and digestive disorders', floor: 4, head: 'Dr. Rohan Kadam', icon: 'Compass' },
+    { name: 'Psychiatry', code: 'PSYC', description: 'Mental wellness, anxiety, depression, addiction recovery, and psychotherapy', floor: 1, head: 'Dr. Anjali Pawar', icon: 'Smile' },
+    { name: 'Oncology', code: 'ONCO', description: 'Comprehensive cancer therapy, precision chemotherapy, and palliative care', floor: 5, head: 'Dr. Suresh Nair', icon: 'Shield' },
+    { name: 'Urology', code: 'UROL', description: 'Endourology, laser lithotripsy for kidney stones, and prostate care', floor: 3, head: 'Dr. Vivek Shinde', icon: 'Activity' },
+    { name: 'Radiology', code: 'RAD', description: 'Digital X-ray, 128-slice CT scan, 3T MRI, 4D Ultrasound, and imaging guided biopsies', floor: 1, head: 'Dr. Meera Nambiar', icon: 'Scan' },
+    { name: 'Emergency Medicine', code: 'EMER', description: '24/7 Level-1 trauma resuscitation, acute cardiac care, and emergency triage', floor: 1, head: 'Dr. Nitin Bhosale', icon: 'Siren' },
+    { name: 'Pathology', code: 'PATH', description: 'Automated clinical hematology, biochemistry, microbiology, and molecular diagnostics', floor: 1, head: 'Dr. Kavita Salunke', icon: 'Microscope' }
+  ];
+
+  const deptMap = {};
+  for (const dep of departmentsSeed) {
+    deptMap[dep.code] = await getOrInsertDepartment(dep.name, dep.code, dep.description, dep.floor, dep.head, dep.icon);
+  }
+
+  // 3. Seed 20 Indian Specialist Doctors (idempotent with pending approval status)
+  const indianDoctorsList = [
+    {
+      fullName: 'Dr. Ramesh Ganeshrao Surye',
+      email: 'rameshgsurya@gmail.com',
+      passwordHash: rameshUnifiedHash,
+      phone: '+91 7875723205',
+      deptCode: 'GENM',
+      qualification: 'MBBS, BHMS',
+      specialization: 'General Physician & Family Medicine',
+      experienceYears: 18,
+      roomNumber: 'Room 101',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 300.00
+    },
+    {
+      fullName: 'Dr. Rajesh Deshmukh',
+      email: 'dr.rajesh@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98201 55667',
+      deptCode: 'CARD',
+      qualification: 'MD, DM (Cardiology), FACC',
+      specialization: 'Interventional Cardiology & Preventive Health',
+      experienceYears: 16,
+      roomNumber: 'Room 301',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 700.00
+    },
+    {
+      fullName: 'Dr. Arjun Mehta',
+      email: 'dr.arjun@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98201 66778',
+      deptCode: 'NEUR',
+      qualification: 'MBBS, DM (Neurology), Stroke Specialist',
+      specialization: 'Neurovascular & Cognitive Disorders',
+      experienceYears: 15,
+      roomNumber: 'Room 408',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 800.00
+    },
+    {
+      fullName: 'Dr. Vikram Malhotra',
+      email: 'dr.vikram@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98201 77889',
+      deptCode: 'ORTH',
+      qualification: 'MBBS, MS (Orthopedics), Joint Replacement Fellow',
+      specialization: 'Spine, Trauma & Joint Reconstruction',
+      experienceYears: 14,
+      roomNumber: 'Room 205',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 600.00
+    },
+    {
+      fullName: 'Dr. Sunita Kulkarni',
+      email: 'dr.sunita@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98201 88990',
+      deptCode: 'GYN',
+      qualification: 'MBBS, MD, DGO (OB-GYN)',
+      specialization: 'High-Risk Pregnancy & Laparoscopic Gynae Surgery',
+      experienceYears: 13,
+      roomNumber: 'Room 202',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 500.00
+    },
+    {
+      fullName: 'Dr. Anand Joshi',
+      email: 'dr.anand@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98201 99001',
+      deptCode: 'PED',
+      qualification: 'MBBS, MD (Pediatrics), DCH',
+      specialization: 'Neonatology & Pediatric Critical Care',
+      experienceYears: 12,
+      roomNumber: 'Room 105',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 450.00
+    },
+    {
+      fullName: 'Dr. Pooja Sharma',
+      email: 'dr.pooja@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 11223',
+      deptCode: 'DERM',
+      qualification: 'MBBS, MD (Dermatology, Venereology & Leprosy)',
+      specialization: 'Clinical Dermatology & Laser Aesthetics',
+      experienceYears: 9,
+      roomNumber: 'Room 108',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 500.00
+    },
+    {
+      fullName: 'Dr. Milind Patil',
+      email: 'dr.milind@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 22334',
+      deptCode: 'SURG',
+      qualification: 'MBBS, MS (General Surgery), FIAGES',
+      specialization: 'Advanced Laparoscopic & GI Surgery',
+      experienceYears: 17,
+      roomNumber: 'Room 304',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 650.00
+    },
+    {
+      fullName: 'Dr. Deepa Iyer',
+      email: 'dr.deepa@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 33445',
+      deptCode: 'OPHT',
+      qualification: 'MBBS, MS (Ophthalmology), FICO',
+      specialization: 'Cataract, Refractive & Vitreo-Retinal Surgery',
+      experienceYears: 11,
+      roomNumber: 'Room 110',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 400.00
+    },
+    {
+      fullName: 'Dr. Sanjay Verma',
+      email: 'dr.sanjay@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 44556',
+      deptCode: 'ENT',
+      qualification: 'MBBS, MS (Otorhinolaryngology)',
+      specialization: 'Endoscopic Sinus Surgery & Micro Ear Surgery',
+      experienceYears: 14,
+      roomNumber: 'Room 112',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 450.00
+    },
+    {
+      fullName: 'Dr. Neha Choudhary',
+      email: 'dr.neha@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 55667',
+      deptCode: 'ENDO',
+      qualification: 'MBBS, MD (Medicine), DM (Endocrinology)',
+      specialization: 'Diabetology, Thyroid & Metabolic Disorders',
+      experienceYears: 10,
+      roomNumber: 'Room 206',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 600.00
+    },
+    {
+      fullName: 'Dr. Pradeep Jadhav',
+      email: 'dr.pradeep@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 66778',
+      deptCode: 'PULM',
+      qualification: 'MBBS, MD (Pulmonary Medicine), DTCD',
+      specialization: 'Interventional Pulmonology, Asthma & Sleep Apnea',
+      experienceYears: 13,
+      roomNumber: 'Room 208',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 550.00
+    },
+    {
+      fullName: 'Dr. Snehal Gaikwad',
+      email: 'dr.snehal@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 77889',
+      deptCode: 'NEPH',
+      qualification: 'MBBS, MD, DM (Nephrology)',
+      specialization: 'Dialysis, Renal Failure & Kidney Transplant',
+      experienceYears: 12,
+      roomNumber: 'Room 401',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 750.00
+    },
+    {
+      fullName: 'Dr. Rohan Kadam',
+      email: 'dr.rohan@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 88990',
+      deptCode: 'GAST',
+      qualification: 'MBBS, MD, DM (Medical Gastroenterology)',
+      specialization: 'Hepatology, Therapeutic Endoscopy & IBD',
+      experienceYears: 11,
+      roomNumber: 'Room 405',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 700.00
+    },
+    {
+      fullName: 'Dr. Anjali Pawar',
+      email: 'dr.anjali@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98202 99001',
+      deptCode: 'PSYC',
+      qualification: 'MBBS, MD (Psychiatry), DPM',
+      specialization: 'Adult Psychiatry, Anxiety & Neurocognitive Rehabilitation',
+      experienceYears: 9,
+      roomNumber: 'Room 115',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 500.00
+    },
+    {
+      fullName: 'Dr. Suresh Nair',
+      email: 'dr.suresh@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98203 11223',
+      deptCode: 'ONCO',
+      qualification: 'MBBS, MD (Radiotherapy), DM (Medical Oncology)',
+      specialization: 'Precision Oncology, Immunotherapy & Chemotherapy',
+      experienceYears: 18,
+      roomNumber: 'Room 501',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 900.00
+    },
+    {
+      fullName: 'Dr. Vivek Shinde',
+      email: 'dr.vivek@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98203 22334',
+      deptCode: 'UROL',
+      qualification: 'MBBS, MS (Surgery), MCh (Urology)',
+      specialization: 'Endourology, Kidney Stones & Uro-Oncology',
+      experienceYears: 15,
+      roomNumber: 'Room 308',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 700.00
+    },
+    {
+      fullName: 'Dr. Meera Nambiar',
+      email: 'dr.meera@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98203 33445',
+      deptCode: 'RAD',
+      qualification: 'MBBS, MD (Radio-Diagnosis), PDCC',
+      specialization: 'Cross-Sectional Imaging, MRI & Doppler Ultrasonography',
+      experienceYears: 14,
+      roomNumber: 'Room B-02 (Radiology Suite)',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 500.00
+    },
+    {
+      fullName: 'Dr. Nitin Bhosale',
+      email: 'dr.nitin@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98203 44556',
+      deptCode: 'EMER',
+      qualification: 'MBBS, MD (Emergency Medicine), FEM',
+      specialization: 'Trauma Resuscitation & Critical Care Toxicology',
+      experienceYears: 11,
+      roomNumber: 'Emergency Casualty Triage 1',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 500.00
+    },
+    {
+      fullName: 'Dr. Kavita Salunke',
+      email: 'dr.kavita@medtech.ai',
+      passwordHash: docUnifiedHash,
+      phone: '+91 98203 55667',
+      deptCode: 'PATH',
+      qualification: 'MBBS, MD (Pathology)',
+      specialization: 'Histopathology, Hematology & Molecular Diagnostics',
+      experienceYears: 13,
+      roomNumber: 'Central Diagnostic Lab Suite',
+      shiftTimings: '09:00 AM - 05:00 PM',
+      fee: 350.00
+    }
+  ];
+
+  let docRajeshId = null;
+  let docArjunId = null;
+  let docRameshId = null;
+
+  for (const doc of indianDoctorsList) {
+    const dUserId = await getOrInsertUser(doc.email, doc.passwordHash, 'doctor', doc.fullName, doc.phone);
+    const dDeptId = deptMap[doc.deptCode];
+    const docRecordId = await getOrInsertDoctor(
+      dUserId,
+      doc.fullName,
+      dDeptId,
+      doc.qualification,
+      doc.specialization,
+      doc.experienceYears,
+      doc.roomNumber,
+      doc.shiftTimings,
+      0, // is_on_duty = 0 until approved
+      doc.fee,
+      'pending' // pending administrator approval
+    );
+    if (doc.deptCode === 'CARD') docRajeshId = docRecordId;
+    if (doc.deptCode === 'NEUR') docArjunId = docRecordId;
+    if (doc.deptCode === 'GENM') docRameshId = docRecordId;
+  }
+
+  // Cleanup foreign doctors if present in Cloud / Local DB
+  try {
+    const foreignEmails = ['dr.sarah@medtech.ai', 'dr.emily@medtech.ai', 'dr.marcus@medtech.ai'];
+    for (const fEmail of foreignEmails) {
+      const fUser = await getOne('SELECT id FROM Users WHERE email = ?', [fEmail]);
+      if (fUser) {
+        const fDoc = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [fUser.id]);
+        if (fDoc && docRajeshId) {
+          await run('UPDATE Appointments SET doctor_id = ? WHERE doctor_id = ?', [docRajeshId, fDoc.id]);
+          await run('UPDATE Prescriptions SET doctor_id = ? WHERE doctor_id = ?', [docRajeshId, fDoc.id]);
+          await run('DELETE FROM Doctors WHERE id = ?', [fDoc.id]);
+        }
+        await run('DELETE FROM Users WHERE id = ?', [fUser.id]);
+      }
+    }
+  } catch (e) {}
+
   await getOrInsertUser('shravangaikwad388@gmail.com', '$2a$10$CuXOKoAthKbyBYwGdrCNoO9A.gewnJNOSht.G3CoWsyOcRRxe8dWS', 'patient', 'Shravan Gaikwad', '+91 8766023102');
-
-  const docRajeshUserId = await getOrInsertUser('dr.rajesh@medtech.ai', doctorHash, 'doctor', 'Dr. Rajesh Deshmukh, MD', '+91 98201 55667');
   const patientRahulUserId = await getOrInsertUser('rahul@medtech.ai', patientHash, 'patient', 'Rahul Patil', '+91 98202 33445');
-
-  const doc1UserId = await getOrInsertUser('dr.sarah@medtech.ai', doctorHash, 'doctor', 'Dr. Sarah Chen, MD', '+1 (555) 302-8812');
-  const doc2UserId = await getOrInsertUser('dr.arjun@medtech.ai', doctorHash, 'doctor', 'Dr. Arjun Mehta, DM', '+1 (555) 441-9923');
-  const doc3UserId = await getOrInsertUser('dr.emily@medtech.ai', doctorHash, 'doctor', 'Dr. Emily Vance, MS', '+1 (555) 872-1144');
-  const doc4UserId = await getOrInsertUser('dr.marcus@medtech.ai', doctorHash, 'doctor', 'Dr. Marcus Holloway, MD', '+1 (555) 901-4422');
-
-  const patient1UserId = await getOrInsertUser('elena.rodriguez@email.com', patientHash, 'patient', 'Elena Rodriguez', '+1 (555) 672-9011');
-  const patient2UserId = await getOrInsertUser('james.wilson@email.com', patientHash, 'patient', 'James Wilson', '+1 (555) 789-2234');
-  const patient3UserId = await getOrInsertUser('sophia.kim@email.com', patientHash, 'patient', 'Sophia Kim', '+1 (555) 234-9988');
-
-  // 2. Seed Departments (idempotent)
-  const deptCardioId = await getOrInsertDepartment('Cardiology', 'CARD', 'Advanced cardiovascular diagnostics, interventions, and coronary care', 3, 'Dr. Sarah Chen, MD', 'Heart');
-  const deptNeuroId = await getOrInsertDepartment('Neurology', 'NEUR', 'Comprehensive brain, spinal cord, and neuro-muscular clinical care', 4, 'Dr. Arjun Mehta, DM', 'Brain');
-  const deptOrthoId = await getOrInsertDepartment('Orthopedics', 'ORTH', 'Joint replacements, trauma, sports medicine, and spinal stabilization', 2, 'Dr. Emily Vance, MS', 'Bone');
-  const deptPediatricsId = await getOrInsertDepartment('Pediatrics', 'PED', 'Infant, child, and adolescent healthcare with specialized neonatal support', 1, 'Dr. Marcus Holloway, MD', 'Baby');
-  const deptGenMedId = await getOrInsertDepartment('General Medicine', 'GENM', 'Primary ambulatory care, acute illness assessment, and chronic disease management', 1, 'Dr. Arthur Pendelton', 'Stethoscope');
-
-  // 3. Seed Doctors (idempotent)
-  await getOrInsertDoctor(docRajeshUserId, 'Dr. Rajesh Deshmukh, MD', deptCardioId, 'MD (Cardiology), DM', 'Interventional Cardiology & Preventive Health', 14, 'Room 301', '09:00 AM - 05:00 PM', 1, 650.00);
-  const doc1Id = await getOrInsertDoctor(doc1UserId, 'Dr. Sarah Chen, MD', deptCardioId, 'MD (Cardiology), FACC', 'Interventional Cardiology & Arrhythmia', 12, 'Room 302', '09:00 AM - 05:00 PM', 1, 650.00);
-  const doc2Id = await getOrInsertDoctor(doc2UserId, 'Dr. Arjun Mehta, DM', deptNeuroId, 'DM (Neurology), Stroke Specialist', 'Neurovascular & Cognitive Disorders', 15, 'Room 408', '09:00 AM - 05:00 PM', 1, 750.00);
-  const doc3Id = await getOrInsertDoctor(doc3UserId, 'Dr. Emily Vance, MS', deptOrthoId, 'MS (Orthopedics), Joint Replacement Fellow', 'Arthroscopy & Complex Joint Reconstruction', 9, 'Room 214', '09:00 AM - 05:00 PM', 1, 550.00);
-  const doc4Id = await getOrInsertDoctor(doc4UserId, 'Dr. Marcus Holloway, MD', deptPediatricsId, 'MD (Pediatrics), FAAP', 'Pediatric Pulmonology & Preventive Child Health', 8, 'Room 105', '09:00 AM - 05:00 PM', 0, 500.00);
 
   // 4. Seed Patients (idempotent)
   const pat1Id = await getOrInsertPatient(
@@ -836,19 +1147,19 @@ async function seedDefaultData() {
     await run(
       `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
        VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?, '124/82', '76 bpm', '98.4 F', '68 kg')`,
-      [pat1Id, doc1Id, deptCardioId, today, '10:00 AM', 101, 'Routine follow-up for episodic palpitations and blood pressure check']
+      [pat1Id, docRajeshId, deptMap['CARD'], today, '10:00 AM', 101, 'Routine follow-up for episodic palpitations and blood pressure check']
     );
 
     await run(
       `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
        VALUES (?, ?, ?, ?, ?, ?, 'in_consultation', ?, '132/88', '82 bpm', '98.6 F', '79 kg')`,
-      [pat2Id, doc2Id, deptNeuroId, today, '10:30 AM', 102, 'Persistent tension headaches with visual aura in right eye']
+      [pat2Id, docArjunId, deptMap['NEUR'], today, '10:30 AM', 102, 'Persistent tension headaches with visual aura in right eye']
     );
 
     const appt3Res = await run(
       `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit, vitals_bp, vitals_pulse, vitals_temp, vitals_weight)
        VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, '118/74', '70 bpm', '98.1 F', '58 kg')`,
-      [pat3Id, doc1Id, deptCardioId, today, '09:00 AM', 100, 'Pre-employment cardiology clearance and baseline vitals examination']
+      [pat3Id, docRajeshId, deptMap['CARD'], today, '09:00 AM', 100, 'Pre-employment cardiology clearance and baseline vitals examination']
     );
     appt3Id = appt3Res.lastID;
   } else {
@@ -866,7 +1177,7 @@ async function seedDefaultData() {
       [
         appt3Id,
         pat3Id,
-        doc1Id,
+        docRajeshId,
         'Normal Sinus Rhythm with Physiological Sinus Tachycardia on Exertion',
         'Normal S1/S2 heart sounds, no audible murmurs or gallops. Normal baseline ECG. Recommended adequate hydration.',
         'Maintain adequate hydration (2.5L daily). Limit stimulant energy drinks. Annual wellness checkup.',
@@ -1153,7 +1464,7 @@ async function seedStaffAndSanitation() {
     if (pat2) {
       await run(
         `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status)
-         VALUES (?, ?, 'ICU Bed 1', 'Dr. Arthur Pendelton', 'Inj. Enoxaparin', '40mg SC', '03:00 PM', 'pending')`,
+         VALUES (?, ?, 'ICU Bed 1', 'Dr. Ramesh Ganeshrao Surye', 'Inj. Enoxaparin', '40mg SC', '03:00 PM', 'pending')`,
         [pat2.id, pat2.full_name]
       );
     }
@@ -1161,7 +1472,7 @@ async function seedStaffAndSanitation() {
     if (pat3) {
       await run(
         `INSERT INTO MedicationSchedules (patient_id, patient_name, bed_number, doctor_name, medicine_name, dosage, scheduled_time, status)
-         VALUES (?, ?, 'Bed 102', 'Dr. Marcus Vance', 'Syp. Paracetamol', '650mg Oral', '01:00 PM', 'pending')`,
+         VALUES (?, ?, 'Bed 102', 'Dr. Rajesh Deshmukh', 'Syp. Paracetamol', '650mg Oral', '01:00 PM', 'pending')`,
         [pat3.id, pat3.full_name]
       );
     }

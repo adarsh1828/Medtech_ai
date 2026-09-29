@@ -33,7 +33,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
 
   // Live Hospital Telemetry Events Feed
   const [recentEvents] = useState([
-    { id: 1, time: '2m ago', text: 'Dr. Sarah Chen generated NMC-stamped Digital Rx with QR for Token #103', badge: 'Digital Rx', color: '#06b6d4' },
+    { id: 1, time: '2m ago', text: 'Dr. Ramesh Surye generated NMC-stamped Digital Rx with QR for Token #103', badge: 'Digital Rx', color: '#06b6d4' },
     { id: 2, time: '7m ago', text: 'Bed #ICU-03 reserved for Post-Op Critical Observation (Cardiology)', badge: 'ICU Telemetry', color: '#f59e0b' },
     { id: 3, time: '14m ago', text: 'Token #104 checked into OPD Room 408 with Dr. Arjun Mehta', badge: 'Live OPD', color: '#10b981' },
     { id: 4, time: '22m ago', text: '24x7 Emergency Ambulance Dispatch Center: All 4 ALS Units on Standby', badge: 'SOS 108', color: '#f43f5e' }
