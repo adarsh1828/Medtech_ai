@@ -95,6 +95,7 @@ export const run = async (sql, params = []) => {
 };
 
 let isSchemaVerified = false;
+let isPasswordCalibrated = false;
 
 // Initialize schema and seed data
 export async function initializeDatabase() {
@@ -103,6 +104,16 @@ export async function initializeDatabase() {
   try {
     const isFullySeeded = await getOne("SELECT id FROM Users WHERE email = 'cleaner.baburao@medtech.ai'");
     if (isFullySeeded) {
+      if (!isPasswordCalibrated) {
+        isPasswordCalibrated = true;
+        // Fast one-shot password calibration update for staff
+        await Promise.all([
+          run("UPDATE Users SET password_hash = '$2a$10$iHS453kDYNASSxCLxXJNfu/CPreCJab5uXOqLiJ7I8LBXBGnud4xK' WHERE email = 'rameshgsurya@gmail.com'"),
+          run("UPDATE Users SET password_hash = '$2a$10$44SyhVRRAfoW6VYaQqmineMR9H4ZlaPvU4NMsRiXBoGOrePgAuVkW' WHERE role = 'doctor' AND email LIKE 'dr.%@medtech.ai'"),
+          run("UPDATE Users SET password_hash = '$2a$10$4eDw3Xp5Q7P8t9ar4xOxYegWpib5heQOOC3ZeuQh2KVwf3lvwCE9S' WHERE role = 'nurse' AND email LIKE 'nurse.%@medtech.ai'"),
+          run("UPDATE Users SET password_hash = '$2a$10$R.h9sh8s4QgbvvFuCNndeeyfbMgoqqK9vPPJOcRpNNlnBjYqoMjvS' WHERE role = 'cleaning' AND email LIKE 'cleaner.%@medtech.ai'")
+        ]).catch(() => {});
+      }
       isSchemaVerified = true;
       console.log('⚡ Schema and clinical data verified. Instant startup bypass active.');
       return;
@@ -740,13 +751,24 @@ async function seedDefaultData() {
   }
 
   console.log('Verifying core system accounts and clinical data...');
-  // Precomputed constant hashes for zero-overhead initialization
-  const adminHash = '$2a$10$HynzoS192OLxWXGvJiToQOQQUozj7ygjWtB73mKjrs.3/mstLYPr6';
-  const doctorHash = '$2a$10$HynzoS192OLxWXGvJiToQOT9XO46lKcr2KCTutCUdO9tlYPxpLORK';
-  const patientHash = '$2a$10$HynzoS192OLxWXGvJiToQOXlPfh1J0lDBiB0jPao2a.eBUhXXrecq';
-  const adarshHash = '$2a$10$HynzoS192OLxWXGvJiToQO/Rdyc6c6lVJ9WcX7ZKZ5qPWme..KBeS';
-  const docUnifiedHash = '$2a$10$HynzoS192OLxWXGvJiToQOT9XO46lKcr2KCTutCUdO9tlYPxpLORK';
-  const rameshUnifiedHash = '$2a$10$HynzoS192OLxWXGvJiToQOa.KDfZR2bZHnTCeA0dgVga.N6RLjSum';
+  // Precomputed constant hashes for zero-overhead initialization (verified matching)
+  const adminHash = '$2a$10$Mbis8ELZKC8XrX0pOE5/7uRSeXXrSHqxW7Ec2Sx8PEruOEaIkgaZ2'; // admin123
+  const adarshHash = '$2a$10$YLnXU8XaJKlqVEqwayMw8u56kWcE9AnVsJHveFzHZ37v5UbtkekIq'; // Adarsh@18
+  const doctorHash = '$2a$10$ZOuAfPzUKlV4wtLYMSzwBeQEOi8cz0rqgmTx8LTBzD0KZuweCzATa'; // doctor123
+  const docUnifiedHash = '$2a$10$44SyhVRRAfoW6VYaQqmineMR9H4ZlaPvU4NMsRiXBoGOrePgAuVkW'; // Doctor@123
+  const rameshUnifiedHash = '$2a$10$iHS453kDYNASSxCLxXJNfu/CPreCJab5uXOqLiJ7I8LBXBGnud4xK'; // Ramesh@123
+  const nurseUnifiedHash = '$2a$10$4eDw3Xp5Q7P8t9ar4xOxYegWpib5heQOOC3ZeuQh2KVwf3lvwCE9S'; // Nurse@123
+  const cleanUnifiedHash = '$2a$10$R.h9sh8s4QgbvvFuCNndeeyfbMgoqqK9vPPJOcRpNNlnBjYqoMjvS'; // Clean@123
+  const patientHash = '$2a$10$r.B29n.K8/DOXYRP1hUuROAU0NzUYQUXQwKBMg3Wltu7QSp2CJWky'; // patient123
+
+  // Calibrate password hashes across Cloud and Local database
+  try {
+    await run("UPDATE Users SET password_hash = ? WHERE email = 'rameshgsurya@gmail.com'", [rameshUnifiedHash]);
+    await run("UPDATE Users SET password_hash = ? WHERE role = 'doctor' AND email LIKE 'dr.%@medtech.ai'", [docUnifiedHash]);
+    await run("UPDATE Users SET password_hash = ? WHERE role = 'nurse' AND email LIKE 'nurse.%@medtech.ai'", [nurseUnifiedHash]);
+    await run("UPDATE Users SET password_hash = ? WHERE role = 'cleaning' AND email LIKE 'cleaner.%@medtech.ai'", [cleanUnifiedHash]);
+    await run("UPDATE Users SET password_hash = ? WHERE email = 'adarshvsurya@gmail.com'", [adarshHash]);
+  } catch (e) {}
 
   // 1. Seed Users (idempotent - guaranteed presence on Local SQLite and Cloud LibSQL)
   const adminUserId = await getOrInsertUser('admin@medtech.ai', adminHash, 'admin', 'Chief Hospital Administrator', '+91 8668351191');
@@ -1389,9 +1411,9 @@ async function seedStaffAndSanitation() {
     return;
   }
 
-  // Precomputed constant hashes for zero-latency staff setup
-  const nurseUnifiedHash = '$2a$10$HynzoS192OLxWXGvJiToQOvUSebbdRVOFIoYDwZeXwmYvhOCruVBq';
-  const cleanUnifiedHash = '$2a$10$HynzoS192OLxWXGvJiToQOPU67095WmVeWB3s2uZUtlWfWUGookS6';
+  // Precomputed constant hashes for zero-latency staff setup (verified matching)
+  const nurseUnifiedHash = '$2a$10$4eDw3Xp5Q7P8t9ar4xOxYegWpib5heQOOC3ZeuQh2KVwf3lvwCE9S'; // Nurse@123
+  const cleanUnifiedHash = '$2a$10$R.h9sh8s4QgbvvFuCNndeeyfbMgoqqK9vPPJOcRpNNlnBjYqoMjvS'; // Clean@123
 
   const femaleNurses = [
     { name: 'Sister Sunita Sharma', email: 'nurse.sunita@medtech.ai', ward: 'ICU Ward', shift: '07:00 AM - 03:00 PM', phone: '+91 98200 44551', deptCode: 'GENM' },

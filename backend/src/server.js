@@ -137,7 +137,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled server error:', err);
-  res.status(500).json({ error: 'Internal server error. Please try again.' });
+  res.status(500).json({ error: err.message || 'Internal server error. Please try again.' });
 });
 
 // Boot database and start listener locally (on Vercel, requests are handled serverlessly via ensureDb)
