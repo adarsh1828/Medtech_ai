@@ -191,6 +191,10 @@ router.post('/add-area', async (req, res) => {
     });
   } catch (err) {
     console.error('Error adding cleaning area:', err);
+    res.status(500).json({ error: 'Failed to add cleaning area.' });
+  }
+});
+
 // PATCH Update Cleaning Task Status (In-Progress / Pending / Completed)
 router.patch('/tasks/:id/status', async (req, res) => {
   try {
