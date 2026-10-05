@@ -97,9 +97,40 @@ export const run = async (sql, params = []) => {
 let isSchemaVerified = false;
 let isPasswordCalibrated = false;
 
+// Ensure newest schema columns exist across both SQLite local & Turso Cloud
+async function ensureLatestSchemaColumns() {
+  // Appointments Live OPD tracking & remark extensions
+  try { await run("ALTER TABLE Appointments ADD COLUMN consultation_started_at DATETIME"); } catch (e) {}
+  try { await run("ALTER TABLE Appointments ADD COLUMN completed_at DATETIME"); } catch (e) {}
+  try { await run("ALTER TABLE Appointments ADD COLUMN completion_remark TEXT"); } catch (e) {}
+
+  // CleaningTasks
+  try { await run("ALTER TABLE CleaningTasks ADD COLUMN assigned_cleaner_id INTEGER"); } catch (e) {}
+  try { await run("ALTER TABLE CleaningTasks ADD COLUMN assigned_cleaner_name TEXT"); } catch (e) {}
+  try { await run("ALTER TABLE CleaningTasks ADD COLUMN priority TEXT DEFAULT 'routine'"); } catch (e) {}
+  try { await run("ALTER TABLE CleaningTasks ADD COLUMN task_status TEXT DEFAULT 'pending'"); } catch (e) {}
+  try { await run("ALTER TABLE CleaningTasks ADD COLUMN notes TEXT"); } catch (e) {}
+
+  // Nurses
+  try { await run("ALTER TABLE Nurses ADD COLUMN assigned_ward TEXT DEFAULT 'General Ward'"); } catch (e) {}
+  try { await run("ALTER TABLE Nurses ADD COLUMN shift_timings TEXT DEFAULT '08:00 AM - 04:00 PM'"); } catch (e) {}
+  try { await run("ALTER TABLE Nurses ADD COLUMN is_on_duty INTEGER DEFAULT 1"); } catch (e) {}
+  try { await run("ALTER TABLE Nurses ADD COLUMN status TEXT DEFAULT 'approved'"); } catch (e) {}
+  try { await run("ALTER TABLE Nurses ADD COLUMN approved_at DATETIME"); } catch (e) {}
+
+  // HousekeepingStaff
+  try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN assigned_area TEXT DEFAULT 'General Ward & Restrooms'"); } catch (e) {}
+  try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN shift_timings TEXT DEFAULT '07:00 AM - 03:00 PM'"); } catch (e) {}
+  try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN is_on_duty INTEGER DEFAULT 1"); } catch (e) {}
+  try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN status TEXT DEFAULT 'approved'"); } catch (e) {}
+  try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN approved_at DATETIME"); } catch (e) {}
+}
+
 // Initialize schema and seed data
 export async function initializeDatabase() {
   if (isSchemaVerified) return;
+
+  await ensureLatestSchemaColumns().catch(() => {});
 
   try {
     const isFullySeeded = await getOne("SELECT id FROM Users WHERE email = 'cleaner.baburao@medtech.ai'");
@@ -206,6 +237,9 @@ export async function initializeDatabase() {
       vitals_pulse TEXT,
       vitals_temp TEXT,
       vitals_weight TEXT,
+      consultation_started_at DATETIME,
+      completed_at DATETIME,
+      completion_remark TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (patient_id) REFERENCES Patients(id),
       FOREIGN KEY (doctor_id) REFERENCES Doctors(id),
@@ -612,6 +646,17 @@ export async function initializeDatabase() {
     console.error('Error migrating Appointments status CHECK constraint:', err);
   }
 
+  // Appointments Live OPD tracking & remark extensions
+  try {
+    await run('ALTER TABLE Appointments ADD COLUMN consultation_started_at DATETIME');
+  } catch (e) {}
+  try {
+    await run('ALTER TABLE Appointments ADD COLUMN completed_at DATETIME');
+  } catch (e) {}
+  try {
+    await run('ALTER TABLE Appointments ADD COLUMN completion_remark TEXT');
+  } catch (e) {}
+
   // Auto-migration for Users role to allow 'nurse', 'cleaning', 'staff' in CHECK constraint
   try {
     const userMaster = await getOne("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Users'");
@@ -671,6 +716,45 @@ export async function initializeDatabase() {
   } catch (e) {}
   try {
     await run("UPDATE HousekeepingStaff SET status = 'approved' WHERE status IS NULL OR status = ''");
+  } catch (e) {}
+
+  // Auto-migration for CleaningTasks table: ensure assignment and priority columns exist
+  try {
+    await run("ALTER TABLE CleaningTasks ADD COLUMN assigned_cleaner_id INTEGER");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE CleaningTasks ADD COLUMN assigned_cleaner_name TEXT");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE CleaningTasks ADD COLUMN priority TEXT DEFAULT 'routine'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE CleaningTasks ADD COLUMN task_status TEXT DEFAULT 'pending'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE CleaningTasks ADD COLUMN notes TEXT");
+  } catch (e) {}
+
+  // Auto-migration for Nurses table: ensure assigned_ward, shift_timings, is_on_duty exist
+  try {
+    await run("ALTER TABLE Nurses ADD COLUMN assigned_ward TEXT DEFAULT 'General Ward'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE Nurses ADD COLUMN shift_timings TEXT DEFAULT '08:00 AM - 04:00 PM'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE Nurses ADD COLUMN is_on_duty INTEGER DEFAULT 1");
+  } catch (e) {}
+
+  // Auto-migration for HousekeepingStaff table: ensure assigned_area, shift_timings, is_on_duty exist
+  try {
+    await run("ALTER TABLE HousekeepingStaff ADD COLUMN assigned_area TEXT DEFAULT 'General Ward & Restrooms'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE HousekeepingStaff ADD COLUMN shift_timings TEXT DEFAULT '07:00 AM - 03:00 PM'");
+  } catch (e) {}
+  try {
+    await run("ALTER TABLE HousekeepingStaff ADD COLUMN is_on_duty INTEGER DEFAULT 1");
   } catch (e) {}
 
   console.log('Database tables verified.');

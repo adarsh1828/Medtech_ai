@@ -75,6 +75,7 @@ router.post('/scan', async (req, res) => {
            last_cleaned_by = ?,
            last_cleaner_id = ?,
            status = 'clean',
+           task_status = 'completed',
            checklist_mopping = ?,
            checklist_linen = ?,
            checklist_dustbin = ?,
@@ -190,7 +191,60 @@ router.post('/add-area', async (req, res) => {
     });
   } catch (err) {
     console.error('Error adding cleaning area:', err);
-    res.status(500).json({ error: 'Failed to create cleaning area.' });
+// PATCH Update Cleaning Task Status (In-Progress / Pending / Completed)
+router.patch('/tasks/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { task_status, cleaner_name } = req.body;
+
+    if (!['pending', 'in_progress', 'completed'].includes(task_status)) {
+      return res.status(400).json({ error: 'Valid task_status (pending, in_progress, completed) is required.' });
+    }
+
+    const task = await getOne('SELECT * FROM CleaningTasks WHERE id = ?', [id]);
+    if (!task) {
+      return res.status(404).json({ error: 'Cleaning task not found.' });
+    }
+
+    await run(
+      `UPDATE CleaningTasks
+       SET task_status = ?,
+           assigned_cleaner_name = COALESCE(?, assigned_cleaner_name)
+       WHERE id = ?`,
+      [task_status, cleaner_name || null, id]
+    );
+
+    const updated = await getOne('SELECT * FROM CleaningTasks WHERE id = ?', [id]);
+    res.json({ message: `Task status updated to ${task_status}`, task: updated });
+  } catch (err) {
+    console.error('Error updating task status:', err);
+    res.status(500).json({ error: 'Failed to update task status.' });
+  }
+});
+
+// GET My Assigned Tasks (for Sanitation Staff View)
+router.get('/my-tasks', async (req, res) => {
+  try {
+    const { cleaner_id, cleaner_name } = req.query;
+
+    let sql = 'SELECT * FROM CleaningTasks WHERE 1=1';
+    const params = [];
+
+    if (cleaner_id) {
+      sql += ' AND assigned_cleaner_id = ?';
+      params.push(cleaner_id);
+    } else if (cleaner_name) {
+      sql += ' AND (assigned_cleaner_name LIKE ? OR last_cleaned_by LIKE ?)';
+      params.push(`%${cleaner_name.trim()}%`, `%${cleaner_name.trim()}%`);
+    }
+
+    sql += ' ORDER BY CASE priority WHEN "urgent" THEN 1 WHEN "high" THEN 2 ELSE 3 END, created_at DESC';
+    const tasks = await query(sql, params);
+
+    res.json({ tasks });
+  } catch (err) {
+    console.error('Error fetching cleaner tasks:', err);
+    res.status(500).json({ error: 'Failed to retrieve assigned tasks.' });
   }
 });
 

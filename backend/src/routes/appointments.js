@@ -65,6 +65,149 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+// GET Live Queue & OPD Tracker ("Where is my train" style live tracking)
+router.get('/live-tracker', authenticateToken, async (req, res) => {
+  try {
+    const { doctor_id } = req.query;
+    const today = new Date().toISOString().split('T')[0];
+
+    // 1. If user is patient, look for their active appointment today
+    let patientAppt = null;
+    let targetDoctorId = doctor_id ? parseInt(doctor_id) : null;
+
+    if (req.user.role === 'patient') {
+      const patient = await getOne('SELECT id FROM Patients WHERE user_id = ?', [req.user.userId]);
+      if (patient) {
+        patientAppt = await getOne(
+          `SELECT a.*, d.full_name as doctor_name, d.specialization as doctor_specialization, 
+                  d.room_number as doctor_room, dep.name as department_name, dep.floor_number as department_floor
+           FROM Appointments a
+           JOIN Doctors d ON a.doctor_id = d.id
+           JOIN Departments dep ON a.department_id = dep.id
+           WHERE a.patient_id = ? AND (a.appointment_date = ? OR a.status IN ('scheduled', 'confirmed', 'in_consultation'))
+           ORDER BY CASE 
+             WHEN a.status = 'in_consultation' THEN 1
+             WHEN a.status = 'confirmed' THEN 2
+             WHEN a.status = 'scheduled' THEN 3
+             WHEN a.status = 'completed' THEN 4
+             ELSE 5 END ASC, a.appointment_date DESC, a.token_number ASC
+           LIMIT 1`,
+          [patient.id, today]
+        );
+        if (patientAppt && !targetDoctorId) {
+          targetDoctorId = patientAppt.doctor_id;
+        }
+      }
+    } else if (req.user.role === 'doctor') {
+      const doctor = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [req.user.userId]);
+      if (doctor) {
+        targetDoctorId = doctor.id;
+      }
+    }
+
+    // If still no targetDoctorId, pick first active doctor
+    if (!targetDoctorId) {
+      const firstActiveDoc = await getOne(
+        `SELECT doctor_id FROM Appointments WHERE appointment_date = ? AND status IN ('in_consultation', 'confirmed', 'scheduled') LIMIT 1`,
+        [today]
+      );
+      if (firstActiveDoc) {
+        targetDoctorId = firstActiveDoc.doctor_id;
+      } else {
+        const firstDoc = await getOne('SELECT id FROM Doctors LIMIT 1');
+        targetDoctorId = firstDoc ? firstDoc.id : 1;
+      }
+    }
+
+    // Get doctor info
+    const doctor = await getOne(
+      `SELECT d.*, dep.name as department_name, dep.floor_number as department_floor
+       FROM Doctors d
+       LEFT JOIN Departments dep ON d.department_id = dep.id
+       WHERE d.id = ?`,
+      [targetDoctorId]
+    );
+
+    // Get all appointments for this doctor on this day
+    const apptDate = patientAppt?.appointment_date || today;
+    const docAppointments = await query(
+      `SELECT a.id, a.token_number, a.status, a.time_slot, a.reason_for_visit,
+              a.consultation_started_at, a.completed_at, a.completion_remark,
+              a.patient_id, p.full_name as patient_name
+       FROM Appointments a
+       JOIN Patients p ON a.patient_id = p.id
+       WHERE a.doctor_id = ? AND a.appointment_date = ?
+       ORDER BY a.token_number ASC`,
+      [targetDoctorId, apptDate]
+    );
+
+    // Current patient in consultation
+    const currentlyConsulting = docAppointments.find(a => a.status === 'in_consultation') || null;
+
+    // Last completed consultation
+    const completedList = docAppointments.filter(a => a.status === 'completed');
+    const lastCompleted = completedList.length > 0 ? completedList[completedList.length - 1] : null;
+
+    // Next patient to be called
+    const nextWaiting = docAppointments.find(a => a.status === 'confirmed' || a.status === 'scheduled') || null;
+
+    // For the requesting patient:
+    let patientsAhead = 0;
+    let estimatedWaitMins = 0;
+    let journeyStep = 1; // 1: Booked, 2: Waiting/Arrived, 3: In Cabin, 4: Done
+
+    if (patientAppt) {
+      if (patientAppt.status === 'completed') {
+        patientsAhead = 0;
+        estimatedWaitMins = 0;
+        journeyStep = 4;
+      } else if (patientAppt.status === 'in_consultation') {
+        patientsAhead = 0;
+        estimatedWaitMins = 0;
+        journeyStep = 3;
+      } else {
+        const aheadList = docAppointments.filter(a => 
+          ['in_consultation', 'confirmed', 'scheduled'].includes(a.status) &&
+          a.token_number < patientAppt.token_number
+        );
+        patientsAhead = aheadList.length;
+        estimatedWaitMins = Math.max(5, patientsAhead * 8); // ~8 mins avg per patient
+        journeyStep = patientAppt.status === 'confirmed' ? 2 : 1;
+      }
+    }
+
+    // Active doctors list with counts today
+    const activeDoctors = await query(
+      `SELECT d.id, d.full_name, d.specialization, d.room_number, dep.name as department_name,
+              COUNT(a.id) as total_today,
+              SUM(CASE WHEN a.status = 'completed' THEN 1 ELSE 0 END) as total_completed,
+              SUM(CASE WHEN a.status = 'in_consultation' THEN 1 ELSE 0 END) as in_cabin_count
+       FROM Doctors d
+       LEFT JOIN Departments dep ON d.department_id = dep.id
+       LEFT JOIN Appointments a ON a.doctor_id = d.id AND a.appointment_date = ?
+       GROUP BY d.id
+       ORDER BY total_today DESC`,
+      [today]
+    );
+
+    res.json({
+      doctor,
+      patient_appointment: patientAppt,
+      currently_consulting: currentlyConsulting,
+      last_completed: lastCompleted,
+      next_waiting: nextWaiting,
+      patients_ahead: patientsAhead,
+      estimated_wait_mins: estimatedWaitMins,
+      journey_step: journeyStep,
+      queue_list: docAppointments,
+      active_doctors: activeDoctors
+    });
+  } catch (err) {
+    console.error('Error in live-tracker endpoint:', err);
+    res.status(500).json({ error: 'Failed to fetch live queue tracking data.' });
+  }
+});
+
 // GET single appointment
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
@@ -161,7 +304,7 @@ router.post('/book', authenticateToken, async (req, res) => {
 // PATCH update appointment status / vitals (Doctor or Admin)
 router.patch('/:id/status', authenticateToken, async (req, res) => {
   try {
-    const { status, vitals_bp, vitals_pulse, vitals_temp, vitals_weight } = req.body;
+    const { status, vitals_bp, vitals_pulse, vitals_temp, vitals_weight, completion_remark } = req.body;
     const appointmentId = req.params.id;
 
     const appointment = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);
@@ -174,15 +317,47 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Invalid status value.' });
     }
 
+    const nowIso = new Date().toISOString();
+    const timeFormatted = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    let startedAt = null;
+    let completedAt = null;
+    let finalRemark = completion_remark || null;
+
+    if (status === 'in_consultation') {
+      startedAt = nowIso;
+      if (!finalRemark) {
+        finalRemark = `डॉक्टरांच्या केबिनमध्ये तपासणी सुरू (${timeFormatted})`;
+      }
+    } else if (status === 'completed') {
+      completedAt = nowIso;
+      if (!finalRemark) {
+        finalRemark = `तपासणी यशस्वीरित्या पूर्ण झाली (Completed at ${timeFormatted})`;
+      }
+    }
+
     await run(
       `UPDATE Appointments
        SET status = COALESCE(?, status),
            vitals_bp = COALESCE(?, vitals_bp),
            vitals_pulse = COALESCE(?, vitals_pulse),
            vitals_temp = COALESCE(?, vitals_temp),
-           vitals_weight = COALESCE(?, vitals_weight)
+           vitals_weight = COALESCE(?, vitals_weight),
+           consultation_started_at = COALESCE(?, consultation_started_at),
+           completed_at = COALESCE(?, completed_at),
+           completion_remark = COALESCE(?, completion_remark)
        WHERE id = ?`,
-      [status || null, vitals_bp || null, vitals_pulse || null, vitals_temp || null, vitals_weight || null, appointmentId]
+      [
+        status || null,
+        vitals_bp || null,
+        vitals_pulse || null,
+        vitals_temp || null,
+        vitals_weight || null,
+        startedAt,
+        completedAt,
+        finalRemark,
+        appointmentId
+      ]
     );
 
     const updated = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);

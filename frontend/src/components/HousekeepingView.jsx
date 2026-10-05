@@ -13,10 +13,12 @@ import {
   Check, 
   X,
   FileCheck,
-  AlertCircle
+  AlertCircle,
+  Send
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function HousekeepingView({ user, hospitalInfo }) {
   const { t } = useLanguage();
@@ -25,6 +27,9 @@ export default function HousekeepingView({ user, hospitalInfo }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all' | 'clean' | 'due' | 'overdue'
+
+  // Dispatch modal state
+  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
   // Scan modal state
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
@@ -60,6 +65,18 @@ export default function HousekeepingView({ user, hospitalInfo }) {
       console.error('Failed to load housekeeping data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateTaskStatus = async (taskId, newStatus) => {
+    try {
+      await api.updateCleaningTaskStatus(taskId, {
+        task_status: newStatus,
+        cleaner_name: user?.fullName || 'Staff Cleaner'
+      });
+      await loadData();
+    } catch (err) {
+      alert(err.message || 'Failed to update task status');
     }
   };
 
@@ -134,6 +151,16 @@ export default function HousekeepingView({ user, hospitalInfo }) {
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setIsDispatchModalOpen(true)}
+              className="btn btn-outline"
+              style={{ borderColor: '#34d399', color: '#34d399', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', fontWeight: '700' }}
+            >
+              <Send size={16} /> काम वाटप करा (Dispatch Tasks)
+            </button>
+          )}
+
           <button
             onClick={() => handleOpenScan(null)}
             className="btn btn-primary"
@@ -201,6 +228,126 @@ export default function HousekeepingView({ user, hospitalInfo }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* DISPATCHED TASKS & STAFF ROSTER (सफाई काम वाटप व ड्युटी बोर्ड) */}
+      <div className="glass-card" style={{ padding: '20px', borderRadius: '14px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 10px #34d399' }} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '700', fontFamily: 'var(--font-display)', color: '#fff' }}>
+                सफाई काम वाटप व प्रगती (Dispatched Staff Tasks & Hygiene Board)
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              Admin कडून सफाई कामगारांना सोपवलेली विशिष्ट कामे व त्यांचे रिअल-टाइम स्टेटस
+            </p>
+          </div>
+
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setIsDispatchModalOpen(true)}
+              className="btn btn-sm btn-primary"
+              style={{ background: '#10b981', borderColor: '#10b981', gap: '6px' }}
+            >
+              <Send size={14} /> नवीन काम वाटप (Assign Task)
+            </button>
+          )}
+        </div>
+
+        {tasks.filter(t => t.assigned_cleaner_name || t.priority === 'urgent').length === 0 ? (
+          <div style={{ padding: '18px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+            सध्या कोणतेही विशेष सफाई कार्य प्रलंबित नाही. सर्व स्वच्छता सामान्य वेळेनुसार सुरू आहे.
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+            {tasks.filter(t => t.assigned_cleaner_name || t.priority === 'urgent').map((t) => {
+              const isUrgent = t.priority === 'urgent';
+              const isHigh = t.priority === 'high';
+              const isDone = t.task_status === 'completed';
+              const isInProgress = t.task_status === 'in_progress';
+
+              return (
+                <div
+                  key={t.id}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '10px',
+                    background: isDone ? 'rgba(16, 185, 129, 0.05)' : isUrgent ? 'rgba(239, 68, 68, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid',
+                    borderColor: isDone ? 'rgba(16, 185, 129, 0.3)' : isUrgent ? 'rgba(239, 68, 68, 0.3)' : 'var(--border-subtle)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '10px'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                      <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#fff' }}>
+                        {t.area_name}
+                      </div>
+                      <span style={{
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.68rem',
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
+                        background: isUrgent ? 'rgba(239, 68, 68, 0.2)' : isHigh ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                        color: isUrgent ? '#f87171' : isHigh ? '#fbbf24' : '#34d399'
+                      }}>
+                        {t.priority || 'routine'}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                      सफाई कर्मचारी: <strong style={{ color: '#38bdf8' }}>{t.assigned_cleaner_name || t.last_cleaned_by || 'Staff Cleaner'}</strong>
+                    </div>
+
+                    {t.notes && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
+                        "{t.notes}"
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontWeight: '700',
+                      color: isDone ? '#34d399' : isInProgress ? '#38bdf8' : '#fbbf24'
+                    }}>
+                      {isDone ? '✓ पूर्ण (Completed)' : isInProgress ? '⏳ काम सुरू (In-Progress)' : '🟡 प्रलंबित (Pending)'}
+                    </span>
+
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {!isDone && !isInProgress && (
+                        <button
+                          onClick={() => handleUpdateTaskStatus(t.id, 'in_progress')}
+                          className="btn btn-outline btn-sm"
+                          style={{ fontSize: '0.72rem', padding: '3px 8px', borderColor: '#38bdf8', color: '#38bdf8' }}
+                        >
+                          काम सुरू करा
+                        </button>
+                      )}
+
+                      {!isDone && (
+                        <button
+                          onClick={() => handleOpenScan(t)}
+                          className="btn btn-primary btn-sm"
+                          style={{ fontSize: '0.72rem', padding: '3px 10px', gap: '4px' }}
+                        >
+                          <QrCode size={12} /> QR स्कॅन
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs */}
@@ -525,6 +672,13 @@ export default function HousekeepingView({ user, hospitalInfo }) {
         </div>
       )}
 
+      {/* Staff Duty & Cleaning Task Dispatcher Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchModalOpen}
+        onClose={() => setIsDispatchModalOpen(false)}
+        initialTab="housekeeping"
+        onUpdateSuccess={loadData}
+      />
     </div>
   );
 }

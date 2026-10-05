@@ -185,4 +185,50 @@ router.post('/handover', async (req, res) => {
   }
 });
 
+// GET Nurse Station telemetry and active assigned ward context
+router.get('/my-station', async (req, res) => {
+  try {
+    const { user_id, nurse_id, nurse_name } = req.query;
+    let nurse = null;
+    if (user_id) {
+      nurse = await getOne('SELECT * FROM Nurses WHERE user_id = ?', [user_id]);
+    } else if (nurse_id) {
+      nurse = await getOne('SELECT * FROM Nurses WHERE id = ?', [nurse_id]);
+    } else if (nurse_name) {
+      nurse = await getOne('SELECT * FROM Nurses WHERE full_name LIKE ?', [`%${nurse_name.trim()}%`]);
+    }
+
+    if (!nurse) {
+      nurse = await getOne('SELECT * FROM Nurses WHERE is_on_duty = 1 ORDER BY id ASC LIMIT 1') || {
+        full_name: 'Sister Sunita Sharma',
+        assigned_ward: 'ICU',
+        shift_timings: '08:00 AM - 04:00 PM',
+        is_on_duty: 1
+      };
+    }
+
+    const assignedWard = nurse.assigned_ward || 'General Ward';
+    const keyword = assignedWard.replace('Ward', '').trim();
+    const bedsInWard = await query(
+      `SELECT b.*, p.full_name as patient_name, p.gender as patient_gender, p.blood_group as patient_blood_group 
+       FROM Beds b 
+       LEFT JOIN Patients p ON b.patient_id = p.id 
+       WHERE b.ward_type LIKE ? OR ? LIKE '%' || b.ward_type || '%'
+       ORDER BY b.bed_number ASC`,
+      [`%${keyword}%`, assignedWard]
+    );
+
+    res.json({
+      nurse,
+      assignedWard,
+      shiftTimings: nurse.shift_timings || '08:00 AM - 04:00 PM',
+      isOnDuty: nurse.is_on_duty === 1,
+      bedsInWard
+    });
+  } catch (err) {
+    console.error('Error fetching nurse station info:', err);
+    res.status(500).json({ error: 'Failed to retrieve nurse station telemetry.' });
+  }
+});
+
 export default router;

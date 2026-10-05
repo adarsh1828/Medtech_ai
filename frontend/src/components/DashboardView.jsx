@@ -20,15 +20,18 @@ import {
   Flame,
   Zap,
   Radio,
-  Tv
+  Tv,
+  HeartPulse
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function DashboardView({ user, setActiveTab, onOpenBookModal, onOpenEmergency }) {
   const { t } = useLanguage();
   const [overview, setOverview] = useState(null);
   const [todayAppointments, setTodayAppointments] = useState([]);
+  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Live Hospital Telemetry Events Feed
@@ -152,6 +155,15 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         </div>
 
         <div className="dashboard-hero-actions" style={{ display: 'flex', gap: '12px', zIndex: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setIsDispatchModalOpen(true)}
+              className="btn btn-outline"
+              style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#38bdf8', background: 'rgba(6, 182, 212, 0.1)', gap: '8px' }}
+            >
+              <HeartPulse size={16} /> ड्युटी व काम वाटप
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('ai-triage')}
             className="btn btn-outline"
@@ -681,6 +693,13 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           </div>
         </div>
       </div>
+
+      {/* Staff Duty & Cleaning Task Dispatcher Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchModalOpen}
+        onClose={() => setIsDispatchModalOpen(false)}
+        onUpdateSuccess={loadDashboardData}
+      />
     </div>
   );
 }

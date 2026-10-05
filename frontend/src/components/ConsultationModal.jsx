@@ -114,6 +114,14 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
         medicines: validMedicines
       });
 
+      // 4. Set explicit completion remark for Admin & Reception visibility
+      const completedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      await api.updateAppointmentStatus(
+        appointment.id,
+        'completed',
+        `तपासणी यशस्वीरित्या पूर्ण झाली • निदान: ${diagnosis.trim()} • Rx जारी (${completedTime})`
+      );
+
       onSuccess();
       onClose();
     } catch (err) {

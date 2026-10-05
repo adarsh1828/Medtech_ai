@@ -147,9 +147,10 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(payload)
   }),
-  updateAppointmentStatus: (id, status) => request(`/appointments/${id}/status`, {
+  getLiveQueueTracker: (doctorId = '') => request(`/appointments/live-tracker${doctorId ? `?doctor_id=${doctorId}` : ''}`),
+  updateAppointmentStatus: (id, status, remark = '') => request(`/appointments/${id}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status })
+    body: JSON.stringify({ status, completion_remark: remark })
   }),
   updateAppointmentVitals: (id, vitals) => request(`/appointments/${id}/vitals`, {
     method: 'PATCH',
@@ -234,6 +235,32 @@ export const api = {
   getShiftHandovers: () => request('/nurse/handovers'),
   submitShiftHandover: (payload) => request('/nurse/handover', {
     method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getNurseStationInfo: (params = '') => request(`/nurse/my-station${params ? `?${params}` : ''}`),
+
+  // Admin Resource & Staff Duty Dispatcher
+  getAdminNurses: () => request('/admin/nurses'),
+  assignNurseDuty: (id, payload) => request(`/admin/nurses/${id}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  }),
+  getAdminCleaners: () => request('/admin/cleaners'),
+  assignCleanerDuty: (id, payload) => request(`/admin/cleaners/${id}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  }),
+  dispatchCleaningTask: (payload) => request('/admin/cleaning-tasks', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getAdminCleaningTasks: () => request('/admin/cleaning-tasks'),
+  getMyCleaningTasks: (cleanerId = '', cleanerName = '') => {
+    const q = cleanerId ? `cleaner_id=${cleanerId}` : cleanerName ? `cleaner_name=${encodeURIComponent(cleanerName)}` : '';
+    return request(`/housekeeping/my-tasks${q ? `?${q}` : ''}`);
+  },
+  updateCleaningTaskStatus: (id, payload) => request(`/housekeeping/tasks/${id}/status`, {
+    method: 'PATCH',
     body: JSON.stringify(payload)
   })
 };

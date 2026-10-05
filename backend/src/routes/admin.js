@@ -393,5 +393,232 @@ router.put('/hospital-settings', async (req, res) => {
   }
 });
 
+// GET all nurses for Admin Duty & Ward Dispatch
+router.get('/nurses', async (req, res) => {
+  try {
+    const nurses = await query(`
+      SELECT n.*, u.email, u.phone, dep.name as department_name, dep.code as department_code
+      FROM Nurses n
+      JOIN Users u ON n.user_id = u.id
+      LEFT JOIN Departments dep ON n.department_id = dep.id
+      ORDER BY n.is_on_duty DESC, n.assigned_ward ASC, n.full_name ASC
+    `);
+
+    // Grouping by ward for quick summary
+    const wardCounts = nurses.reduce((acc, curr) => {
+      const w = curr.assigned_ward || 'Unassigned';
+      acc[w] = (acc[w] || 0) + (curr.is_on_duty ? 1 : 0);
+      return acc;
+    }, {});
+
+    res.json({
+      nurses,
+      totalNurses: nurses.length,
+      onDutyCount: nurses.filter(n => n.is_on_duty === 1).length,
+      wardCounts
+    });
+  } catch (err) {
+    console.error('Error fetching admin nurses:', err);
+    res.status(500).json({ error: 'Failed to retrieve nursing staff directory.' });
+  }
+});
+
+// PATCH assign Nurse to Ward/ICU, Shift & Duty Status (Admin Duty Dispatcher)
+router.patch('/nurses/:id/assign', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { assigned_ward, shift_timings, is_on_duty, notes } = req.body;
+
+    const nurse = await getOne('SELECT * FROM Nurses WHERE id = ?', [id]);
+    if (!nurse) {
+      return res.status(404).json({ error: 'Nurse record not found.' });
+    }
+
+    const newWard = assigned_ward !== undefined ? assigned_ward.trim() : nurse.assigned_ward;
+    const newShift = shift_timings !== undefined ? shift_timings.trim() : nurse.shift_timings;
+    const newDuty = is_on_duty !== undefined ? (is_on_duty ? 1 : 0) : nurse.is_on_duty;
+
+    await run(
+      `UPDATE Nurses
+       SET assigned_ward = ?,
+           shift_timings = ?,
+           is_on_duty = ?
+       WHERE id = ?`,
+      [newWard, newShift, newDuty, id]
+    );
+
+    // Audit log
+    try {
+      await run(
+        `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          req.user?.id || null,
+          req.user?.email || 'admin',
+          'NURSE_DUTY_ASSIGNED',
+          req.ip || '127.0.0.1',
+          req.headers['user-agent'] || 'System',
+          `Admin assigned Nurse ${nurse.full_name} to ${newWard} (${newShift}) [On Duty: ${newDuty === 1 ? 'YES' : 'NO'}]`
+        ]
+      );
+    } catch (e) {}
+
+    const updated = await getOne(
+      `SELECT n.*, u.email, u.phone FROM Nurses n JOIN Users u ON n.user_id = u.id WHERE n.id = ?`,
+      [id]
+    );
+
+    res.json({
+      message: `Nurse ${nurse.full_name} assigned to ${newWard} (${newShift}) successfully!`,
+      nurse: updated
+    });
+  } catch (err) {
+    console.error('Error updating nurse assignment:', err);
+    res.status(500).json({ error: 'Failed to update nurse assignment.' });
+  }
+});
+
+// GET all Cleaning Staff for Admin Dispatch & Housekeeping Roster
+router.get('/cleaners', async (req, res) => {
+  try {
+    const cleaners = await query(`
+      SELECT h.*, u.email, u.phone,
+        (SELECT COUNT(*) FROM CleaningTasks WHERE (assigned_cleaner_id = h.id OR assigned_cleaner_name = h.full_name) AND task_status != 'completed') as active_tasks_count
+      FROM HousekeepingStaff h
+      JOIN Users u ON h.user_id = u.id
+      ORDER BY h.is_on_duty DESC, h.full_name ASC
+    `);
+
+    res.json({
+      cleaners,
+      totalCleaners: cleaners.length,
+      onDutyCount: cleaners.filter(c => c.is_on_duty === 1).length
+    });
+  } catch (err) {
+    console.error('Error fetching admin cleaners:', err);
+    res.status(500).json({ error: 'Failed to retrieve housekeeping staff.' });
+  }
+});
+
+// PATCH assign Cleaning Staff to Area, Shift & Duty Status
+router.patch('/cleaners/:id/assign', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { assigned_area, shift_timings, is_on_duty } = req.body;
+
+    const cleaner = await getOne('SELECT * FROM HousekeepingStaff WHERE id = ?', [id]);
+    if (!cleaner) {
+      return res.status(404).json({ error: 'Cleaning staff record not found.' });
+    }
+
+    const newArea = assigned_area !== undefined ? assigned_area.trim() : cleaner.assigned_area;
+    const newShift = shift_timings !== undefined ? shift_timings.trim() : cleaner.shift_timings;
+    const newDuty = is_on_duty !== undefined ? (is_on_duty ? 1 : 0) : cleaner.is_on_duty;
+
+    await run(
+      `UPDATE HousekeepingStaff
+       SET assigned_area = ?,
+           shift_timings = ?,
+           is_on_duty = ?
+       WHERE id = ?`,
+      [newArea, newShift, newDuty, id]
+    );
+
+    // Audit log
+    try {
+      await run(
+        `INSERT INTO SecurityAuditLogs (user_id, email, action, ip_address, user_agent, details) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          req.user?.id || null,
+          req.user?.email || 'admin',
+          'CLEANER_DUTY_ASSIGNED',
+          req.ip || '127.0.0.1',
+          req.headers['user-agent'] || 'System',
+          `Admin assigned Sanitation Staff ${cleaner.full_name} to ${newArea} (${newShift}) [On Duty: ${newDuty === 1 ? 'YES' : 'NO'}]`
+        ]
+      );
+    } catch (e) {}
+
+    const updated = await getOne(
+      `SELECT h.*, u.email, u.phone FROM HousekeepingStaff h JOIN Users u ON h.user_id = u.id WHERE h.id = ?`,
+      [id]
+    );
+
+    res.json({
+      message: `Sanitation Staff ${cleaner.full_name} assigned to ${newArea} successfully!`,
+      cleaner: updated
+    });
+  } catch (err) {
+    console.error('Error assigning cleaning staff:', err);
+    res.status(500).json({ error: 'Failed to assign cleaning staff.' });
+  }
+});
+
+// POST Admin Dispatches a Cleaning Task to Specific Cleaner
+router.post('/cleaning-tasks', async (req, res) => {
+  try {
+    const { area_name, area_code, area_type = 'Ward Bed', cleaner_id, cleaner_name, priority = 'routine', notes, cleaning_frequency_hours = 4 } = req.body;
+
+    if (!area_name) {
+      return res.status(400).json({ error: 'Area name or room/bed identifier is required.' });
+    }
+
+    // Auto-generate code if not provided
+    const code = (area_code && area_code.trim()) 
+      ? area_code.trim().toUpperCase() 
+      : `TASK-${Date.now().toString().slice(-6)}`;
+
+    // Check if task with this area_code already exists
+    let existing = await getOne('SELECT id FROM CleaningTasks WHERE area_code = ?', [code]);
+    let taskId = null;
+
+    if (existing) {
+      // Re-dispatch existing task
+      taskId = existing.id;
+      await run(
+        `UPDATE CleaningTasks
+         SET area_name = ?,
+             area_type = ?,
+             assigned_cleaner_id = ?,
+             assigned_cleaner_name = ?,
+             priority = ?,
+             task_status = 'pending',
+             status = 'due',
+             notes = ?
+         WHERE id = ?`,
+        [area_name.trim(), area_type, cleaner_id || null, cleaner_name || 'Staff Cleaner', priority, notes || 'Admin Dispatched Cleaning Task', taskId]
+      );
+    } else {
+      // Insert new task
+      const result = await run(
+        `INSERT INTO CleaningTasks (area_name, area_code, area_type, cleaning_frequency_hours, assigned_cleaner_id, assigned_cleaner_name, priority, task_status, status, notes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 'due', ?)`,
+        [area_name.trim(), code, area_type, Number(cleaning_frequency_hours) || 4, cleaner_id || null, cleaner_name || 'Staff Cleaner', priority, notes || 'Admin Dispatched Cleaning Task']
+      );
+      taskId = result.lastID;
+    }
+
+    const task = await getOne('SELECT * FROM CleaningTasks WHERE id = ?', [taskId]);
+
+    res.status(201).json({
+      message: `Cleaning task dispatched to ${cleaner_name || 'staff'} successfully!`,
+      task
+    });
+  } catch (err) {
+    console.error('Error dispatching cleaning task:', err);
+    res.status(500).json({ error: 'Failed to dispatch cleaning task.' });
+  }
+});
+
+// GET all Cleaning Tasks for Admin Control
+router.get('/cleaning-tasks', async (req, res) => {
+  try {
+    const tasks = await query('SELECT * FROM CleaningTasks ORDER BY CASE priority WHEN "urgent" THEN 1 WHEN "high" THEN 2 ELSE 3 END, created_at DESC');
+    res.json({ tasks });
+  } catch (err) {
+    console.error('Error fetching admin cleaning tasks:', err);
+    res.status(500).json({ error: 'Failed to retrieve cleaning tasks.' });
+  }
+});
+
 export default router;
 

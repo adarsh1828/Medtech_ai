@@ -44,6 +44,25 @@ router.get('/', authenticateToken, async (req, res) => {
     const occupied = beds.filter(b => b.status === 'occupied').length;
     const maintenance = beds.filter(b => b.status === 'maintenance').length;
 
+    // Ward-wise breakdown with vacant bed counts
+    const WARD_ORDER = ['ICU', 'Emergency', 'General Ward', 'Semi-Private', 'Pediatric Ward'];
+    const allBeds = await query('SELECT ward_type, status FROM Beds');
+    const wardBreakdown = WARD_ORDER.map(wardName => {
+      const wBeds = allBeds.filter(b => b.ward_type === wardName);
+      const wTotal = wBeds.length;
+      const wAvail = wBeds.filter(b => b.status === 'available').length;
+      const wOcc = wBeds.filter(b => b.status === 'occupied').length;
+      const wMaint = wBeds.filter(b => b.status === 'maintenance').length;
+      return {
+        ward_type: wardName,
+        total: wTotal,
+        available: wAvail,
+        occupied: wOcc,
+        maintenance: wMaint,
+        occupancyRate: wTotal > 0 ? Math.round((wOcc / wTotal) * 100) : 0
+      };
+    });
+
     res.json({
       beds,
       stats: {
@@ -51,7 +70,8 @@ router.get('/', authenticateToken, async (req, res) => {
         available,
         occupied,
         maintenance,
-        occupancyRate: total > 0 ? Math.round((occupied / total) * 100) : 0
+        occupancyRate: total > 0 ? Math.round((occupied / total) * 100) : 0,
+        wardBreakdown
       }
     });
   } catch (err) {

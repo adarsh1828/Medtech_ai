@@ -7,21 +7,31 @@ import {
   Wrench, 
   User, 
   Clock, 
-  Building2,
-  RefreshCw,
-  Plus
+  Building2, 
+  RefreshCw, 
+  Plus,
+  HeartPulse,
+  Sparkles,
+  ShieldAlert,
+  Send,
+  CheckCircle2
 } from 'lucide-react';
 import { api } from '../api';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 const WARDS = ['All', 'ICU', 'Emergency', 'General Ward', 'Semi-Private', 'Pediatric Ward'];
 
 export default function BedsView({ user }) {
   const [beds, setBeds] = useState([]);
-  const [stats, setStats] = useState({ total: 0, available: 0, occupied: 0, maintenance: 0, occupancyRate: 0 });
+  const [stats, setStats] = useState({ total: 0, available: 0, occupied: 0, maintenance: 0, occupancyRate: 0, wardBreakdown: [] });
   const [wardFilter, setWardFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+
+  // Dispatch modal state
+  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
+  const [initialDispatchTab, setInitialDispatchTab] = useState('nurse');
 
   useEffect(() => {
     loadBeds();
@@ -62,28 +72,97 @@ export default function BedsView({ user }) {
     return matchesWard && matchesStatus;
   });
 
+  // Calculate ICU critical alert
+  const icuStats = stats.wardBreakdown?.find(w => w.ward_type === 'ICU');
+  const isIcuShortage = icuStats && icuStats.available <= 1;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-            Ward & Hospital Bed Tracking
+            वॉर्ड व हॉस्पिटल बेड ट्रॅकिंग (Ward & Inpatient Bed Control)
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Real-time telemetry, ICU occupancy, and bed turnover management
+            रिअल-टाइम रिकामे बेड्स, ICU उपलब्धता आणि स्टाफ ड्युटी वाटप केंद्र
           </p>
         </div>
 
-        <button
-          onClick={loadBeds}
-          className="btn btn-outline btn-sm"
-        >
-          <RefreshCw size={14} /> Refresh Bed Grid
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {user?.role === 'admin' && (
+            <>
+              <button
+                onClick={() => {
+                  setInitialDispatchTab('nurse');
+                  setIsDispatchOpen(true);
+                }}
+                className="btn btn-primary btn-sm"
+                style={{ gap: '6px' }}
+              >
+                <HeartPulse size={14} /> नर्स वॉर्ड/ICU वाटप (Nurse Duty)
+              </button>
+
+              <button
+                onClick={() => {
+                  setInitialDispatchTab('housekeeping');
+                  setIsDispatchOpen(true);
+                }}
+                className="btn btn-outline btn-sm"
+                style={{ borderColor: '#34d399', color: '#34d399', gap: '6px' }}
+              >
+                <Sparkles size={14} /> सफाई काम वाटप (Housekeeping)
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={loadBeds}
+            className="btn btn-outline btn-sm"
+            style={{ gap: '6px' }}
+          >
+            <RefreshCw size={14} /> Refresh Bed Grid
+          </button>
+        </div>
       </div>
 
-      {/* Overview Stat Counters */}
+      {/* Critical ICU Shortage Alert Banner if applicable */}
+      {isIcuShortage && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 18px',
+          borderRadius: '10px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.35)',
+          color: '#f87171',
+          fontSize: '0.88rem',
+          fontWeight: '600'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <ShieldAlert size={20} />
+            <span>
+              ⚠️ <strong>ICU क्रिटिकल अलर्ट:</strong> ICU मध्ये सध्या फक्त <strong>{icuStats.available} रिकामे बेड (Vacant Bed)</strong> उपलब्ध आहे. आपत्कालीन परिस्थितीसाठी नवीन बेड रिकामे करा किंवा सॅनिटायझेशन पूर्ण करा.
+            </span>
+          </div>
+
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => {
+                setInitialDispatchTab('housekeeping');
+                setIsDispatchOpen(true);
+              }}
+              className="btn btn-sm"
+              style={{ background: '#ef4444', color: '#fff', border: 'none', fontSize: '0.78rem' }}
+            >
+              सफाई टास्क पाठवा
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Overall Hospital Counters */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -91,36 +170,42 @@ export default function BedsView({ user }) {
       }}>
         <div className="glass-card" style={{ padding: '18px' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600' }}>
-            Total Registered Beds
+            Total Registered Beds (एकूण बेड्स)
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: '800', fontFamily: 'var(--font-display)', marginTop: '4px' }}>
             {stats.total || 0}
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '18px', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
-          <div style={{ fontSize: '0.75rem', color: '#34d399', textTransform: 'uppercase', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="glass-card" style={{ padding: '18px', borderColor: 'rgba(16, 185, 129, 0.35)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#34d399', textTransform: 'uppercase', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-            Available For Admission
+            उपलब्ध रिकामे बेड्स (Vacant Beds)
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: '#34d399', marginTop: '4px' }}>
             {stats.available || 0}
           </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+            दाखल करण्यासाठी सज्ज (Ready for Admission)
+          </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '18px', borderColor: 'rgba(244, 63, 94, 0.3)' }}>
-          <div style={{ fontSize: '0.75rem', color: '#fb7185', textTransform: 'uppercase', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="glass-card" style={{ padding: '18px', borderColor: 'rgba(244, 63, 94, 0.35)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#fb7185', textTransform: 'uppercase', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f43f5e', boxShadow: '0 0 8px #f43f5e' }} />
-            Currently Occupied
+            भरलेले बेड्स (Occupied Beds)
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: '#fb7185', marginTop: '4px' }}>
             {stats.occupied || 0}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+            सध्या उपचार घेत असलेले रुग्ण
           </div>
         </div>
 
         <div className="glass-card" style={{ padding: '18px' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600' }}>
-            Occupancy Rate
+            एकूण ऑक्युपन्सी (Occupancy Rate)
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: '#38bdf8', marginTop: '4px' }}>
             {stats.occupancyRate || 0}%
@@ -128,6 +213,105 @@ export default function BedsView({ user }) {
           <div style={{ width: '100%', height: '4px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', marginTop: '8px', overflow: 'hidden' }}>
             <div style={{ width: `${stats.occupancyRate || 0}%`, height: '100%', background: '#38bdf8' }} />
           </div>
+        </div>
+      </div>
+
+      {/* WARD-WISE VACANCY MATRIX (वॉर्डनुसार रिकामे बेड्स ट्रॅकर) */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', fontFamily: 'var(--font-display)' }}>
+              वॉर्डनुसार रिकामे बेड्स ट्रॅकर (Live Vacant Bed Availability by Ward)
+            </h3>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              कोणत्या वॉर्डमध्ये किती रिकामे बेड्स शिल्लक आहेत याची थेट माहिती:
+            </p>
+          </div>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '14px'
+        }}>
+          {(stats.wardBreakdown || []).map((w) => {
+            const isIcu = w.ward_type === 'ICU';
+            const isEmergency = w.ward_type === 'Emergency';
+            const isSelected = wardFilter === w.ward_type;
+
+            return (
+              <div
+                key={w.ward_type}
+                onClick={() => setWardFilter(isSelected ? 'All' : w.ward_type)}
+                className="glass-card"
+                style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-subtle)',
+                  background: isSelected ? 'rgba(6, 182, 212, 0.08)' : 'var(--bg-card)',
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Accent top stripe */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: isIcu ? '#ef4444' : isEmergency ? '#f59e0b' : '#06b6d4'
+                }} />
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div style={{ fontWeight: '700', fontSize: '0.95rem', color: '#fff' }}>
+                    {isIcu && '🚨 '}
+                    {isEmergency && '⚡ '}
+                    {w.ward_type}
+                  </div>
+                  <span style={{
+                    fontSize: '0.7rem',
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    fontWeight: '700',
+                    background: isSelected ? 'var(--primary)' : 'rgba(255, 255, 255, 0.06)',
+                    color: isSelected ? '#000' : 'var(--text-muted)'
+                  }}>
+                    {isSelected ? 'Filtered' : 'Filter'}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '6px 0' }}>
+                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: w.available > 0 ? '#34d399' : '#f87171', fontFamily: 'var(--font-display)' }}>
+                    {w.available}
+                  </span>
+                  <span style={{ fontSize: '0.85rem', color: '#34d399', fontWeight: '700' }}>
+                    रिकामे (Vacant)
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                    / {w.total} एकूण
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '6px' }}>
+                  <span>भरलेले: <strong style={{ color: '#fb7185' }}>{w.occupied}</strong></span>
+                  <span>•</span>
+                  <span>मेंटेनन्स: <strong style={{ color: '#fbbf24' }}>{w.maintenance}</strong></span>
+                </div>
+
+                {/* Progress Mini Bar */}
+                <div style={{ width: '100%', height: '5px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '3px', marginTop: '10px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${w.total > 0 ? (w.occupied / w.total) * 100 : 0}%`,
+                    height: '100%',
+                    background: isIcu ? '#ef4444' : isEmergency ? '#f59e0b' : '#38bdf8'
+                  }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -339,6 +523,14 @@ export default function BedsView({ user }) {
           })}
         </div>
       )}
+
+      {/* Staff Duty & Task Dispatcher Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchOpen}
+        onClose={() => setIsDispatchOpen(false)}
+        initialTab={initialDispatchTab}
+        onUpdateSuccess={loadBeds}
+      />
     </div>
   );
 }

@@ -114,15 +114,18 @@ router.post('/', authenticateToken, requireRole(['doctor']), async (req, res) =>
 
     // If an appointment is provided, ensure it exists and update its status
     if (appointment_id) {
+      const completedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       await run(
         `UPDATE Appointments 
          SET status = 'completed',
+             completed_at = CURRENT_TIMESTAMP,
+             completion_remark = COALESCE(completion_remark, ?),
              vitals_bp = COALESCE(?, vitals_bp),
              vitals_pulse = COALESCE(?, vitals_pulse),
              vitals_temp = COALESCE(?, vitals_temp),
              vitals_weight = COALESCE(?, vitals_weight)
          WHERE id = ?`,
-        [vitals?.bp || null, vitals?.pulse || null, vitals?.temp || null, vitals?.weight || null, appointment_id]
+        [`तपासणी पूर्ण आणि प्रिस्क्रिप्शन जारी (${completedTime})`, vitals?.bp || null, vitals?.pulse || null, vitals?.temp || null, vitals?.weight || null, appointment_id]
       );
     }
 

@@ -13,17 +13,23 @@ import {
   ArrowRight, 
   RefreshCw,
   X,
-  Stethoscope
+  Stethoscope,
+  Building2,
+  Users
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function NurseStationView({ user, hospitalInfo }) {
   const { t } = useLanguage();
-  const [activeSubTab, setActiveSubTab] = useState('medications'); // 'medications' | 'vitals' | 'handover'
+  const [activeSubTab, setActiveSubTab] = useState('medications'); // 'medications' | 'vitals' | 'handover' | 'duty-roster'
   const [medications, setMedications] = useState([]);
   const [vitalsList, setVitalsList] = useState([]);
   const [handovers, setHandovers] = useState([]);
+  const [stationInfo, setStationInfo] = useState(null);
+  const [allNurses, setAllNurses] = useState([]);
+  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Administer dose modal state
@@ -69,14 +75,18 @@ export default function NurseStationView({ user, hospitalInfo }) {
 
   const loadData = async () => {
     try {
-      const [medsRes, vitalsRes, handoversRes] = await Promise.all([
+      const [medsRes, vitalsRes, handoversRes, stationRes, nursesRes] = await Promise.all([
         api.getMedicationSchedules(),
         api.getPatientVitals(),
-        api.getShiftHandovers()
+        api.getShiftHandovers(),
+        api.getNurseStationInfo(user?.id ? `user_id=${user.id}` : '').catch(() => null),
+        api.getAdminNurses().catch(() => ({ nurses: [] }))
       ]);
       setMedications(medsRes.medications || []);
       setVitalsList(vitalsRes.vitals || []);
       setHandovers(handoversRes.handovers || []);
+      setStationInfo(stationRes || null);
+      setAllNurses(nursesRes.nurses || []);
     } catch (err) {
       console.error('Failed to load nurse station data:', err);
     } finally {
@@ -183,7 +193,34 @@ export default function NurseStationView({ user, hospitalInfo }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {stationInfo && (
+            <div style={{
+              padding: '6px 12px',
+              borderRadius: '8px',
+              background: 'rgba(6, 182, 212, 0.15)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              color: '#38bdf8',
+              fontSize: '0.78rem',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <Building2 size={13} /> {stationInfo.assignedWard || 'ICU Ward'} ({stationInfo.shiftTimings || 'Morning'})
+            </div>
+          )}
+
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setIsDispatchOpen(true)}
+              className="btn btn-outline"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', borderColor: '#38bdf8', color: '#38bdf8' }}
+            >
+              <Users size={16} /> नर्स ड्युटी वाटप (Duty Dispatch)
+            </button>
+          )}
+
           <button
             onClick={() => setIsAddVitalsOpen(true)}
             className="btn btn-outline"
@@ -302,6 +339,22 @@ export default function NurseStationView({ user, hospitalInfo }) {
           }}
         >
           🤝 Shift Handover Logs ({handovers.length})
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('duty-roster')}
+          style={{
+            padding: '8px 18px',
+            borderRadius: '8px',
+            border: activeSubTab === 'duty-roster' ? '1px solid var(--primary)' : '1px solid transparent',
+            background: activeSubTab === 'duty-roster' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
+            color: activeSubTab === 'duty-roster' ? '#38bdf8' : 'var(--text-secondary)',
+            fontWeight: '700',
+            fontSize: '0.85rem',
+            cursor: 'pointer'
+          }}
+        >
+          🏥 नर्स वॉर्ड/ICU वाटप व रोस्टर ({allNurses.filter(n => n.is_on_duty === 1).length} On Duty)
         </button>
       </div>
 
@@ -477,6 +530,124 @@ export default function NurseStationView({ user, hospitalInfo }) {
 
                   <div style={{ fontSize: '0.78rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <CheckCircle2 size={14} /> Handed over by <strong>{h.outgoing_nurse_name}</strong> to <strong>{h.incoming_nurse_name}</strong> (Digitally Locked)
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Sub-Tab 4: Nurse Ward & ICU Duty Roster */}
+      {activeSubTab === 'duty-roster' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '700', fontFamily: 'var(--font-display)' }}>
+                नर्स वॉर्ड/ICU वाटप व ड्युटी रोस्टर (Clinical Nursing Duty Matrix)
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                कोणती नर्स कोणत्या ICU किंवा वॉर्डमध्ये कार्यरत आहे याची संपूर्ण माहिती
+              </p>
+            </div>
+
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => setIsDispatchOpen(true)}
+                className="btn btn-primary btn-sm"
+                style={{ gap: '6px' }}
+              >
+                <Users size={14} /> ड्युटी बदला (Reassign Nurse Duty)
+              </button>
+            )}
+          </div>
+
+          <div style={{
+            borderRadius: '12px',
+            border: '1px solid var(--border-subtle)',
+            overflow: 'hidden',
+            background: 'rgba(0, 0, 0, 0.15)'
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1.5fr 2fr 1fr',
+              padding: '12px 18px',
+              background: 'rgba(255, 255, 255, 0.03)',
+              borderBottom: '1px solid var(--border-subtle)',
+              fontSize: '0.75rem',
+              fontWeight: '700',
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase'
+            }}>
+              <div>Nurse Name & Contact</div>
+              <div>Assigned Ward / ICU</div>
+              <div>Shift Timing</div>
+              <div style={{ textAlign: 'right' }}>Duty Status</div>
+            </div>
+
+            {allNurses.length === 0 ? (
+              <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                No nurses registered.
+              </div>
+            ) : (
+              allNurses.map((n) => (
+                <div
+                  key={n.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1.5fr 2fr 1fr',
+                    padding: '14px 18px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                    alignItems: 'center',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: '700', color: '#fff' }}>{n.full_name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      {n.phone || n.email}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      background: n.assigned_ward?.includes('ICU')
+                        ? 'rgba(239, 68, 68, 0.15)'
+                        : n.assigned_ward?.includes('Emergency')
+                        ? 'rgba(245, 158, 11, 0.15)'
+                        : 'rgba(6, 182, 212, 0.15)',
+                      color: n.assigned_ward?.includes('ICU')
+                        ? '#f87171'
+                        : n.assigned_ward?.includes('Emergency')
+                        ? '#fbbf24'
+                        : '#38bdf8'
+                    }}>
+                      <Building2 size={12} /> {n.assigned_ward || 'General Ward'}
+                    </span>
+                  </div>
+
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Clock size={13} style={{ color: 'var(--text-muted)' }} />
+                    {n.shift_timings || '08:00 AM - 04:00 PM'}
+                  </div>
+
+                  <div style={{ textAlign: 'right' }}>
+                    {n.is_on_duty === 1 ? (
+                      <span style={{ color: '#34d399', fontWeight: '700', fontSize: '0.78rem' }}>
+                        🟢 On Duty
+                      </span>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                        ⚪ Off Duty
+                      </span>
+                    )}
                   </div>
                 </div>
               ))
@@ -765,6 +936,13 @@ export default function NurseStationView({ user, hospitalInfo }) {
         </div>
       )}
 
+      {/* Staff Duty Dispatch Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchOpen}
+        onClose={() => setIsDispatchOpen(false)}
+        initialTab="nurse"
+        onUpdateSuccess={loadData}
+      />
     </div>
   );
 }
