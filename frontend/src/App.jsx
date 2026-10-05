@@ -37,8 +37,15 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [user, setUser] = useState(() => getStoredUser());
+  const [activeTab, setActiveTab] = useState(() => {
+    const stored = getStoredUser();
+    if (!stored) return 'dashboard';
+    if (stored.role === 'nurse') return 'nurse-station';
+    if (stored.role === 'cleaning') return 'housekeeping';
+    if (stored.role === 'patient' || stored.role === 'doctor' || stored.role === 'staff') return 'appointments';
+    return 'dashboard';
+  });
   const [hospitalInfo, setHospitalInfo] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -92,20 +99,10 @@ export default function App() {
   useEffect(() => {
     loadHospitalInfo();
     const stored = getStoredUser();
-    if (stored) {
-      setUser(stored);
-      if (stored.role === 'nurse') {
-        setActiveTab('nurse-station');
-      } else if (stored.role === 'cleaning') {
-        setActiveTab('housekeeping');
-      } else if (stored.role === 'patient' || stored.role === 'doctor' || stored.role === 'staff') {
-        setActiveTab('appointments');
-      } else {
-        setActiveTab('dashboard');
-      }
-    } else {
+    if (!stored && user) {
       setUser(null);
     }
+
 
     // Global shortcut Ctrl+K for search
     const handleKeyDown = (e) => {
@@ -399,6 +396,18 @@ export default function App() {
             <HousekeepingView
               user={user}
               hospitalInfo={hospitalInfo}
+            />
+          )}
+
+          {/* Safe fallback for any unmatched or restricted activeTab */}
+          {((activeTab === 'dashboard' && user?.role !== 'admin') ||
+            (activeTab === 'live-queue' && user?.role !== 'admin' && user?.role !== 'staff') ||
+            (activeTab === 'doctors' && user?.role !== 'admin')) && (
+            <AppointmentsView
+              user={user}
+              onOpenBookModal={() => setIsBookOpen(true)}
+              onOpenConsultation={handleOpenConsultation}
+              onOpenPrescription={handleOpenPrescriptionView}
             />
           )}
         </main>

@@ -8,8 +8,20 @@ export const removeStoredToken = () => localStorage.removeItem('medtech_token');
 export const getStoredUser = () => {
   try {
     const raw = localStorage.getItem('medtech_user');
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    const validRoles = ['admin', 'doctor', 'patient', 'nurse', 'cleaning', 'staff'];
+    if (!user || typeof user !== 'object' || !validRoles.includes(user.role)) {
+      localStorage.removeItem('medtech_user');
+      localStorage.removeItem('medtech_token');
+      return null;
+    }
+    return user;
   } catch (e) {
+    try {
+      localStorage.removeItem('medtech_user');
+      localStorage.removeItem('medtech_token');
+    } catch {}
     return null;
   }
 };
