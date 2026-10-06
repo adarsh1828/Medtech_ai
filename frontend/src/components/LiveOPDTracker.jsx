@@ -138,6 +138,9 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
     active_doctors = []
   } = trackerData || {};
 
+  const activeDoctors = active_doctors || [];
+  const patientsAhead = patients_ahead ?? 0;
+
   const isPatient = user?.role === 'patient';
   const isDoctor = user?.role === 'doctor';
   const isAdmin = user?.role === 'admin' || user?.role === 'staff';

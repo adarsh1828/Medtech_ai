@@ -32,6 +32,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Vercel Serverless rewrite path normalization
+app.use((req, res, next) => {
+  const matchedPath = req.headers['x-matched-path'] || req.url;
+  if (matchedPath && matchedPath.startsWith('/api') && !req.url.startsWith('/api')) {
+    req.url = matchedPath;
+  } else if (!req.url.startsWith('/api')) {
+    req.url = '/api' + (req.url.startsWith('/') ? req.url : '/' + req.url);
+  }
+  next();
+});
+
 // Middleware & Strict CORS
 const allowedOrigins = [
   'https://medtech-ai.vercel.app',
