@@ -312,6 +312,17 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found.' });
     }
 
+    // Role-based authorization for appointment status
+    if (req.user.role === 'patient') {
+      const patient = await getOne('SELECT id FROM Patients WHERE user_id = ?', [req.user.userId]);
+      if (!patient || appointment.patient_id !== patient.id) {
+        return res.status(403).json({ error: 'Unauthorized: You can only manage your own appointments.' });
+      }
+      if (status !== 'cancelled') {
+        return res.status(403).json({ error: 'Patients can only cancel appointments.' });
+      }
+    }
+
     const validStatuses = ['scheduled', 'confirmed', 'in_consultation', 'completed', 'cancelled'];
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status value.' });

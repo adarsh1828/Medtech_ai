@@ -16,6 +16,7 @@ import billingRouter from './routes/billing.js';
 import aiRouter from './routes/ai.js';
 import housekeepingRouter from './routes/housekeeping.js';
 import nurseRouter from './routes/nurse.js';
+import emergencyRouter from './routes/emergency.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/api/billing', billingRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/housekeeping', housekeepingRouter);
 app.use('/api/nurse', nurseRouter);
+app.use('/api/emergency-sos', emergencyRouter);
 
 // Public Hospital Info (White-labeling with fast in-memory cache)
 let cachedHospital = null;

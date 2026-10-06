@@ -178,6 +178,22 @@ export const api = {
 
   // Lab Reports
   getLabReports: (query = '') => request(`/lab-reports${query ? `?${query}` : ''}`),
+  getLabTests: () => request('/lab-reports/tests'),
+  createLabReport: (payload) => request('/lab-reports', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+
+  // Emergency SOS
+  triggerEmergencySOS: (payload) => request('/emergency-sos', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  getEmergencyIncidents: () => request('/emergency-sos'),
+  updateEmergencyIncident: (id, payload) => request(`/emergency-sos/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  }),
 
   // Beds
   getBeds: (query = '') => request(`/beds${query ? `?${query}` : ''}`),

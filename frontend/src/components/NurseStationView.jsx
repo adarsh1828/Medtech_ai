@@ -29,6 +29,8 @@ export default function NurseStationView({ user, hospitalInfo }) {
   const [handovers, setHandovers] = useState([]);
   const [stationInfo, setStationInfo] = useState(null);
   const [allNurses, setAllNurses] = useState([]);
+  const [patientsList, setPatientsList] = useState([]);
+  const [bedsList, setBedsList] = useState([]);
   const [isDispatchOpen, setIsDispatchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -47,8 +49,9 @@ export default function NurseStationView({ user, hospitalInfo }) {
   // New vitals modal state
   const [isAddVitalsOpen, setIsAddVitalsOpen] = useState(false);
   const [vitalsForm, setVitalsForm] = useState({
-    patient_name: 'Elena Rodriguez',
-    bed_number: 'Bed 101',
+    patient_id: '',
+    patient_name: '',
+    bed_number: '',
     bp: '120/80',
     pulse: '75',
     temp: '98.6',
@@ -75,18 +78,22 @@ export default function NurseStationView({ user, hospitalInfo }) {
 
   const loadData = async () => {
     try {
-      const [medsRes, vitalsRes, handoversRes, stationRes, nursesRes] = await Promise.all([
+      const [medsRes, vitalsRes, handoversRes, stationRes, nursesRes, patRes, bedsRes] = await Promise.all([
         api.getMedicationSchedules(),
         api.getPatientVitals(),
         api.getShiftHandovers(),
         api.getNurseStationInfo(user?.id ? `user_id=${user.id}` : '').catch(() => null),
-        api.getAdminNurses().catch(() => ({ nurses: [] }))
+        api.getAdminNurses().catch(() => ({ nurses: [] })),
+        api.getPatients().catch(() => ({ patients: [] })),
+        api.getBeds().catch(() => ({ beds: [] }))
       ]);
       setMedications(medsRes.medications || []);
       setVitalsList(vitalsRes.vitals || []);
       setHandovers(handoversRes.handovers || []);
       setStationInfo(stationRes || null);
       setAllNurses(nursesRes.nurses || []);
+      setPatientsList(patRes.patients || []);
+      setBedsList(bedsRes.beds || []);
     } catch (err) {
       console.error('Failed to load nurse station data:', err);
     } finally {
@@ -762,26 +769,67 @@ export default function NurseStationView({ user, hospitalInfo }) {
 
             <form onSubmit={handleRecordVitals} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <label className="form-label">Patient Name *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={vitalsForm.patient_name}
-                  onChange={(e) => setVitalsForm({ ...vitalsForm, patient_name: e.target.value })}
-                  required
-                />
+                <label className="form-label">Patient Name (रुग्ण) *</label>
+                {patientsList.length > 0 ? (
+                  <select
+                    className="form-input"
+                    value={vitalsForm.patient_id || ''}
+                    onChange={(e) => {
+                      const sel = patientsList.find(p => String(p.id) === e.target.value);
+                      setVitalsForm({
+                        ...vitalsForm,
+                        patient_id: e.target.value,
+                        patient_name: sel ? sel.full_name : ''
+                      });
+                    }}
+                    required
+                  >
+                    <option value="">-- रुग्ण निवडा (Select Patient) --</option>
+                    {patientsList.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.full_name} ({p.phone || 'Phone N/A'})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Enter patient name"
+                    value={vitalsForm.patient_name}
+                    onChange={(e) => setVitalsForm({ ...vitalsForm, patient_name: e.target.value })}
+                    required
+                  />
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
                 <div>
-                  <label className="form-label">Bed Number *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={vitalsForm.bed_number}
-                    onChange={(e) => setVitalsForm({ ...vitalsForm, bed_number: e.target.value })}
-                    required
-                  />
+                  <label className="form-label">Bed Number (बेड) *</label>
+                  {bedsList.length > 0 ? (
+                    <select
+                      className="form-input"
+                      value={vitalsForm.bed_number}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, bed_number: e.target.value })}
+                      required
+                    >
+                      <option value="">-- बेड निवडा --</option>
+                      {bedsList.map(b => (
+                        <option key={b.id} value={`${b.bed_number} (${b.ward_type})`}>
+                          {b.bed_number} - {b.ward_type} ({b.status})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="उदा. Bed 101"
+                      value={vitalsForm.bed_number}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, bed_number: e.target.value })}
+                      required
+                    />
+                  )}
                 </div>
                 <div>
                   <label className="form-label">Blood Pressure (BP) *</label>

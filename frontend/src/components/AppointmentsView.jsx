@@ -513,15 +513,19 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                   )}
 
                   {/* Cancel button */}
-                  {appt.status !== 'cancelled' && !isCompleted && (
+                  {appt.status !== 'cancelled' && !isCompleted && !isInCabin && (
                     <button
-                      onClick={() => handleUpdateStatus(appt.id, 'cancelled', 'अपॉइंटमेंट रद्द केली')}
+                      onClick={() => {
+                        if (window.confirm('तुम्हाला ही अपॉइंटमेंट रद्द करायची आहे का? (Are you sure you want to cancel this appointment?)')) {
+                          handleUpdateStatus(appt.id, 'cancelled', isPatient ? 'रुग्णाकडून रद्द करण्यात आले (Cancelled by patient)' : 'अपॉइंटमेंट रद्द केली');
+                        }
+                      }}
                       disabled={actionLoading === appt.id}
                       className="btn btn-outline btn-sm"
-                      style={{ color: '#fb7185' }}
+                      style={{ color: '#fb7185', borderColor: 'rgba(244, 63, 94, 0.35)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       title="Cancel Appointment"
                     >
-                      <XCircle size={14} />
+                      <XCircle size={14} /> <span>रद्द करा</span>
                     </button>
                   )}
                 </div>

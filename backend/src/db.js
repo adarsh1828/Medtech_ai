@@ -124,6 +124,25 @@ async function ensureLatestSchemaColumns() {
   try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN is_on_duty INTEGER DEFAULT 1"); } catch (e) {}
   try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN status TEXT DEFAULT 'approved'"); } catch (e) {}
   try { await run("ALTER TABLE HousekeepingStaff ADD COLUMN approved_at DATETIME"); } catch (e) {}
+
+  // Emergency SOS Incidents Table
+  try {
+    await run(`
+      CREATE TABLE IF NOT EXISTS EmergencyIncidents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        patient_name TEXT,
+        phone TEXT,
+        emergency_type TEXT NOT NULL,
+        priority TEXT DEFAULT 'LEVEL_1_CRITICAL',
+        location TEXT,
+        notes TEXT,
+        status TEXT DEFAULT 'active' CHECK(status IN ('active', 'dispatched', 'resolved')),
+        dispatched_at DATETIME,
+        resolved_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } catch (e) {}
 }
 
 // Initialize schema and seed data

@@ -1,10 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { FlaskConical, Calendar, User, Stethoscope, CheckCircle2, Clock, Activity, FileText } from 'lucide-react';
+import { 
+  FlaskConical, 
+  Calendar, 
+  User, 
+  Stethoscope, 
+  CheckCircle2, 
+  Clock, 
+  Activity, 
+  FileText,
+  Plus,
+  X,
+  RefreshCw,
+  Search,
+  Filter
+} from 'lucide-react';
 import { api } from '../api';
 
 export default function LabReportsView({ user }) {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Add Lab Report Modal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [patients, setPatients] = useState([]);
+  const [labTests, setLabTests] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [newReport, setNewReport] = useState({
+    patient_id: '',
+    test_id: '',
+    test_date: new Date().toISOString().split('T')[0],
+    status: 'completed',
+    result_value: '',
+    reference_range: '',
+    remarks: ''
+  });
+
+  const canCreateReport = user?.role && ['doctor', 'admin', 'nurse', 'staff'].includes(user.role);
 
   useEffect(() => {
     loadReports();
@@ -22,30 +56,180 @@ export default function LabReportsView({ user }) {
     }
   };
 
+  const handleOpenAddModal = async () => {
+    setFormError('');
+    setIsAddModalOpen(true);
+    try {
+      const [patRes, testRes] = await Promise.all([
+        api.getPatients().catch(() => ({ patients: [] })),
+        api.getLabTests().catch(() => ({ tests: [] }))
+      ]);
+      const pList = patRes.patients || [];
+      const tList = testRes.tests || [];
+      setPatients(pList);
+      setLabTests(tList);
+
+      setNewReport({
+        patient_id: pList[0]?.id || '',
+        test_id: tList[0]?.id || '',
+        test_date: new Date().toISOString().split('T')[0],
+        status: 'completed',
+        result_value: '',
+        reference_range: tList[0]?.normal_range || '',
+        remarks: ''
+      });
+    } catch (err) {
+      console.error('Error fetching patients or tests:', err);
+    }
+  };
+
+  const handleTestChange = (e) => {
+    const testId = e.target.value;
+    const selected = labTests.find(t => String(t.id) === String(testId));
+    setNewReport(prev => ({
+      ...prev,
+      test_id: testId,
+      reference_range: selected?.normal_range || ''
+    }));
+  };
+
+  const handleSaveReport = async (e) => {
+    e.preventDefault();
+    if (!newReport.patient_id || !newReport.test_id || !newReport.result_value.trim()) {
+      setFormError('कृपया रुग्ण, टेस्ट आणि चाचणीचा निकाल (Result) प्रविष्ट करा.');
+      return;
+    }
+
+    setSubmitting(true);
+    setFormError('');
+    try {
+      await api.createLabReport(newReport);
+      await loadReports();
+      setIsAddModalOpen(false);
+    } catch (err) {
+      setFormError(err.message || 'लॅब रिपोर्ट सेव्ह करताना त्रुटी आली.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const categories = ['All', ...new Set(reports.map(r => r.category).filter(Boolean))];
+
+  const filteredReports = reports.filter(r => {
+    const matchesCategory = filterCategory === 'All' || r.category === filterCategory;
+    const matchesSearch = !searchTerm || 
+      r.test_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.test_code?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div>
-        <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-          Diagnostic Laboratory Reports
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          Pathology, biochemistry, and diagnostic imaging results
-        </p>
+      {/* Top Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
+        <div>
+          <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
+            Diagnostic Laboratory Reports
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+            Pathology, biochemistry, hematology, and diagnostic imaging results
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {canCreateReport && (
+            <button
+              onClick={handleOpenAddModal}
+              className="btn btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
+            >
+              <Plus size={16} /> नवीन लॅब रिपोर्ट नोंदवा (Add Lab Report)
+            </button>
+          )}
+
+          <button
+            onClick={loadReports}
+            className="btn btn-outline"
+            style={{ padding: '10px' }}
+            title="रिफ्रेश करा"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
       </div>
 
+      {/* Filter and Search Bar */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
+        background: 'var(--bg-card)',
+        padding: '12px 16px',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-subtle)'
+      }}>
+        {/* Category Pills */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '2px' }}>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFilterCategory(cat)}
+              className={`status-pill ${filterCategory === cat ? 'active' : ''}`}
+              style={{
+                fontSize: '0.8rem',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                background: filterCategory === cat ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
+                color: filterCategory === cat ? '#fff' : 'var(--text-secondary)',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Search Input */}
+        <div style={{ position: 'relative', minWidth: '220px' }}>
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            placeholder="रुग्ण किंवा टेस्ट शोधा..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-input"
+            style={{ paddingLeft: '34px', fontSize: '0.85rem' }}
+          />
+        </div>
+      </div>
+
+      {/* Reports Grid */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-          Loading laboratory records...
+          <RefreshCw size={24} className="animate-spin" style={{ margin: '0 auto 12px' }} color="var(--primary)" />
+          <div>प्रयोगशाळा निकाल लोड होत आहेत... (Loading laboratory records)</div>
         </div>
-      ) : reports.length === 0 ? (
+      ) : filteredReports.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '48px' }}>
           <FlaskConical size={36} color="var(--text-muted)" style={{ margin: '0 auto 12px auto' }} />
-          <h3>No Diagnostic Reports Found</h3>
+          <h3>कोणतेही लॅब रिपोर्ट्स आढळले नाहीत</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+            निवडलेल्या फिल्टरनुसार कोणतेही अहवाल उपलब्ध नाहीत.
+          </p>
         </div>
       ) : (
         <div className="lab-reports-grid">
-          {reports.map((rpt) => {
+          {filteredReports.map((rpt) => {
             const isCompleted = rpt.status === 'completed';
 
             return (
@@ -114,8 +298,8 @@ export default function LabReportsView({ user }) {
                   <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     Observed Diagnostic Value
                   </div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-                    {rpt.result_value}
+                  <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+                    {rpt.result_value} {rpt.units ? <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>{rpt.units}</span> : null}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                     Reference Range: <span style={{ color: 'var(--text-secondary)' }}>{rpt.reference_range}</span>
@@ -131,6 +315,166 @@ export default function LabReportsView({ user }) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Add New Lab Report Modal */}
+      {isAddModalOpen && (
+        <div className="modal-backdrop" onClick={() => setIsAddModalOpen(false)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '520px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FlaskConical size={20} color="var(--primary)" />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: '700', margin: 0 }}>
+                  नवीन लॅब चाचणी निकाल नोंदवा (Add Lab Result)
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {formError && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                color: '#f87171',
+                fontSize: '0.85rem',
+                marginBottom: '16px'
+              }}>
+                {formError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveReport} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Patient Selection */}
+              <div>
+                <label className="form-label">रुग्ण निवडा (Select Patient) *</label>
+                <select
+                  className="form-input"
+                  value={newReport.patient_id}
+                  onChange={(e) => setNewReport({ ...newReport, patient_id: e.target.value })}
+                  required
+                >
+                  <option value="">-- रुग्ण निवडा --</option>
+                  {patients.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.full_name} ({p.gender || 'रुग्ण'}, {p.phone || 'Phone N/A'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Lab Test Selection */}
+              <div>
+                <label className="form-label">लॅब टेस्ट निवडा (Select Test) *</label>
+                <select
+                  className="form-input"
+                  value={newReport.test_id}
+                  onChange={handleTestChange}
+                  required
+                >
+                  <option value="">-- चाचणी निवडा --</option>
+                  {labTests.map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.test_name} ({t.category} • {t.test_code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Observed Value & Date */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label className="form-label">चाचणी निकाल (Result Value) *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="उदा. 14.5 g/dL किंवा 105 mg/dL"
+                    value={newReport.result_value}
+                    onChange={(e) => setNewReport({ ...newReport, result_value: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="form-label">चाचणी तारीख (Date) *</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={newReport.test_date}
+                    onChange={(e) => setNewReport({ ...newReport, test_date: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Reference Range & Status */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label className="form-label">Reference Range</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="उदा. 12.0 - 16.0 g/dL"
+                    value={newReport.reference_range}
+                    onChange={(e) => setNewReport({ ...newReport, reference_range: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="form-label">स्थिती (Status) *</label>
+                  <select
+                    className="form-input"
+                    value={newReport.status}
+                    onChange={(e) => setNewReport({ ...newReport, status: e.target.value })}
+                  >
+                    <option value="completed">Completed (पूर्ण)</option>
+                    <option value="pending">Pending (प्रलंबित)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Clinical Remarks */}
+              <div>
+                <label className="form-label">Clinical Remarks / शेरा</label>
+                <textarea
+                  className="form-input"
+                  rows={2}
+                  placeholder="उदा. Within normal physiological limits. No acute abnormality."
+                  value={newReport.remarks}
+                  onChange={(e) => setNewReport({ ...newReport, remarks: e.target.value })}
+                />
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="btn btn-outline"
+                  style={{ flex: 1 }}
+                >
+                  रद्द करा (Cancel)
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn btn-primary"
+                  style={{ flex: 2, fontWeight: '700' }}
+                >
+                  {submitting ? 'जतन करत आहे...' : 'निकाल जतन करा (Save Result)'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

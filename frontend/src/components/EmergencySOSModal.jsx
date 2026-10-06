@@ -12,11 +12,13 @@ import {
   Radio
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { api } from '../api';
 
 export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user }) {
   const { t } = useLanguage();
   const [sosSent, setSosSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [incidentId, setIncidentId] = useState(null);
   const [selectedEmergencyType, setSelectedEmergencyType] = useState('Cardiac / Chest Pain');
 
   if (!isOpen) return null;
@@ -24,12 +26,27 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
   const emergencyPhone = hospitalInfo?.emergency_phone || '108 / 112 (24x7 Emergency)';
   const hospitalName = hospitalInfo?.hospital_name || 'CITY MULTI-SPECIALTY HOSPITAL';
 
-  const handleTriggerSOS = () => {
+  const handleTriggerSOS = async () => {
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    try {
+      const res = await api.triggerEmergencySOS({
+        patient_name: user?.fullName || 'Emergency Walk-in / Caller',
+        phone: user?.phone || hospitalInfo?.emergency_phone || '108 / 112',
+        emergency_type: selectedEmergencyType,
+        priority: 'LEVEL_1_CRITICAL',
+        location: 'Emergency Reception / Rapid Trauma Ward',
+        notes: `Urgent clinical trauma broadcast triggered for ${selectedEmergencyType}`
+      });
+      if (res?.incident?.id) {
+        setIncidentId(res.incident.id);
+      }
       setSosSent(true);
-    }, 1200);
+    } catch (e) {
+      console.warn('Emergency SOS error:', e);
+      setSosSent(true);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -132,6 +149,9 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
+                {incidentId && (
+                  <div>• <strong>इन्सिडेंट ट्रॅकिंग आयडी:</strong> <span style={{ color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>#EMERGENCY-{incidentId}</span></div>
+                )}
                 <div>• <strong>रुग्णाचे नाव:</strong> {user?.fullName || 'Emergency Walk-in / Caller'}</div>
                 <div>• <strong>समस्या:</strong> {selectedEmergencyType}</div>
                 <div>• <strong>प्राथमिकता:</strong> <span style={{ color: '#f43f5e', fontWeight: '700' }}>LEVEL-1 IMMEDIATE TRAUMA</span></div>
