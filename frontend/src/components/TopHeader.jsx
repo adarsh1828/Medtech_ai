@@ -203,11 +203,11 @@ export default function TopHeader({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: isLangDropdownOpen ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-              border: `1px solid ${isLangDropdownOpen ? 'rgba(6, 182, 212, 0.5)' : 'var(--border-subtle)'}`,
+              background: isLangDropdownOpen ? 'var(--accent-cyan-bg)' : 'rgba(255, 255, 255, 0.04)',
+              border: `1px solid ${isLangDropdownOpen ? 'var(--border-active)' : 'var(--border-subtle)'}`,
               padding: '6px 9px',
               borderRadius: '8px',
-              color: isLangDropdownOpen ? '#38bdf8' : 'var(--text-primary)',
+              color: isLangDropdownOpen ? 'var(--accent-cyan)' : 'var(--text-primary)',
               fontSize: '0.8rem',
               fontWeight: '500',
               cursor: 'pointer',
@@ -227,10 +227,10 @@ export default function TopHeader({
               top: 'calc(100% + 8px)',
               right: 0,
               width: '165px',
-              backgroundColor: '#0d1524',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '10px',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)',
+              boxShadow: 'var(--shadow-md)',
               padding: '6px',
               zIndex: 1000,
               display: 'flex',
@@ -265,19 +265,19 @@ export default function TopHeader({
                       justifyContent: 'space-between',
                       padding: '8px 10px',
                       borderRadius: '6px',
-                      backgroundColor: isSelected ? 'rgba(6, 182, 212, 0.12)' : 'transparent',
-                      color: isSelected ? '#38bdf8' : 'var(--text-secondary)',
+                      backgroundColor: isSelected ? 'var(--accent-cyan-bg)' : 'transparent',
+                      color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)',
                       border: 'none',
                       cursor: 'pointer',
                       fontSize: '0.82rem',
-                      fontWeight: isSelected ? '600' : '400',
+                      fontWeight: isSelected ? '700' : '500',
                       textAlign: 'left',
                       transition: 'all 0.12s ease',
                       width: '100%'
                     }}
                     onMouseEnter={(e) => {
                       if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
                         e.currentTarget.style.color = 'var(--text-primary)';
                       }
                     }}
@@ -292,7 +292,7 @@ export default function TopHeader({
                       <span style={{ fontSize: '0.95rem' }}>{lang.flag}</span>
                       <span>{lang.nativeLabel}</span>
                     </div>
-                    {isSelected && <Check size={14} color="#38bdf8" />}
+                    {isSelected && <Check size={14} color="var(--accent-cyan)" />}
                   </button>
                 );
               })}

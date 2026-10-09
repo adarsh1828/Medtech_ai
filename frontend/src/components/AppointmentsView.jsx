@@ -259,9 +259,9 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     ? '1.5px solid rgba(6, 182, 212, 0.5)' 
                     : '1px solid var(--border-subtle)',
                   background: isCompleted 
-                    ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.04) 0%, rgba(15, 23, 42, 0.8) 100%)' 
+                    ? 'var(--card-highlight-completed)' 
                     : isInCabin 
-                    ? 'linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, rgba(15, 23, 42, 0.8) 100%)' 
+                    ? 'var(--card-highlight-cabin)' 
                     : undefined
                 }}
               >
@@ -274,9 +274,9 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                       fontWeight: '800',
                       padding: '3px 10px',
                       borderRadius: '6px',
-                      background: isInCabin ? 'rgba(6, 182, 212, 0.25)' : 'rgba(6, 182, 212, 0.12)',
+                      background: isInCabin ? 'var(--accent-cyan-bg)' : 'var(--accent-cyan-bg)',
                       border: '1px solid rgba(6, 182, 212, 0.4)',
-                      color: '#38bdf8'
+                      color: 'var(--accent-cyan)'
                     }}>
                       TOKEN #{appt.token_number}
                     </span>

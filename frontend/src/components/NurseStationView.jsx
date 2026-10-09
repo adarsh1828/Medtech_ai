@@ -305,9 +305,9 @@ export default function NurseStationView({ user, hospitalInfo }) {
           style={{
             padding: '8px 18px',
             borderRadius: '8px',
-            border: activeSubTab === 'medications' ? '1px solid var(--primary)' : '1px solid transparent',
-            background: activeSubTab === 'medications' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
-            color: activeSubTab === 'medications' ? '#38bdf8' : 'var(--text-secondary)',
+            border: activeSubTab === 'medications' ? '1px solid var(--border-active)' : '1px solid transparent',
+            background: activeSubTab === 'medications' ? 'var(--accent-cyan-bg)' : 'transparent',
+            color: activeSubTab === 'medications' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
             fontWeight: '700',
             fontSize: '0.85rem',
             cursor: 'pointer'
@@ -321,9 +321,9 @@ export default function NurseStationView({ user, hospitalInfo }) {
           style={{
             padding: '8px 18px',
             borderRadius: '8px',
-            border: activeSubTab === 'vitals' ? '1px solid var(--primary)' : '1px solid transparent',
-            background: activeSubTab === 'vitals' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
-            color: activeSubTab === 'vitals' ? '#38bdf8' : 'var(--text-secondary)',
+            border: activeSubTab === 'vitals' ? '1px solid var(--border-active)' : '1px solid transparent',
+            background: activeSubTab === 'vitals' ? 'var(--accent-cyan-bg)' : 'transparent',
+            color: activeSubTab === 'vitals' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
             fontWeight: '700',
             fontSize: '0.85rem',
             cursor: 'pointer'
@@ -337,9 +337,9 @@ export default function NurseStationView({ user, hospitalInfo }) {
           style={{
             padding: '8px 18px',
             borderRadius: '8px',
-            border: activeSubTab === 'handover' ? '1px solid var(--primary)' : '1px solid transparent',
-            background: activeSubTab === 'handover' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
-            color: activeSubTab === 'handover' ? '#38bdf8' : 'var(--text-secondary)',
+            border: activeSubTab === 'handover' ? '1px solid var(--border-active)' : '1px solid transparent',
+            background: activeSubTab === 'handover' ? 'var(--accent-cyan-bg)' : 'transparent',
+            color: activeSubTab === 'handover' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
             fontWeight: '700',
             fontSize: '0.85rem',
             cursor: 'pointer'
@@ -353,9 +353,9 @@ export default function NurseStationView({ user, hospitalInfo }) {
           style={{
             padding: '8px 18px',
             borderRadius: '8px',
-            border: activeSubTab === 'duty-roster' ? '1px solid var(--primary)' : '1px solid transparent',
-            background: activeSubTab === 'duty-roster' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
-            color: activeSubTab === 'duty-roster' ? '#38bdf8' : 'var(--text-secondary)',
+            border: activeSubTab === 'duty-roster' ? '1px solid var(--border-active)' : '1px solid transparent',
+            background: activeSubTab === 'duty-roster' ? 'var(--accent-cyan-bg)' : 'transparent',
+            color: activeSubTab === 'duty-roster' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
             fontWeight: '700',
             fontSize: '0.85rem',
             cursor: 'pointer'

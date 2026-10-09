@@ -391,7 +391,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
               className="glass-card"
               style={{
                 border: isOverdue ? '1px solid rgba(244, 63, 94, 0.4)' : isDue ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border-subtle)',
-                background: isOverdue ? 'linear-gradient(135deg, rgba(244, 63, 94, 0.06) 0%, rgba(15, 23, 42, 0.6) 100%)' : 'var(--bg-card)',
+                background: isOverdue ? 'var(--card-gradient-rose)' : 'var(--bg-card)',
                 padding: '18px',
                 display: 'flex',
                 flexDirection: 'column',

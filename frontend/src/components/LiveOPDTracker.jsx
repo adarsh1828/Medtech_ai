@@ -110,7 +110,7 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
   if (loading && !trackerData) {
     return (
       <div style={{
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
+        background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
         borderRadius: '16px',
         padding: '24px',
@@ -276,11 +276,11 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
               value={selectedDoctorId || doctor?.id || ''}
               onChange={(e) => setSelectedDoctorId(e.target.value)}
               style={{
-                background: 'rgba(15, 23, 42, 0.8)',
+                background: 'var(--bg-card)',
                 border: '1px solid rgba(6, 182, 212, 0.4)',
                 borderRadius: '8px',
                 padding: '6px 12px',
-                color: '#38bdf8',
+                color: 'var(--accent-cyan)',
                 fontSize: '0.82rem',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -288,7 +288,7 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
               }}
             >
               {activeDoctors.map((doc) => (
-                <option key={doc.id} value={doc.id} style={{ background: '#0b1329', color: '#fff' }}>
+                <option key={doc.id} value={doc.id} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                   {doc.full_name} ({doc.specialization})
                 </option>
               ))}
@@ -585,17 +585,17 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
                 background: station.isCurrent
                   ? 'radial-gradient(circle, #06b6d4 0%, #0891b2 100%)'
                   : station.isCompleted
-                  ? 'rgba(16, 185, 129, 0.25)'
-                  : 'rgba(15, 23, 42, 0.9)',
+                  ? 'var(--accent-emerald-bg)'
+                  : 'var(--bg-card-subtle)',
                 border: station.isCurrent
-                  ? '3px solid #38bdf8'
+                  ? '3px solid var(--accent-cyan)'
                   : station.isCompleted
-                  ? '2px solid #10b981'
-                  : '2px solid rgba(255, 255, 255, 0.2)',
+                  ? '2px solid var(--accent-emerald)'
+                  : '2px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: station.isCurrent ? '#fff' : station.isCompleted ? '#34d399' : 'rgba(255, 255, 255, 0.4)',
+                color: station.isCurrent ? '#fff' : station.isCompleted ? 'var(--accent-emerald)' : 'var(--text-muted)',
                 fontWeight: '800',
                 fontSize: '0.9rem',
                 boxShadow: station.isCurrent ? '0 0 20px rgba(6, 182, 212, 0.8)' : 'none',

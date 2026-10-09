@@ -126,7 +126,7 @@ export default function LiveQueueView({ user, hospitalInfo }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '14px 20px',
-        backgroundColor: 'rgba(15, 23, 42, 0.7)',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: 'var(--radius-md)',
         border: '1px solid var(--border-subtle)',
         flexWrap: 'wrap',

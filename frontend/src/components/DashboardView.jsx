@@ -216,7 +216,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             gap: '8px',
             cursor: 'pointer',
             border: '1px solid rgba(6, 182, 212, 0.25)',
-            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            background: 'var(--card-gradient-cyan)',
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
@@ -224,14 +224,14 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
               एकूण नोंदणीकृत रुग्ण (Total Patients)
             </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
               <Users size={18} />
             </div>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
             {overview?.totalPatients ?? '--'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}>
             <ArrowUpRight size={14} /> रिअल-टाइम ईएचआर रेकॉर्ड्स
           </div>
         </div>
@@ -247,7 +247,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             gap: '8px',
             cursor: 'pointer',
             border: '1px solid rgba(16, 185, 129, 0.25)',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            background: 'var(--card-gradient-emerald)',
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
@@ -255,14 +255,14 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
               आजच्या ओपीडी भेटी (Today's Visits)
             </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
               <Calendar size={18} />
             </div>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
             {overview?.appointmentsToday ?? '--'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
             कन्सल्टेशन आणि टोकन ट्रॅकिंग
           </div>
         </div>
@@ -278,7 +278,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             gap: '8px',
             cursor: 'pointer',
             border: '1px solid rgba(245, 158, 11, 0.25)',
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            background: 'var(--card-gradient-amber)',
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
@@ -286,14 +286,14 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
               ड्युटीवर डॉक्टर्स (On-Duty Doctors)
             </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
               <Stethoscope size={18} />
             </div>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
             {overview?.doctorsOnDuty ?? 0} <span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-secondary)' }}>/ {overview?.totalDoctors ?? 0}</span>
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#fbbf24' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: '600' }}>
             बोर्ड सर्टिफाइड तज्ज्ञ डॉक्टर
           </div>
         </div>
@@ -309,7 +309,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             gap: '8px',
             cursor: 'pointer',
             border: '1px solid rgba(139, 92, 246, 0.25)',
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            background: 'var(--card-gradient-violet)',
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
@@ -317,14 +317,14 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
               बेड ऑक्युपन्सी (Bed Occupancy)
             </span>
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.15)', color: '#c084fc' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
               <BedDouble size={18} />
             </div>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
             {overview?.occupancyRate ?? 0}%
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
             {overview?.occupiedBeds ?? 0} ॲडमिट • {overview?.availableBeds ?? 0} रिकामे बेड्स
           </div>
         </div>
@@ -343,10 +343,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             textAlign: 'left',
             cursor: 'pointer',
             border: '1px solid rgba(6, 182, 212, 0.25)',
-            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+            background: 'var(--card-gradient-cyan)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.2)', color: '#38bdf8' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
             <Stethoscope size={18} />
           </div>
           <div>
@@ -366,10 +366,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             textAlign: 'left',
             cursor: 'pointer',
             border: '1px solid rgba(245, 158, 11, 0.25)',
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+            background: 'var(--card-gradient-amber)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
             <BedDouble size={18} />
           </div>
           <div>
@@ -389,10 +389,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             textAlign: 'left',
             cursor: 'pointer',
             border: '1px solid rgba(16, 185, 129, 0.25)',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+            background: 'var(--card-gradient-emerald)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
             <Tv size={18} />
           </div>
           <div>
@@ -412,10 +412,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             textAlign: 'left',
             cursor: 'pointer',
             border: '1px solid rgba(139, 92, 246, 0.25)',
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%)'
+            background: 'var(--card-gradient-violet)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
             <QrCode size={18} />
           </div>
           <div>
@@ -436,14 +436,14 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
               textAlign: 'left',
               cursor: 'pointer',
               border: '1px solid rgba(244, 63, 94, 0.35)',
-              background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%)'
+              background: 'var(--card-gradient-rose)'
             }}
           >
-            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(244, 63, 94, 0.25)', color: '#fb7185' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)' }}>
               <Flame size={18} />
             </div>
             <div>
-              <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#fb7185' }}>SOS 108 Center</div>
+              <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--accent-rose)' }}>SOS 108 Center</div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Code Red Dispatch</div>
             </div>
           </button>

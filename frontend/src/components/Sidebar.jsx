@@ -406,11 +406,11 @@ export default function Sidebar({
                   padding: isCollapsed ? '12px 0' : '10px 14px',
                   borderRadius: '8px',
                   fontSize: '0.875rem',
-                  fontWeight: isActive ? '600' : '500',
-                  color: isActive ? '#38bdf8' : 'var(--text-secondary)',
-                  backgroundColor: isActive ? 'rgba(6, 182, 212, 0.08)' : 'transparent',
+                  fontWeight: isActive ? '700' : '500',
+                  color: isActive ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                  backgroundColor: isActive ? 'var(--accent-cyan-bg)' : 'transparent',
                   border: '1px solid',
-                  borderColor: isActive ? 'rgba(6, 182, 212, 0.25)' : 'transparent',
+                  borderColor: isActive ? 'var(--border-active)' : 'transparent',
                   cursor: 'pointer',
                   textAlign: 'left',
                   width: '100%',
@@ -418,7 +418,7 @@ export default function Sidebar({
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
                     e.currentTarget.style.color = 'var(--text-primary)';
                   }
                 }}
@@ -429,7 +429,7 @@ export default function Sidebar({
                   }
                 }}
               >
-                <Icon size={isCollapsed ? 20 : 18} style={{ color: isActive ? '#38bdf8' : 'var(--text-muted)' }} />
+                <Icon size={isCollapsed ? 20 : 18} style={{ color: isActive ? 'var(--accent-cyan)' : 'var(--text-muted)' }} />
                 {!isCollapsed && <span style={{ flex: 1 }}>{item.label}</span>}
                 {!isCollapsed && item.badge && (
                   <span style={{
