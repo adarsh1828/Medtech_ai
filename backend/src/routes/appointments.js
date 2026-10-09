@@ -379,4 +379,38 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
   }
 });
 
+// PATCH update appointment vitals specifically (Doctor Consultation Flow)
+router.patch('/:id/vitals', authenticateToken, async (req, res) => {
+  try {
+    const { vitals_bp, vitals_pulse, vitals_temp, vitals_weight, bp, pulse, temp, weight } = req.body;
+    const appointmentId = req.params.id;
+
+    const appointment = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found.' });
+    }
+
+    const bpVal = vitals_bp || bp || appointment.vitals_bp;
+    const pulseVal = vitals_pulse || pulse || appointment.vitals_pulse;
+    const tempVal = vitals_temp || temp || appointment.vitals_temp;
+    const weightVal = vitals_weight || weight || appointment.vitals_weight;
+
+    await run(
+      `UPDATE Appointments
+       SET vitals_bp = ?,
+           vitals_pulse = ?,
+           vitals_temp = ?,
+           vitals_weight = ?
+       WHERE id = ?`,
+      [bpVal, pulseVal, tempVal, weightVal, appointmentId]
+    );
+
+    const updated = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);
+    res.json({ message: 'Patient vitals saved successfully!', appointment: updated });
+  } catch (err) {
+    console.error('Error updating appointment vitals:', err);
+    res.status(500).json({ error: 'Failed to record vitals for appointment.' });
+  }
+});
+
 export default router;

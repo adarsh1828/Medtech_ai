@@ -49,35 +49,41 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // If admin, we can fetch full admin overview
+      // If admin, fetch full admin overview
       let ov = null;
       if (user?.role === 'admin') {
         ov = await api.getAdminOverview().catch(() => null);
       }
       
-      // Also fetch beds to compute live stats if admin overview not available
+      const adminData = ov?.overview || ov || {};
+      
+      // Also fetch beds, doctors, appointments to compute live stats
       const bedsRes = await api.getBeds().catch(() => ({ beds: [], stats: {} }));
       const docsRes = await api.getDoctors().catch(() => ({ doctors: [] }));
       const apptsRes = await api.getAppointments().catch(() => ({ appointments: [] }));
 
-      const totalBeds = bedsRes.stats?.total || 18;
-      const occupiedBeds = bedsRes.stats?.occupied || 8;
-      const availableBeds = bedsRes.stats?.available || 9;
-      const occupancyRate = bedsRes.stats?.occupancyRate || Math.round((occupiedBeds / totalBeds) * 100);
+      const totalBeds = adminData.totalBeds ?? bedsRes.stats?.total ?? 18;
+      const occupiedBeds = adminData.occupiedBeds ?? bedsRes.stats?.occupied ?? 8;
+      const availableBeds = adminData.availableBeds ?? bedsRes.stats?.available ?? 9;
+      const occupancyRate = adminData.occupancyRate ?? (totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 44);
 
-      const docsOnDuty = docsRes.doctors?.filter(d => d.is_on_duty).length || 3;
-      const totalDocs = docsRes.doctors?.length || 4;
+      const docsOnDuty = adminData.doctorsOnDuty ?? docsRes.doctors?.filter(d => d.is_on_duty).length ?? 3;
+      const totalDocs = adminData.totalDoctors ?? docsRes.doctors?.length ?? 4;
+      const totalRegisteredPatients = adminData.totalRegisteredPatients ?? 14;
+      const appointmentsToday = adminData.patientsToday ?? apptsRes.appointments?.length ?? 3;
+      const pendingDoctorsCount = adminData.pendingDoctorsCount ?? 0;
 
       setOverview({
-        totalPatients: ov?.kpis?.totalPatients || 14,
-        appointmentsToday: ov?.kpis?.appointmentsToday || apptsRes.appointments?.length || 3,
+        totalPatients: totalRegisteredPatients,
+        appointmentsToday: appointmentsToday,
         doctorsOnDuty: docsOnDuty,
         totalDoctors: totalDocs,
+        pendingDoctorsCount: pendingDoctorsCount,
         totalBeds,
         occupiedBeds,
         availableBeds,
         occupancyRate,
-        departments: ov?.departmentDistribution || [
+        departments: adminData.departmentStats || [
           { name: 'Cardiology', doctors_count: 1, appointments_today: 2, beds_count: 5, beds_occupied: 2 },
           { name: 'Neurology', doctors_count: 1, appointments_today: 1, beds_count: 4, beds_occupied: 2 },
           { name: 'Orthopedics', doctors_count: 1, appointments_today: 0, beds_count: 3, beds_occupied: 1 },
@@ -191,6 +197,137 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           filter: 'blur(35px)',
           zIndex: 1
         }} />
+      </div>
+
+      {/* Primary KPI Metrics Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '16px'
+      }}>
+        {/* Metric 1: Total Patients */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('appointments')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(6, 182, 212, 0.25)',
+            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              एकूण नोंदणीकृत रुग्ण (Total Patients)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8' }}>
+              <Users size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.totalPatients ?? '--'}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <ArrowUpRight size={14} /> रिअल-टाइम ईएचआर रेकॉर्ड्स
+          </div>
+        </div>
+
+        {/* Metric 2: Today's Appointments */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('appointments')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              आजच्या ओपीडी भेटी (Today's Visits)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+              <Calendar size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.appointmentsToday ?? '--'}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            कन्सल्टेशन आणि टोकन ट्रॅकिंग
+          </div>
+        </div>
+
+        {/* Metric 3: Clinicians On Duty */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('doctors')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              ड्युटीवर डॉक्टर्स (On-Duty Doctors)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+              <Stethoscope size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.doctorsOnDuty ?? 0} <span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-secondary)' }}>/ {overview?.totalDoctors ?? 0}</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#fbbf24' }}>
+            बोर्ड सर्टिफाइड तज्ज्ञ डॉक्टर
+          </div>
+        </div>
+
+        {/* Metric 4: Bed Occupancy */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('beds')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              बेड ऑक्युपन्सी (Bed Occupancy)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.15)', color: '#c084fc' }}>
+              <BedDouble size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.occupancyRate ?? 0}%
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            {overview?.occupiedBeds ?? 0} ॲडमिट • {overview?.availableBeds ?? 0} रिकामे बेड्स
+          </div>
+        </div>
       </div>
 
       {/* Quick Action Executive Command Dock */}

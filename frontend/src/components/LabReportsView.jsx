@@ -12,7 +12,13 @@ import {
   X,
   RefreshCw,
   Search,
-  Filter
+  Filter,
+  Sparkles,
+  Share2,
+  AlertTriangle,
+  ShieldCheck,
+  HeartPulse,
+  ArrowRight
 } from 'lucide-react';
 import { api } from '../api';
 
@@ -21,6 +27,10 @@ export default function LabReportsView({ user }) {
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // AI Report Explainer State
+  const [isExplainerOpen, setIsExplainerOpen] = useState(false);
+  const [explainedData, setExplainedData] = useState(null);
 
   // Add Lab Report Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -111,6 +121,116 @@ export default function LabReportsView({ user }) {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleExplainReport = (rpt) => {
+    const testName = rpt.test_name || 'Diagnostic Test';
+    const valStr = String(rpt.result_value || '');
+    const numVal = parseFloat(valStr.replace(/[^0-9.]/g, '')) || 0;
+    const refStr = rpt.reference_range || '';
+
+    let status = 'normal';
+    let statusLabel = 'सामान्य (Normal / Within Range)';
+    let statusColor = '#10b981';
+    let gaugePercent = 50;
+    let simpleMeaning = '';
+    let dietAdvice = [];
+    let redFlags = [];
+
+    const lowerTest = testName.toLowerCase();
+
+    if (lowerTest.includes('glucose') || lowerTest.includes('sugar') || lowerTest.includes('hba1c')) {
+      if (numVal > 140 || (lowerTest.includes('fasting') && numVal > 100)) {
+        status = 'elevated';
+        statusLabel = 'वाढलेले (Elevated / High Blood Sugar)';
+        statusColor = '#f43f5e';
+        gaugePercent = 85;
+        simpleMeaning = 'तुमच्या रक्तातील साखरेची पातळी सामान्य मर्यादेपेक्षा जास्त आहे. हे इन्सुलिनची कमतरता किंवा प्री-डायबेटिस/मधुमेहाचे लक्षण असू शकते.';
+        dietAdvice = [
+          'साखर, गूळ, मिठाई, कोल्ड्रिंक्स आणि पांढरा भात मर्यादित करा.',
+          'आहारात मेथी, कारले, जांभूळ बी पावडर आणि हिरव्या पालेभाज्यांचा समावेश करा.',
+          'दररोज किमान ३० ते ४५ मिनिटे वेगाने चालण्याचा व्यायाम करा.'
+        ];
+        redFlags = ['अति तहान लागणे', 'वारंवार लघवी होणे', 'अचानक वजन कमी होणे किंवा थकवा'];
+      } else {
+        status = 'normal';
+        simpleMeaning = 'तुमच्या रक्तातील साखरेची पातळी अगदी व्यवस्थित आणि नियंत्रणात आहे.';
+        dietAdvice = ['सध्याचा संतुलित आहार आणि नियमित व्यायाम सुरू ठेवा.'];
+        redFlags = ['वार्षिक नियमित तपासणी करा.'];
+      }
+    } else if (lowerTest.includes('hemoglobin') || lowerTest.includes('cbc') || lowerTest.includes('blood count')) {
+      if (numVal > 0 && numVal < 11) {
+        status = 'low';
+        statusLabel = 'कमी (Low Hemoglobin / Anemia)';
+        statusColor = '#f59e0b';
+        gaugePercent = 30;
+        simpleMeaning = 'शरीरातील रक्ताचे प्रमाण (Hb) सामान्यपेक्षा कमी आहे, ज्यामुळे ॲनिमिया (रक्तक्षय) होऊ शकतो आणि थकवा जाणवू शकतो.';
+        dietAdvice = [
+          'आहारात लोहयुक्त (Iron-rich) पदार्थ वाढवा: पालक, बीट, खजूर, डाळिंब आणि गूळ-शेंगदाणे खा.',
+          'व्हिटॅमिन सी साठी लिंबू आणि संत्री घ्या, ज्यामुळे लोह लवकर शोषले जाते.'
+        ];
+        redFlags = ['सतत चक्कर येणे', 'श्वास घेण्यास त्रास होणे', 'नखे आणि डोळे पांढरे दिसणे'];
+      } else {
+        status = 'normal';
+        simpleMeaning = 'तुमचे हिमोग्लोबिन आणि रक्तातील पेशी निरोगी मर्यादेत आहेत.';
+        dietAdvice = ['पौष्टिक आणि संतुलित आहाराचे सेवन सुरू ठेवा.'];
+        redFlags = ['काहीही काळजी करण्याचे कारण नाही.'];
+      }
+    } else if (lowerTest.includes('creatinine') || lowerTest.includes('kidney') || lowerTest.includes('renal')) {
+      if (numVal > 1.3) {
+        status = 'elevated';
+        statusLabel = 'किंचित जास्त (Elevated / Kidney Filtration Alert)';
+        statusColor = '#f43f5e';
+        gaugePercent = 80;
+        simpleMeaning = 'किडनीचे कार्य (फिल्ट्रेशन) दर्शवणारा सिरम क्रिएटिनिन किंचित वाढलेला आहे. शरीरातील पाण्याची कमतरता किंवा किडनीवरील ताण यामुळे असे होऊ शकते.';
+        dietAdvice = [
+          'डॉक्टरांच्या सल्ल्यानुसार पुरेसे पाणी (२ ते २.५ लिटर) प्या.',
+          'अति मीठ आणि पेनकिलर (Painkiller) औषधांचे सेवन त्वरित टाळा.',
+          'प्रथिनांचे (Protein) प्रमाण डॉक्टरांच्या सल्ल्याने नियंत्रित ठेवा.'
+        ];
+        redFlags = ['पायांवर किंवा चेहऱ्यावर सूज येणे', 'लघवीचे प्रमाण अचानक कमी होणे'];
+      } else {
+        status = 'normal';
+        simpleMeaning = 'किडनीचे फिल्ट्रेशन कार्य १००% सुरळीत चालू आहे.';
+        dietAdvice = ['रोज भरपूर पाणी पिण्याची सवय ठेवा.'];
+        redFlags = ['किडनीचे आरोग्य उत्तम आहे.'];
+      }
+    } else if (lowerTest.includes('lipid') || lowerTest.includes('cholesterol') || lowerTest.includes('triglyceride')) {
+      if (numVal > 200) {
+        status = 'elevated';
+        statusLabel = 'वाढलेले (High Cholesterol Alert)';
+        statusColor = '#f43f5e';
+        gaugePercent = 85;
+        simpleMeaning = 'रक्तातील चरबीचे (कोलेस्ट्रॉल) प्रमाण वाढलेले आहे. दीर्घकाळ दुर्लक्ष केल्यास रक्तवाहिन्यांवर ताण येऊन हृदयाचे आरोग्य प्रभावित होऊ शकते.';
+        dietAdvice = [
+          'तळलेले, तेलकट, बेकरी आणि जंक फूड पूर्णपणे टाळा.',
+          'आहारात लसूण, अक्रोड, बदाम आणि ओट्सचा समावेश करा.',
+          'वजन नियंत्रणात ठेवा आणि रोज एरोबिक व्यायाम करा.'
+        ];
+        redFlags = ['छातीत जडपणा किंवा चालताना दम लागणे', 'अचानक घाम येणे'];
+      } else {
+        status = 'normal';
+        simpleMeaning = 'कोलेस्ट्रॉल आणि ट्रायग्लिसराइड्स सुरक्षित मर्यादेत आहेत.';
+        dietAdvice = ['कमी तेलाचा सकस आहार चालू ठेवा.'];
+        redFlags = ['हृदयाचे आरोग्य सामान्य आहे.'];
+      }
+    } else {
+      simpleMeaning = `अहवालातील मूल्य ${rpt.result_value} ${rpt.units || ''} हे संदर्भ मर्यादा (${refStr || 'मानक'}) नुसार नोंदवले गेले आहे.`;
+      dietAdvice = ['सकस, ताजे आणि घरगुती अन्न सेवन करा.', 'पुरेशी झोप आणि ताणतणावमुक्त जीवनशैली ठेवा.'];
+      redFlags = ['कोणतीही नवीन लक्षणे आढळल्यास संबंधित डॉक्टरांशी संपर्क साधा.'];
+    }
+
+    setExplainedData({
+      report: rpt,
+      status,
+      statusLabel,
+      statusColor,
+      gaugePercent,
+      simpleMeaning,
+      dietAdvice,
+      redFlags
+    });
+    setIsExplainerOpen(true);
   };
 
   const categories = ['All', ...new Set(reports.map(r => r.category).filter(Boolean))];
@@ -312,6 +432,29 @@ export default function LabReportsView({ user }) {
                     <strong>Clinical Remarks: </strong> {rpt.remarks}
                   </div>
                 )}
+
+                {/* 1-Click AI Report Explainer Button */}
+                <button
+                  type="button"
+                  onClick={() => handleExplainReport(rpt)}
+                  className="btn btn-outline btn-sm"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    borderColor: 'rgba(168, 85, 247, 0.4)',
+                    color: '#c084fc',
+                    background: 'rgba(168, 85, 247, 0.08)',
+                    fontWeight: '700',
+                    marginTop: '4px',
+                    padding: '8px 12px',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <Sparkles size={15} color="#c084fc" />
+                  <span>🤖 AI द्वारे अहवाल समजावून घ्या (AI Explainer)</span>
+                </button>
               </div>
             );
           })}

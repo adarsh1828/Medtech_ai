@@ -68,6 +68,16 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
   // Filter doctors based on selected department
   const filteredDoctors = doctors.filter(doc => !departmentId || doc.department_id === Number(departmentId));
 
+  // Auto-select first matching doctor if doctorId is empty or not in filtered list
+  useEffect(() => {
+    if (filteredDoctors.length > 0) {
+      const isCurrentDocValid = filteredDoctors.some(d => String(d.id) === String(doctorId));
+      if (!isCurrentDocValid) {
+        setDoctorId(filteredDoctors[0].id);
+      }
+    }
+  }, [departmentId, doctors]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!doctorId) {

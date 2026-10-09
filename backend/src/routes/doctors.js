@@ -90,4 +90,39 @@ router.patch('/:id/toggle-duty', authenticateToken, async (req, res) => {
   }
 });
 
+// Update Duty Status directly (Frontend api.updateDoctorDuty)
+router.patch('/:id/duty', authenticateToken, async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    const doctor = await getOne('SELECT * FROM Doctors WHERE id = ?', [doctorId]);
+
+    if (!doctor) {
+      return res.status(404).json({ error: 'Doctor record not found.' });
+    }
+
+    if (doctor.status && doctor.status !== 'approved') {
+      return res.status(403).json({ error: 'Unapproved doctors cannot change duty status.' });
+    }
+
+    // Check authorization: must be the doctor themself or an admin
+    if (req.user.role !== 'admin' && req.user.doctorId != doctorId) {
+      return res.status(403).json({ error: 'You are only authorized to change your own duty status.' });
+    }
+
+    const newDuty = req.body.is_on_duty !== undefined 
+      ? (req.body.is_on_duty ? 1 : 0) 
+      : (doctor.is_on_duty === 1 ? 0 : 1);
+
+    await run('UPDATE Doctors SET is_on_duty = ? WHERE id = ?', [newDuty, doctorId]);
+
+    res.json({
+      message: `Doctor duty status changed to ${newDuty === 1 ? 'On Duty' : 'Off Duty'}`,
+      is_on_duty: newDuty
+    });
+  } catch (err) {
+    console.error('Update doctor duty error:', err);
+    res.status(500).json({ error: 'Could not update duty status.' });
+  }
+});
+
 export default router;

@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import os from 'os';
+import { seedRichPrototypeData } from './seedDemoData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -165,6 +166,7 @@ export async function initializeDatabase() {
           run("DELETE FROM FailedLoginAttempts WHERE identifier LIKE '%ramesh%'")
         ]).catch(() => {});
       }
+      await seedRichPrototypeData().catch(() => {});
       isSchemaVerified = true;
       console.log('⚡ Schema and clinical data verified. Instant startup bypass active.');
       return;
@@ -789,6 +791,13 @@ export async function initializeDatabase() {
     await seedStaffAndSanitation();
   } catch (err) {
     console.error('Staff and sanitation seed warning:', err.message);
+  }
+
+  // Seed rich prototype demo data (Prescriptions, Lab Reports, Live Queue, Vitals)
+  try {
+    await seedRichPrototypeData();
+  } catch (err) {
+    console.error('Rich prototype data seed warning:', err.message);
   }
 }
 
