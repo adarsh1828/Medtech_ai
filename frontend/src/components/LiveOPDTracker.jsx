@@ -143,7 +143,7 @@ export default function LiveOPDTracker({ user, onOpenConsultation, onOpenPrescri
 
   const isPatient = user?.role === 'patient';
   const isDoctor = user?.role === 'doctor';
-  const isAdmin = user?.role === 'admin' || user?.role === 'staff';
+  const isAdmin = user?.role === 'admin';
 
   // "Where is my train" Journey Stations
   const stations = [

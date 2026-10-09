@@ -48,7 +48,7 @@ export default function Sidebar({
       label: t('nav.liveQueue', 'Live OPD Queue TV'), 
       icon: Tv, 
       badge: 'LIVE',
-      roles: ['admin', 'staff']
+      roles: ['admin']
     },
     { 
       id: 'billing', 
@@ -56,7 +56,7 @@ export default function Sidebar({
         ? t('nav.myBilling', 'My Bills & Receipts') 
         : t('nav.billing', 'Billing & Invoices'), 
       icon: Receipt,
-      roles: ['admin', 'patient', 'staff']
+      roles: ['admin', 'patient']
     },
     { 
       id: 'appointments', 
@@ -66,7 +66,7 @@ export default function Sidebar({
         ? t('nav.opdQueue', 'OPD Queue & Consultations') 
         : t('nav.appointments', 'Appointments & OPD'), 
       icon: Calendar,
-      roles: ['admin', 'doctor', 'patient', 'staff']
+      roles: ['admin', 'doctor', 'patient']
     },
     { 
       id: 'nurse-station', 
@@ -86,7 +86,7 @@ export default function Sidebar({
       id: 'beds', 
       label: t('nav.beds', 'Ward & Inpatient Beds'), 
       icon: BedDouble,
-      roles: ['admin', 'doctor', 'nurse', 'staff']
+      roles: ['admin', 'doctor', 'nurse']
     },
     { 
       id: 'doctors', 
@@ -100,7 +100,7 @@ export default function Sidebar({
         ? t('nav.myPrescriptions', 'My Prescriptions') 
         : t('nav.prescriptions', 'Prescriptions & Rx'), 
       icon: FileText,
-      roles: ['admin', 'doctor', 'patient', 'nurse', 'staff']
+      roles: ['admin', 'doctor', 'patient', 'nurse']
     },
     { 
       id: 'lab-reports', 
@@ -108,7 +108,7 @@ export default function Sidebar({
         ? t('nav.myLabReports', 'My Lab Reports') 
         : t('nav.labReports', 'Diagnostic Labs'), 
       icon: FlaskConical,
-      roles: ['admin', 'doctor', 'patient', 'nurse', 'staff']
+      roles: ['admin', 'doctor', 'patient', 'nurse']
     },
     { 
       id: 'ai-triage', 
@@ -131,8 +131,6 @@ export default function Sidebar({
         return t('nav.nurseStation', 'NURSE CLINICAL STATION');
       case 'cleaning':
         return t('nav.housekeeping', 'HOUSEKEEPING & SANITATION');
-      case 'staff':
-        return t('auth.staff', 'HOSPITAL STAFF PORTAL');
       case 'admin':
       default:
         return t('brand.adminCommand', 'HOSPITAL COMMAND CENTER');
@@ -207,23 +205,6 @@ export default function Sidebar({
             fontWeight: '700'
           }}>
             <Sparkles size={11} /> CLEANING
-          </span>
-        );
-      case 'staff':
-        return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(249, 115, 22, 0.15)',
-            border: '1px solid rgba(249, 115, 22, 0.3)',
-            color: '#fb923c',
-            fontWeight: '700'
-          }}>
-            <Building2 size={11} /> STAFF
           </span>
         );
       case 'patient':

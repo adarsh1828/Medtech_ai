@@ -50,7 +50,7 @@ export default function LabReportsView({ user }) {
     remarks: ''
   });
 
-  const canCreateReport = user?.role && ['doctor', 'admin', 'nurse', 'staff'].includes(user.role);
+  const canCreateReport = user?.role && ['doctor', 'admin', 'nurse'].includes(user.role);
 
   useEffect(() => {
     loadReports();

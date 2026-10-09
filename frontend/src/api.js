@@ -10,7 +10,7 @@ export const getStoredUser = () => {
     const raw = localStorage.getItem('medtech_user');
     if (!raw) return null;
     const user = JSON.parse(raw);
-    const validRoles = ['admin', 'doctor', 'patient', 'nurse', 'cleaning', 'staff'];
+    const validRoles = ['admin', 'doctor', 'patient', 'nurse', 'cleaning'];
     if (!user || typeof user !== 'object' || !validRoles.includes(user.role)) {
       localStorage.removeItem('medtech_user');
       localStorage.removeItem('medtech_token');

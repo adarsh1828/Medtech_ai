@@ -35,7 +35,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
 
   const isPatient = user?.role === 'patient';
   const isDoctor = user?.role === 'doctor';
-  const isAdmin = user?.role === 'admin' || user?.role === 'staff';
+  const isAdmin = user?.role === 'admin';
 
   const loadAppointments = async (isBackground = false) => {
     if (!isBackground) setLoading(true);

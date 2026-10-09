@@ -1021,33 +1021,6 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                     </span>
                   </button>
 
-                  {/* Staff Demo */}
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('staff', 'staff@medtech.ai', 'staff123')}
-                    className="btn btn-outline"
-                    style={{
-                      padding: '10px 6px',
-                      flexDirection: 'column',
-                      gap: '4px',
-                      borderRadius: '10px',
-                      border: selectedRole === 'staff' ? '2px solid #f97316' : '1px solid rgba(249, 115, 22, 0.3)',
-                      background: selectedRole === 'staff' ? 'rgba(249, 115, 22, 0.15)' : 'rgba(249, 115, 22, 0.04)',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      boxShadow: selectedRole === 'staff' ? '0 0 12px rgba(249, 115, 22, 0.3)' : 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Building2 size={18} color="#f97316" />
-                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#f97316' }}>
-                      🏢 Staff
-                    </span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      Priya D.
-                    </span>
-                  </button>
-
                   {/* Admin Demo */}
                   <button
                     type="button"
@@ -1095,7 +1068,6 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                       {selectedRole === 'doctor' && '🩺 Dr. Rajesh Deshmukh (Doctor) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'nurse' && '👩‍⚕️ Sister Sunita Sharma (Staff Nurse) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'cleaning' && '🧹 Ramesh Shinde (Sanitation Staff) चे क्रेडेंशियल्स भरले आहेत.'}
-                      {selectedRole === 'staff' && '🏢 Priya Deshmukh (Hospital Staff & Reception) चे क्रेडेंशियल्स भरले आहेत.'}
                       {selectedRole === 'admin' && '🛡️ Adarsh Surya (Admin & Medical Director) चे क्रेडेंशियल्स भरले आहेत.'}
                       {' '}लॉगिन करण्यासाठी खालील <strong>"Sign In to Hospital Portal"</strong> बटण दाबा.
                     </span>

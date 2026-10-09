@@ -43,7 +43,7 @@ export default function App() {
     if (!stored) return 'dashboard';
     if (stored.role === 'nurse') return 'nurse-station';
     if (stored.role === 'cleaning') return 'housekeeping';
-    if (stored.role === 'patient' || stored.role === 'doctor' || stored.role === 'staff') return 'appointments';
+    if (stored.role === 'patient' || stored.role === 'doctor') return 'appointments';
     return 'dashboard';
   });
   const [hospitalInfo, setHospitalInfo] = useState(null);
@@ -127,11 +127,6 @@ export default function App() {
       const allowed = ['housekeeping'];
       if (!allowed.includes(activeTab)) {
         setActiveTab('housekeeping');
-      }
-    } else if (user.role === 'staff') {
-      const allowed = ['appointments', 'live-queue', 'beds', 'billing', 'prescriptions', 'lab-reports'];
-      if (!allowed.includes(activeTab)) {
-        setActiveTab('appointments');
       }
     } else if (user.role === 'patient') {
       const allowed = ['appointments', 'prescriptions', 'lab-reports', 'billing', 'ai-triage'];
@@ -327,7 +322,7 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'live-queue' && (user?.role === 'admin' || user?.role === 'staff') && (
+          {activeTab === 'live-queue' && user?.role === 'admin' && (
             <LiveQueueView
               user={user}
               hospitalInfo={hospitalInfo}
@@ -401,7 +396,7 @@ export default function App() {
 
           {/* Safe fallback for any unmatched or restricted activeTab */}
           {((activeTab === 'dashboard' && user?.role !== 'admin') ||
-            (activeTab === 'live-queue' && user?.role !== 'admin' && user?.role !== 'staff') ||
+            (activeTab === 'live-queue' && user?.role !== 'admin') ||
             (activeTab === 'doctors' && user?.role !== 'admin')) && (
             <AppointmentsView
               user={user}
@@ -738,45 +733,6 @@ export default function App() {
           </>
         )}
 
-        {user?.role === 'staff' && (
-          <>
-            <button
-              className={`mobile-nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
-              onClick={() => setActiveTab('appointments')}
-            >
-              <Calendar size={18} />
-              <span>Visits</span>
-            </button>
-            <button
-              className={`mobile-nav-item ${activeTab === 'live-queue' ? 'active' : ''}`}
-              onClick={() => setActiveTab('live-queue')}
-            >
-              <Tv size={18} />
-              <span>Queue</span>
-            </button>
-            <button
-              className={`mobile-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
-              onClick={() => setActiveTab('billing')}
-            >
-              <Receipt size={18} />
-              <span>Bills</span>
-            </button>
-            <button
-              className={`mobile-nav-item ${activeTab === 'beds' ? 'active' : ''}`}
-              onClick={() => setActiveTab('beds')}
-            >
-              <BedDouble size={18} />
-              <span>Beds</span>
-            </button>
-            <button
-              className={`mobile-nav-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
-              onClick={() => setActiveTab('prescriptions')}
-            >
-              <FileText size={18} />
-              <span>Rx</span>
-            </button>
-          </>
-        )}
       </nav>
     </div>
   );

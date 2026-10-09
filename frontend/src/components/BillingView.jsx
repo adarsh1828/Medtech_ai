@@ -60,7 +60,7 @@ export default function BillingView({ user, hospitalInfo }) {
 
   useEffect(() => {
     loadInvoices();
-    if (user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'staff') {
+    if (user?.role === 'admin' || user?.role === 'doctor') {
       loadPatientsAndDoctors();
     }
   }, [user, filterStatus]);
@@ -302,7 +302,7 @@ export default function BillingView({ user, hospitalInfo }) {
           </p>
         </div>
 
-        {(user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'staff') && (
+        {(user?.role === 'admin' || user?.role === 'doctor') && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="btn btn-primary"

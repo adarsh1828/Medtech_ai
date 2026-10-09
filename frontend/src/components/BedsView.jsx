@@ -477,8 +477,8 @@ export default function BedsView({ user }) {
                   )}
                 </div>
 
-                {/* Quick Bed Status Actions for Staff */}
-                {(user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'nurse' || user?.role === 'staff') && (
+                {/* Quick Bed Status Actions */}
+                {(user?.role === 'admin' || user?.role === 'doctor' || user?.role === 'nurse') && (
                   <div style={{ display: 'flex', gap: '6px', marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
                     {isOccupied ? (
                       <button
