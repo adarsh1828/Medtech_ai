@@ -23,8 +23,10 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { formatCurrency } from '../utils/currency';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDoctor, hospitalInfo }) {
+  const { t } = useLanguage();
   const currencySymbol = hospitalInfo?.currency_symbol || '₹';
   const [doctors, setDoctors] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -149,10 +151,10 @@ export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDocto
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-            Attending Physicians & Specialists
+            {t('doctors.title', 'Medical Staff & Specialist Directory')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Board-certified clinicians, credential verification, shift schedules, and department allocations
+            {t('doctors.subtitle', 'Qualified physicians, consultants, department heads, and OPD shift timings.')}
           </p>
         </div>
 

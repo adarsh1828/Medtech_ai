@@ -15,8 +15,10 @@ import {
   Radio
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LiveQueueView({ user, hospitalInfo }) {
+  const { t } = useLanguage();
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,10 +145,10 @@ export default function LiveQueueView({ user, hospitalInfo }) {
             fontSize: '0.75rem',
             fontWeight: '700'
           }}>
-            <Radio size={14} className="heartbeat-icon" /> LIVE OPD BROADCAST
+            <Radio size={14} className="heartbeat-icon" /> {t('liveQueue.title', 'LIVE OPD QUEUE TV')}
           </div>
           <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-            Hospital Waiting Lounge Display
+            {t('liveQueue.subtitle', 'Hospital Waiting Lounge Display')}
           </span>
         </div>
 
@@ -208,7 +210,7 @@ export default function LiveQueueView({ user, hospitalInfo }) {
           justifyContent: 'center',
           gap: '8px'
         }}>
-          <Sparkles size={16} /> CURRENTLY CONSULTING / NOW SERVING
+          <Sparkles size={16} /> {t('liveQueue.currentServing', 'CURRENTLY CONSULTING / NOW SERVING')}
         </div>
 
         {activeNowServing ? (

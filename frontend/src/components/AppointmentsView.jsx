@@ -21,9 +21,11 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 import LiveOPDTracker from './LiveOPDTracker';
 
 export default function AppointmentsView({ user, onOpenBookModal, onOpenConsultation, onOpenPrescription }) {
+  const { t } = useLanguage();
   const [appointments, setAppointments] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -98,7 +100,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-              {isPatient ? 'माझ्या अपॉइंटमेंट्स व तपासणी ट्रॅकर' : 'Appointments & OPD Clinical Queue'}
+              {isPatient ? t('nav.myAppointments', 'My Appointments & Health') : t('appointments.title', 'Clinical Appointments & OPD Queue')}
             </h2>
             <button
               onClick={() => setShowTracker(!showTracker)}
@@ -117,14 +119,12 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
               }}
             >
               <Compass size={14} />
-              <span>{showTracker ? 'ट्रॅकर लपवा' : '🚆 थेट ओपीडी ट्रॅकर उघडा'}</span>
+              <span>{showTracker ? (t('common.close', 'Hide Tracker')) : (t('nav.liveQueue', 'Open Live OPD Tracker'))}</span>
               {showTracker ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
-            {isPatient 
-              ? 'थेट "Where is my train" प्रमाणे डॉक्टरांची तपासणी व तुमचा नंबर ट्रॅक करा'
-              : 'रिअल-टाइम क्लिनिकल रांग, डॉक्टर केबिन तपासणी आणि पूर्ण झालेल्या अपॉइंटमेंट्सचा शेरा'}
+            {t('appointments.subtitle', 'Manage outpatient visits, live consultation tokens, vitals, and physician schedules.')}
           </p>
         </div>
 
@@ -132,7 +132,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
           onClick={onOpenBookModal}
           className="btn btn-primary"
         >
-          <Plus size={16} /> नवीन अपॉइंटमेंट बुक करा
+          <Plus size={16} /> {t('appointments.bookNewBtn', 'Book New Appointment')}
         </button>
       </div>
 
@@ -160,12 +160,12 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
         {/* Status Pills with Dynamic Counts */}
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '2px' }}>
           {[
-            { key: 'all', label: 'सर्व (All)' },
-            { key: 'scheduled', label: 'शेड्युल्ड' },
-            { key: 'confirmed', label: 'निश्चित (Waiting)' },
-            { key: 'in_consultation', label: '🩺 केबिनमध्ये चालू' },
-            { key: 'completed', label: '✅ तपासणी पूर्ण (Done)' },
-            { key: 'cancelled', label: 'रद्द' }
+            { key: 'all', label: t('common.all', 'All') },
+            { key: 'scheduled', label: t('common.scheduled', 'Scheduled') },
+            { key: 'confirmed', label: t('common.confirmed', 'Confirmed') },
+            { key: 'in_consultation', label: t('appointments.inConsultationTab', 'In Consultation') },
+            { key: 'completed', label: t('common.completed', 'Completed') },
+            { key: 'cancelled', label: t('common.cancelled', 'Cancelled') }
           ].map(({ key, label }) => {
             const count = statusCounts[key] || 0;
             const isSelected = statusFilter === key;
@@ -209,7 +209,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search patient, doctor, remark..."
+            placeholder={t('appointments.searchPlaceholder', 'Search patient, doctor, remark...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="form-input"
@@ -221,21 +221,21 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
       {/* Appointments List */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-          Loading clinical appointments...
+          {t('common.loading', 'Loading clinical appointments...')}
         </div>
       ) : filteredAppointments.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
           <Calendar size={42} color="var(--text-muted)" style={{ margin: '0 auto 12px auto' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>कोणतीही अपॉइंटमेंट आढळली नाही</h3>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>{t('appointments.noAppointments', 'No clinical appointments found')}</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '4px' }}>
-            निवडलेल्या फिल्टरनुसार सध्या कोणतीही अपॉइंटमेंट उपलब्ध नाही.
+            {t('appointments.subtitle', 'No visits found for the selected filter.')}
           </p>
           <button
             onClick={onOpenBookModal}
             className="btn btn-primary btn-sm"
             style={{ marginTop: '16px' }}
           >
-            नवीन अपॉइंटमेंट बुक करा
+            {t('appointments.bookNewBtn', 'Book New Appointment')}
           </button>
         </div>
       ) : (

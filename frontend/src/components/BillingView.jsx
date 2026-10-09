@@ -20,8 +20,10 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { formatCurrency } from '../utils/currency';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BillingView({ user, hospitalInfo }) {
+  const { t } = useLanguage();
   const currencySymbol = hospitalInfo?.currency_symbol || '₹';
   const [invoices, setInvoices] = useState([]);
   const [stats, setStats] = useState({
@@ -292,11 +294,11 @@ export default function BillingView({ user, hospitalInfo }) {
               <Receipt size={20} />
             </div>
             <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-              Hospital Invoicing & Payments
+              {t('billing.title', 'Hospital Invoicing & Payments')}
             </h2>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px' }}>
-            Automated OPD/IPD bill generation, digital receipts, and real-time UPI mobile settlements
+            {t('billing.subtitle', 'Indian Standard Rupee invoices, instant UPI settlement QR codes, and downloadable receipts.')}
           </p>
         </div>
 

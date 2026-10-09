@@ -21,8 +21,10 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LabReportsView({ user }) {
+  const { t } = useLanguage();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState('All');
@@ -256,10 +258,10 @@ export default function LabReportsView({ user }) {
       }}>
         <div>
           <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-            Diagnostic Laboratory Reports
+            {t('labReports.title', 'Diagnostic Laboratory Reports')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Pathology, biochemistry, hematology, and diagnostic imaging results
+            {t('labReports.subtitle', 'Comprehensive automated test panels, reference ranges, and verified clinical interpretations.')}
           </p>
         </div>
 
@@ -270,7 +272,7 @@ export default function LabReportsView({ user }) {
               className="btn btn-primary"
               style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
             >
-              <Plus size={16} /> नवीन लॅब रिपोर्ट नोंदवा (Add Lab Report)
+              <Plus size={16} /> {t('labReports.recordNewBtn', 'Record New Lab Result')}
             </button>
           )}
 
@@ -278,7 +280,7 @@ export default function LabReportsView({ user }) {
             onClick={loadReports}
             className="btn btn-outline"
             style={{ padding: '10px' }}
-            title="रिफ्रेश करा"
+            title={t('common.refresh', 'Refresh')}
           >
             <RefreshCw size={16} />
           </button>

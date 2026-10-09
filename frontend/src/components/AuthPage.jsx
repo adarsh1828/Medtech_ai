@@ -1247,7 +1247,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                👩‍⚕️ Nurse
+                👩‍⚕️ {t('header.nurse', 'Nurse')}
               </button>
               <button
                 type="button"
@@ -1265,7 +1265,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                🧹 Cleaning
+                🧹 {t('auth.cleaning', 'Cleaning')}
               </button>
               <button
                 type="button"
@@ -1283,7 +1283,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                🏢 Staff
+                🏢 {t('auth.staff', 'Staff')}
               </button>
               <button
                 type="button"
@@ -1301,7 +1301,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                🛡️ Admin
+                🛡️ {t('header.admin', 'Admin')}
               </button>
             </div>
           )}

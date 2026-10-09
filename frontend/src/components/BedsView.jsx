@@ -17,11 +17,13 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 const WARDS = ['All', 'ICU', 'Emergency', 'General Ward', 'Semi-Private', 'Pediatric Ward'];
 
 export default function BedsView({ user }) {
+  const { t } = useLanguage();
   const [beds, setBeds] = useState([]);
   const [stats, setStats] = useState({ total: 0, available: 0, occupied: 0, maintenance: 0, occupancyRate: 0, wardBreakdown: [] });
   const [wardFilter, setWardFilter] = useState('All');
@@ -82,10 +84,10 @@ export default function BedsView({ user }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-            वॉर्ड व हॉस्पिटल बेड ट्रॅकिंग (Ward & Inpatient Bed Control)
+            {t('beds.title', 'Ward & Inpatient Bed Control Matrix')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            रिअल-टाइम रिकामे बेड्स, ICU उपलब्धता आणि स्टाफ ड्युटी वाटप केंद्र
+            {t('beds.subtitle', 'Real-time telemetry tracking of ICU, Emergency, General, and Pediatric bed occupancy.')}
           </p>
         </div>
 

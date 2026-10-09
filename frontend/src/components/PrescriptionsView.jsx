@@ -16,8 +16,10 @@ import {
   HeartPulse 
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function PrescriptionsView({ user, selectedPrescriptionId, hospitalInfo }) {
+  const { t } = useLanguage();
   const [prescriptions, setPrescriptions] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -127,17 +129,17 @@ ${medList}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
-            Digital Prescriptions & Medical Orders
+            {t('prescriptions.title', 'Digital Prescriptions & Medical Orders')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Electronic pharmacotherapy records and physician clinical instructions
+            {t('prescriptions.subtitle', 'Doctor-authorized digital prescriptions with integrated dosage, contraindication warnings, and follow-up advice.')}
           </p>
         </div>
 
         <div style={{ minWidth: '260px' }}>
           <input
             type="text"
-            placeholder="Search by patient, doctor, or diagnosis..."
+            placeholder={t('prescriptions.searchPlaceholder', 'Search by patient, doctor, or diagnosis...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="form-input"
@@ -148,12 +150,12 @@ ${medList}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-          Loading prescription records...
+          {t('common.loading', 'Loading prescription records...')}
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '48px' }}>
           <FileText size={36} color="var(--text-muted)" style={{ margin: '0 auto 12px auto' }} />
-          <h3>No Prescriptions Found</h3>
+          <h3>{t('prescriptions.noPrescriptions', 'No Prescriptions Found')}</h3>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

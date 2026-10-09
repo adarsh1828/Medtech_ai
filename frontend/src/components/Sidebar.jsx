@@ -70,14 +70,14 @@ export default function Sidebar({
     },
     { 
       id: 'nurse-station', 
-      label: 'Nurse Station & Meds', 
+      label: t('nav.nurseStation', 'Nurse Station & Meds'), 
       icon: HeartPulse, 
       badge: 'CLINICAL',
       roles: ['nurse', 'admin', 'doctor']
     },
     { 
       id: 'housekeeping', 
-      label: 'Housekeeping & QR Audits', 
+      label: t('nav.housekeeping', 'Housekeeping & QR Audits'), 
       icon: Sparkles, 
       badge: 'HYGIENE',
       roles: ['cleaning', 'admin']
@@ -128,11 +128,11 @@ export default function Sidebar({
       case 'doctor':
         return t('brand.doctorStation', 'PHYSICIAN CLINICAL STATION');
       case 'nurse':
-        return 'NURSE CLINICAL STATION';
+        return t('nav.nurseStation', 'NURSE CLINICAL STATION');
       case 'cleaning':
-        return 'HOUSEKEEPING & SANITATION';
+        return t('nav.housekeeping', 'HOUSEKEEPING & SANITATION');
       case 'staff':
-        return 'HOSPITAL STAFF PORTAL';
+        return t('auth.staff', 'HOSPITAL STAFF PORTAL');
       case 'admin':
       default:
         return t('brand.adminCommand', 'HOSPITAL COMMAND CENTER');

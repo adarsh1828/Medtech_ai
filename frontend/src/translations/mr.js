@@ -3,7 +3,7 @@ export const mr = {
   brand: {
     poweredBy: 'मेडेटेक एआय द्वारा समर्थित',
     live: 'थेट (LIVE)',
-    defaultHospital: 'सिटी मल्टी-स्पेशालिटी हॉस्पिटल',
+    defaultHospital: 'संजीवनी मल्टी-स्पेशालिटी हॉस्पिटल',
     defaultTagline: 'तृतीयक क्लिनिकल केअर आणि २४x७ ट्रॉमा केंद्र',
     statusReady: 'आपत्कालीन सज्ज',
     statusSubtext: 'SQLite WAL • लेव्हल-१ ट्रॉमा सक्रिय',
@@ -12,20 +12,33 @@ export const mr = {
 
   // Navigation
   nav: {
-    dashboard: 'कमांड सेंटर',
-    appointments: 'अपॉइंटमेंट्स',
-    beds: 'वॉर्ड आणि बेड्स',
-    doctors: 'वैद्यकीय कर्मचारी',
+    dashboard: 'कमांड सेंटर (डॅशबोर्ड)',
+    appointments: 'अपॉइंटमेंट्स आणि ओपीडी',
+    myAppointments: 'माझ्या अपॉइंटमेंट्स आणि आरोग्य',
+    opdQueue: 'ओपीडी रांग आणि कन्सल्टेशन्स',
+    beds: 'वॉर्ड आणि इनपेशंट बेड्स',
+    doctors: 'वैद्यकीय कर्मचारी डिरेक्टरी',
     prescriptions: 'प्रिस्क्रिप्शन्स (औषधोपचार)',
-    labReports: 'डायग्नोस्टिक लॅब्स',
+    myPrescriptions: 'माझे प्रिस्क्रिप्शन्स',
+    labReports: 'डायग्नोस्टिक लॅब्स आणि तपासण्या',
+    myLabReports: 'माझे लॅब अहवाल',
     aiTriage: 'एआय क्लिनिकल ट्रायज',
+    billing: 'बिलिंग आणि इन्व्हॉइसेस',
+    myBilling: 'माझी बिले आणि पावत्या',
+    liveQueue: 'थेट ओपीडी रांग (Live TV)',
+    nurseStation: 'नर्सिंग स्टेशन आणि औषधे',
+    housekeeping: 'स्वच्छता व क्यूआर ऑडिट',
+    emergencySos: 'आपत्कालीन एसओएस ट्रायज'
   },
 
   // Header
   header: {
     liveClock: 'थेट',
     demoRoles: 'डेमो भूमिका:',
-    admin: 'प्रशासक (Admin)',
+    admin: 'प्रशासक',
+    doctor: 'डॉक्टर',
+    patient: 'रुग्ण',
+    nurse: 'नर्स',
     drSarah: 'डॉ. सारा',
     patientElena: 'रुग्ण एलेना',
     hospitalSettings: 'हॉस्पिटल सेटिंग्स',
@@ -33,6 +46,38 @@ export const mr = {
     signIn: 'साइन इन',
     signOut: 'लॉग आउट',
     languages: 'भाषा निवडा',
+  },
+
+  // Auth & Roles
+  auth: {
+    welcomeTitle: 'मेडेटेक एआय हॉस्पिटल ऑपरेटिंग सिस्टीम',
+    welcomeSubtitle: 'इंटेलिजंट क्लिनिकल वर्कफ्लो, लाइव्ह ओपीडी रांगा आणि पेपरलेस डिजिटल वैद्यकीय नोंदी.',
+    selectRole: 'पोर्टल / भूमिका निवडा',
+    patient: 'रुग्ण पोर्टल (Patient)',
+    doctor: 'डॉक्टर वर्कस्टेशन (Doctor)',
+    nurse: 'नर्सिंग स्टेशन (Nurse)',
+    admin: 'मुख्य प्रशासक (CEO/Admin)',
+    cleaning: 'स्वच्छता कर्मचारी (Staff)',
+    staff: 'हॉस्पिटल ऑपरेशन्स (Staff)',
+    signIn: 'साइन इन करा',
+    register: 'नवीन खाते तयार करा',
+    phoneOrEmail: 'फोन नंबर किंवा ईमेल पत्ता',
+    phonePlaceholder: 'उदा. +91 98200 12345 किंवा ईमेल',
+    password: 'पासवर्ड',
+    passwordPlaceholder: 'तुमचा पासवर्ड टाका',
+    loginButton: 'वर्कस्पेसमध्ये प्रवेश करा',
+    registerButton: 'रुग्ण नोंदणी करा',
+    fullName: 'पूर्ण नाव',
+    dateOfBirth: 'जन्मतारीख',
+    gender: 'लिंग',
+    bloodGroup: 'रक्तगट',
+    quickDemoTitle: 'त्वरित वन-क्लिक डेमो लॉगिन:',
+    quickAdmin: 'प्रशासक (Adarsh CEO)',
+    quickDoctor: 'डॉ. रमेश (Doctor)',
+    quickPatient: 'राहुल पाटील (Patient)',
+    quickNurse: 'सिस्टर सुनिता (Nurse)',
+    quickCleaning: 'बाबूराव (Housekeeping)',
+    emergencyNotice: 'आपत्कालीन अपघात किंवा छातीत वेदना? १०८ / ११२ SOS दाबा'
   },
 
   // Dashboard
@@ -48,7 +93,7 @@ export const mr = {
     totalPatients: 'एकूण रुग्ण',
     monthGrowth: '+१२% या महिन्यात',
     doctorsOnDuty: 'कर्तव्यावर असलेले डॉक्टर',
-    deptsCovered: 'सर्व ५ क्लिनिकल विभाग कार्यरत',
+    deptsCovered: 'सर्व क्लिनिकल विभाग कार्यरत',
     appointmentsToday: 'आजच्या अपॉइंटमेंट्स',
     tokenQueueRunning: 'सक्रिय टोकन रांग सुरू आहे',
     bedOccupancy: 'बेड ऑक्युपन्सी',
@@ -85,6 +130,176 @@ export const mr = {
     actionBedDesc: 'थेट स्थिती अपडेटसह आयसीयू, जनरल किंवा आपत्कालीन बेड्स वाटप करा.',
     actionRxTitle: 'ई-प्रिस्क्रिप्शन तयार करा',
     actionRxDesc: 'डोस, वारंवारता आणि लॅब चाचण्यांसह डिजिटल प्रिस्क्रिप्शन.'
+  },
+
+  // Appointments View
+  appointments: {
+    title: 'क्लिनिकल अपॉइंटमेंट्स आणि ओपीडी रांग',
+    subtitle: 'बाह्यरुग्ण भेटी, थेट कन्सल्टेशन टोकन्स, व्हायटल्स आणि डॉक्टरांचे वेळापत्रक व्यवस्थापित करा.',
+    bookNewBtn: 'नवीन अपॉइंटमेंट बुक करा',
+    searchPlaceholder: 'रुग्ण, डॉक्टर किंवा टोकन नंबर शोधा...',
+    allTab: 'सर्व अपॉइंटमेंट्स',
+    todayTab: 'आजची ओपीडी (Today)',
+    scheduledTab: 'नियोजित (Scheduled)',
+    inConsultationTab: 'तपासणी सुरू (In-Clinic)',
+    completedTab: 'पूर्ण (Completed)',
+    cancelledTab: 'रद्द (Cancelled)',
+    tokenCol: 'टोकन #',
+    patientCol: 'रुग्णाचा तपशील',
+    doctorCol: 'उपचार करणारे डॉक्टर',
+    deptCol: 'विभाग',
+    slotCol: 'वेळ स्लॉट',
+    vitalsCol: 'नोंदवलेले व्हायटल्स',
+    statusCol: 'सल्ला स्थिती',
+    actionsCol: 'कृती',
+    startConsultation: 'तपासणी सुरू करा',
+    cancelAppointment: 'अपॉइंटमेंट रद्द करा',
+    viewDetails: 'तपशील पहा',
+    noAppointments: 'या फिल्टरसाठी कोणत्याही अपॉइंटमेंट्स आढळल्या नाहीत.',
+    cancelConfirm: 'तुम्हाला खात्री आहे का की ही अपॉइंटमेंट रद्द करायची आहे?',
+    reasonForVisit: 'भेटीचे मुख्य कारण',
+    dateCol: 'तारीख'
+  },
+
+  // Prescriptions View
+  prescriptions: {
+    title: 'डिजिटल प्रिस्क्रिप्शन्स (ई-प्रिस्क्रिप्शन दस्तऐवज)',
+    subtitle: 'अधिकृत डॉक्टरांचे डिजिटल प्रिस्क्रिप्शन्स, औषध डोस, पथ्य आणि फॉलो-अप सल्ला.',
+    searchPlaceholder: 'रुग्णाचे नाव, डॉक्टर किंवा निदानानुसार प्रिस्क्रिप्शन शोधा...',
+    rxId: 'प्रिस्क्रिप्शन क्रमांक #',
+    date: 'जारी केल्याची तारीख',
+    doctor: 'सल्लागार डॉक्टर',
+    patient: 'रुग्ण तपशील',
+    dept: 'वैद्यकीय विभाग',
+    diagnosis: 'क्लिनिकल निदान (Diagnosis)',
+    clinicalNotes: 'क्लिनिकल निरीक्षणे आणि नोट्स',
+    advice: 'डॉक्टरांचा सल्ला आणि पथ्य',
+    followUp: 'पुढील फॉलो-अप तारीख',
+    medicinesHeader: 'विहित केलेली औषधे (Medicines)',
+    medName: 'औषधाचे नाव',
+    dosage: 'डोस',
+    frequency: 'वारंवारता',
+    duration: 'कालावधी',
+    instructions: 'विशेष सूचना / कसे घ्यावे',
+    printBtn: 'प्रिस्क्रिप्शन प्रिंट / डाऊनलोड करा',
+    noPrescriptions: 'कोणतेही प्रिस्क्रिप्शन उपलब्ध नाही.'
+  },
+
+  // Lab Reports View
+  labReports: {
+    title: 'पॅथॉलॉजी आणि डायग्नोस्टिक लॅब अहवाल',
+    subtitle: 'स्वयंचलित चाचणी पॅनेल्स, सामान्य संदर्भ श्रेणी आणि वैद्यकीय अहवाल.',
+    recordNewBtn: 'नवीन लॅब निकाल नोंदवा',
+    searchPlaceholder: 'चाचणीचे नाव, रुग्ण किंवा डॉक्टर शोधा...',
+    allCategories: 'सर्व चाचणी श्रेणी',
+    testName: 'डायग्नोस्टिक चाचणी',
+    category: 'श्रेणी',
+    patient: 'रुग्ण',
+    doctor: 'तपासणी डॉक्टर',
+    testDate: 'चाचणी तारीख',
+    status: 'अहवाल स्थिती',
+    resultValue: 'तपासणी निकाल (Result)',
+    normalRange: 'सामान्य संदर्भ श्रेणी',
+    remarks: 'पॅथॉलॉजिस्ट शेरा',
+    downloadPdf: 'अहवाल डाउनलोड करा',
+    noReports: 'कोणतेही लॅब अहवाल आढळले नाहीत.'
+  },
+
+  // Beds View
+  beds: {
+    title: 'इनपेशंट वॉर्ड आणि बेड टेलिमेट्री मॅट्रिक्स',
+    subtitle: 'आयसीयू, आपत्कालीन, जनरल आणि बालरोग वॉर्ड बेड्सचा थेट रिअल-टाइम ट्रॅकर.',
+    allWards: 'सर्व वॉर्ड्स',
+    icuWard: 'आयसीयू आणि क्रिटिकल केअर',
+    erWard: 'आपत्कालीन ट्रायज',
+    gwWard: 'जनरल वॉर्ड',
+    spWard: 'सेमी-प्रायव्हेट रूम्स',
+    pedWard: 'बालरोग वॉर्ड',
+    bedNumber: 'बेड क्रमांक',
+    wardType: 'वॉर्ड प्रकार',
+    status: 'बेड स्थिती',
+    admittedPatient: 'ॲडमिट रुग्ण',
+    admissionTime: 'दाखल वेळ',
+    clinicalNotes: 'क्लिनिकल टेलिमेट्री नोट्स',
+    totalBeds: 'हॉस्पिटलचे एकूण बेड्स',
+    occupiedBeds: 'व्याप्त बेड्स (Occupied)',
+    availableBeds: 'उपलब्ध बेड्स (Available)',
+    maintenanceBeds: 'स्वच्छता / देखभाल सुरू'
+  },
+
+  // Billing View
+  billing: {
+    title: 'ओपीडी व आयपीडी बिलिंग आणि पावती केंद्र',
+    subtitle: 'भारतीय रुपया (₹ INR) टॅक्स इन्व्हॉइसेस, त्वरित UPI QR कोड सेटलमेंट आणि पावत्या.',
+    invoiceNo: 'इन्व्हॉइस क्रमांक #',
+    patient: 'रुग्ण',
+    consultant: 'सल्लागार डॉक्टर',
+    date: 'बिलिंग तारीख',
+    amount: 'एकूण रक्कम',
+    tax: 'जीएसटी / कर',
+    netAmount: 'निव्वळ देय रक्कम',
+    status: 'पेमेंट स्थिती',
+    paid: 'भरले (Paid)',
+    pending: 'प्रलंबित (Pending)',
+    payUpi: 'UPI QR द्वारे भरा',
+    downloadReceipt: 'टॅक्स इन्व्हॉइस प्रिंट करा',
+    scanToPay: 'PhonePe, GPay, Paytm द्वारे भरण्यासाठी QR स्कॅन करा',
+    noInvoices: 'कोणतीही बिलिंग इन्व्हॉइसेस आढळली नाहीत.'
+  },
+
+  // Live Queue View
+  liveQueue: {
+    title: 'थेट ओपीडी रांग ब्रॉडकास्टिंग डिस्प्ले (Live TV)',
+    subtitle: 'प्रतीक्षा कक्षातील ऑडिओ-व्हिज्युअल टोकन डिस्प्ले आणि कॉलिंग सिस्टीम.',
+    currentServing: 'सध्या तपासणी केबिनमध्ये उपस्थित:',
+    waitingList: 'पुढील टोकन्स (वेटिंग एरिया):',
+    token: 'टोकन',
+    doctor: 'उपचार करणारे डॉक्टर',
+    dept: 'वैद्यकीय विभाग',
+    room: 'केबिन नंबर',
+    status: 'रांग स्थिती',
+    soundNotice: 'पुढील टोकनसाठी ऑडिओ चाइम सक्षम आहे'
+  },
+
+  // Nurse Station View
+  nurseStation: {
+    title: 'नर्सिंग स्टेशन आणि इनपेशंट काळजी',
+    subtitle: 'दाखल रुग्णांचे व्हायटल्स चार्टिंग, औषध प्रशासन वेळापत्रक आणि शिफ्ट हँडओव्हर.',
+    vitalsTab: 'रुग्ण व्हायटल्स नोंदी (Vitals)',
+    medicationsTab: 'औषध देण्याचे वेळापत्रक (MAR)',
+    handoversTab: 'क्लिनिकल शिफ्ट हँडओव्हर',
+    recordVitalsBtn: 'नवीन व्हायटल्स नोंदवा',
+    scheduleDoseBtn: 'औषधाचा डोस शेड्युल करा',
+    handoverShiftBtn: 'शिफ्ट हँडओव्हर करा',
+    patient: 'दाखल रुग्ण',
+    bed: 'बेड क्रमांक',
+    bp: 'रक्तदाब (BP)',
+    pulse: 'नाडीचे ठोके (Pulse)',
+    temp: 'तापमान (Temp)',
+    spo2: 'ऑक्सिजन पातळी (SpO2)',
+    sugar: 'रक्तातील साखर (Sugar)',
+    medicine: 'विहित औषध',
+    dosage: 'डोस आणि पद्धत',
+    scheduledTime: 'देण्याची वेळ',
+    status: 'डोस स्थिती',
+    administerBtn: 'औषध दिले म्हणून नोंदवा',
+    given: 'दिले (Administered)',
+    pending: 'देणे बाकी (Pending)'
+  },
+
+  // Doctors View
+  doctors: {
+    title: 'वैद्यकीय कर्मचारी आणि विशेषज्ञ डिरेक्टरी',
+    subtitle: 'प्रमाणित विशेषज्ञ डॉक्टर, विभाग प्रमुख आणि ओपीडी तपासणी वेळ.',
+    onboardBtn: 'नवीन डॉक्टर नोंदणी करा',
+    searchPlaceholder: 'डॉक्टर, स्पेशॅलिटी किंवा केबिन शोधा...',
+    onDuty: 'आज कर्तव्यावर हजर',
+    offDuty: 'कर्तव्यावर नाही',
+    consultationFee: 'तपासणी शुल्क',
+    room: 'केबिन क्रमांक',
+    experience: 'अनुभव',
+    qualification: 'पात्रता पदवी',
+    schedule: 'ओपीडी वेळ'
   },
 
   // Book Appointment Modal
