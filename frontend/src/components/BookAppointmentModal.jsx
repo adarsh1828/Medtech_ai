@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Stethoscope, Building2, User, CheckCircle2 } from 'lucide-react';
+import { X, Calendar, Clock, Stethoscope, Building2, User, CheckCircle2, Sparkles } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -9,7 +9,16 @@ const TIME_SLOTS = [
   '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM'
 ];
 
-export default function BookAppointmentModal({ isOpen, onClose, user, onBookingSuccess, preselectedDeptId, preselectedDocId }) {
+export default function BookAppointmentModal({ 
+  isOpen, 
+  onClose, 
+  user, 
+  onBookingSuccess, 
+  preselectedDeptId, 
+  preselectedDocId,
+  preselectedReason
+}) {
+  const { t } = useLanguage();
   const [departments, setDepartments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -20,6 +29,7 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
   const [appointmentDate, setAppointmentDate] = useState(new Date().toISOString().split('T')[0]);
   const [timeSlot, setTimeSlot] = useState('09:30 AM');
   const [reason, setReason] = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -34,7 +44,51 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
   useEffect(() => {
     if (preselectedDeptId) setDepartmentId(preselectedDeptId);
     if (preselectedDocId) setDoctorId(preselectedDocId);
-  }, [preselectedDeptId, preselectedDocId]);
+    if (preselectedReason) setReason(preselectedReason);
+  }, [preselectedDeptId, preselectedDocId, preselectedReason]);
+
+  // Real-Time AI Department Recommendation Trigger Shield
+  useEffect(() => {
+    if (!reason || reason.length < 4) {
+      setAiSuggestion(null);
+      return;
+    }
+
+    const lower = reason.toLowerCase();
+    let suggestedCode = null;
+    let explanation = '';
+
+    if (lower.includes('chest') || lower.includes('heart') || lower.includes('छातीत') || lower.includes('धडधड') || lower.includes('सीने') || lower.includes('कळ')) {
+      suggestedCode = 'CARD';
+      explanation = 'हृदयरोग (Cardiology)';
+    } else if (lower.includes('stroke') || lower.includes('headache') || lower.includes('डोकेदुखी') || lower.includes('पक्षाघात') || lower.includes('चक्कर') || lower.includes('फिट')) {
+      suggestedCode = 'NEUR';
+      explanation = 'मेंदू व मज्जारज्जू (Neurology)';
+    } else if (lower.includes('fracture') || lower.includes('bone') || lower.includes('ankle') || lower.includes('हाड') || lower.includes('फ्रॅक्चर') || lower.includes('मुरगळणे') || lower.includes('सांधे')) {
+      suggestedCode = 'ORTH';
+      explanation = 'हाडांचे विकार व फ्रॅक्चर (Orthopedics)';
+    } else if (lower.includes('child') || lower.includes('baby') || lower.includes('लहान मूल') || lower.includes('बाळ') || lower.includes('बच्चा')) {
+      suggestedCode = 'PED';
+      explanation = 'बालरोग विभाग (Pediatrics)';
+    } else if (lower.includes('asthma') || lower.includes('breath') || lower.includes('दमा') || lower.includes('धाप') || lower.includes('खोकला')) {
+      suggestedCode = 'PULM';
+      explanation = 'श्वसनविकार व दमा (Pulmonology)';
+    } else if (lower.includes('stomach') || lower.includes('vomit') || lower.includes('पोटदुखी') || lower.includes('उलटी') || lower.includes('कावीळ')) {
+      suggestedCode = 'GAST';
+      explanation = 'पोट व पचनसंस्था विकार (Gastroenterology)';
+    }
+
+    if (suggestedCode) {
+      const match = departments.find(d => d.code === suggestedCode);
+      if (match && String(match.id) !== String(departmentId)) {
+        setAiSuggestion({ deptId: match.id, deptName: match.name, explanation });
+      } else {
+        setAiSuggestion(null);
+      }
+    } else {
+      setAiSuggestion(null);
+    }
+  }, [reason, departmentId, departments]);
 
   const loadFormData = async () => {
     setLoading(true);
@@ -114,8 +168,6 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
       setSubmitting(false);
     }
   };
-
-  const { t } = useLanguage();
 
   if (!isOpen) return null;
 
@@ -286,6 +338,39 @@ export default function BookAppointmentModal({ isOpen, onClose, user, onBookingS
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
+            {aiSuggestion && (
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                marginTop: '6px',
+                fontSize: '0.8rem',
+                color: '#fbbf24',
+                animation: 'fadeIn 0.2s ease-out'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Sparkles size={14} />
+                  <span>AI शिफारस: लक्षणांनुसार <strong>{aiSuggestion.explanation}</strong> विभाग योग्य वाटतो.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDepartmentId(aiSuggestion.deptId);
+                    setDoctorId('');
+                    setAiSuggestion(null);
+                  }}
+                  className="btn btn-outline btn-xs"
+                  style={{ borderColor: '#fbbf24', color: '#fbbf24', padding: '3px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                >
+                  विभागात बदला
+                </button>
+              </div>
+            )}
           </div>
 
           <button

@@ -11,67 +11,138 @@ import {
   Brain,
   HeartPulse,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  Mic,
+  MicOff,
+  Flame,
+  Volume2
 } from 'lucide-react';
 import { api } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 
 const PRESETS = [
   {
-    title: 'Cardiac Symptoms',
-    symptoms: 'Chest tightness radiating to left shoulder with shortness of breath and diaphoresis on exertion.',
+    title: '❤️ छातीत कळ व घाम (Cardiac)',
+    titleEn: 'Cardiac Emergency',
+    symptoms: 'छातीत डाव्या बाजूला तीव्र कळ येत आहे, डाव्या हातात वेदना होतात आणि खूप घाम फुटतोय.',
     dept: 'Cardiology',
     deptId: 1,
     urgency: 'CRITICAL',
     confidence: '96%',
-    reasoning: 'Symptoms are classic markers for acute coronary syndrome / angina pectoris requiring prompt ECG and troponin evaluation.',
-    precautions: 'Do not perform strenuous activities. Rest in a semi-upright posture. Seek immediate emergency evaluation if pain escalates.'
+    reasoning: 'लक्षणे एक्यूट कोरोनरी सिंड्रोम (हार्ट अटॅक / एंजायना) दर्शवतात. त्वरित ECG व कार्डियाक तपासणी आवश्यक.',
+    precautions: 'हालचाल थांबवा, विश्रांती घ्या, त्वरित कार्डियाक ICU मध्ये नेणे आवश्यक.'
   },
   {
-    title: 'Neurological Episode',
-    symptoms: 'Sudden throbbing unilateral headache accompanied by visual aura, photophobia, and transient nausea.',
+    title: '🧠 तीव्र डोकेदुखी व पक्षाघात (Neuro)',
+    titleEn: 'Neurological / Stroke',
+    symptoms: 'तीव्र डोकेदुखी, बोलताना अडखळणे आणि शरीराच्या उजव्या बाजूला अशक्तपणा जाणवत आहे.',
     dept: 'Neurology',
     deptId: 2,
-    urgency: 'MODERATE',
-    confidence: '92%',
-    reasoning: 'Clinical presentation consistent with acute migraine with aura. Neuro-vascular consult recommended to rule out secondary etiology.',
-    precautions: 'Rest in a quiet, darkened room. Maintain oral hydration. Avoid bright LED screens.'
+    urgency: 'CRITICAL',
+    confidence: '95%',
+    reasoning: 'एक्यूट स्ट्रोक (पक्षाघात) ची तीव्र शक्यता. गोल्डन अवर (4.5 तास) मध्ये तात्काळ CT Brain स्कॅन आवश्यक.',
+    precautions: 'काहीही खायला किंवा प्यायला देऊ नका (NPO), डोके ३० अंश वर ठेवा.'
   },
   {
-    title: 'Orthopedic Trauma',
-    symptoms: 'Inversion twist to right ankle during sports, acute localized lateral swelling, ecchymosis, and inability to bear full weight.',
+    title: '🦴 फ्रॅक्चर व पाय मुरगळणे (Ortho)',
+    titleEn: 'Orthopedic Trauma',
+    symptoms: 'पायऱ्यांवरून घसरून पडल्यामुळे पायाचा घोटा मुरगळला असून तीव्र सूज आली आहे आणि चालता येत नाही.',
     dept: 'Orthopedics',
     deptId: 3,
-    urgency: 'MODERATE',
+    urgency: 'HIGH',
     confidence: '94%',
-    reasoning: 'Likely lateral ligament complex sprain or distal fibular avulsion fracture. Plain radiographs indicated.',
-    precautions: 'Follow R.I.C.E protocol (Rest, Ice for 20 mins, Compression bandage, Elevation above heart level).'
+    reasoning: 'हाडाला फ्रॅक्चर किंवा लिगामेंट फाटल्याची शक्यता. डिजिटल X-Ray व स्प्लिंट तात्काळ आवश्यक.',
+    precautions: 'पायावर वजन देऊ नका, बर्फाने शेकवा (R.I.C.E. प्रोटोकॉल).'
   },
   {
-    title: 'Pediatric Respiratory',
-    symptoms: '4-year-old with harsh barking cough, inspiratory stridor at rest, and fever of 101.4 F for past 24 hours.',
+    title: '👶 बाळाला ताप व धाप (Pediatric)',
+    titleEn: 'Pediatric Distress',
+    symptoms: '२ वर्षांच्या लहान बाळाला १०२ ताप आहे, धाप लागत आहे आणि बाळ सतत रडत असून दूध पीत नाही.',
     dept: 'Pediatrics',
     deptId: 4,
     urgency: 'HIGH',
-    confidence: '95%',
-    reasoning: 'Clinical features consistent with acute viral laryngotracheobronchitis (Croup). Airway patency monitoring essential.',
-    precautions: 'Expose child to humidified cool mist or steamy bathroom. Keep child calm to minimize airway agitation.'
+    confidence: '94%',
+    reasoning: 'लहान मुलांमधील तीव्र श्वसन संसर्ग व डिहायड्रेशन. बालरोग तज्ज्ञांकडून तात्काळ तपासणी आवश्यक.',
+    precautions: 'बाळाला शांत ठेवा, थोडे थोडे पाणी/ओआरएस पाजा, तातडीने बालरोग डॉक्टरांकडे न्या.'
   },
   {
-    title: 'Systemic Infection',
-    symptoms: 'Persistent fever of 102.5 F, productive cough with yellow sputum, fatigue, and pleuritic chest discomfort.',
-    dept: 'General Medicine',
+    title: '💨 दमा व श्वास घेण्यास त्रास (Pulmonology)',
+    titleEn: 'Asthma / Pulmonology',
+    symptoms: 'छातीत घरघर आवाज येत असून श्वास घेण्यास खूप त्रास होत आहे आणि खूप कफ झाला आहे.',
+    dept: 'Pulmonology',
     deptId: 5,
     urgency: 'HIGH',
-    confidence: '91%',
-    reasoning: 'Suspicion of lower respiratory tract infection / community-acquired pneumonia. Chest auscultation and CBC recommended.',
-    precautions: 'Adequate hydration (at least 2.5L fluids), antipyretic control as advised, isolate from vulnerable persons.'
+    confidence: '93%',
+    reasoning: 'एक्यूट अस्थमा किंवा फुफ्फुसाचा संसर्ग. नेब्युलायझेशन आणि SpO2 ऑक्सिजन तपासणी आवश्यक.',
+    precautions: 'ताठ बसा, थंड हवा किंवा धूर टाळा, त्वरित इनहेलर किंवा नेब्युलायझर घ्या.'
+  },
+  {
+    title: '🔥 पोटदुखी व उलट्या (Gastro)',
+    titleEn: 'Severe Abdominal Pain',
+    symptoms: 'पोटात तीव्र गोळा येऊन वेदना होत आहेत, सतत उलटीचा त्रास आणि संडास पातळ होत आहे.',
+    dept: 'Gastroenterology',
+    deptId: 6,
+    urgency: 'HIGH',
+    confidence: '92%',
+    reasoning: 'एक्यूट गॅस्ट्रोएन्टेरिटिस किंवा ऍसिडिटी संसर्ग. डिहायड्रेशन रोखण्यासाठी हायड्रेशन व तपासणी आवश्यक.',
+    precautions: 'ओआरएस (ORS) थोडे थोडे प्या, तिखट व तेलकट अन्न टाळा.'
   }
 ];
 
 export default function AITriageView({ onBookWithDepartment }) {
+  const { language, t } = useLanguage();
   const [symptomText, setSymptomText] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+
+  // Voice Speech Recognition Trigger (Marathi, Hindi, English)
+  const toggleSpeechRecognition = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('तुमच्या ब्राउझरमध्ये व्हॉईस इनपुट सपोर्ट नाही. कृपया Google Chrome किंवा Edge वापरा.');
+      return;
+    }
+
+    if (isListening) {
+      if (window._medtechRecognition) {
+        window._medtechRecognition.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      window._medtechRecognition = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = language === 'mr' ? 'mr-IN' : language === 'hi' ? 'hi-IN' : 'en-IN';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSymptomText(prev => (prev ? prev + ' ' + transcript : transcript));
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.warn('Speech recognition start failed:', e);
+      setIsListening(false);
+    }
+  };
 
   const runTriage = async (preset = null) => {
     const text = preset ? preset.symptoms : symptomText;
@@ -111,6 +182,16 @@ export default function AITriageView({ onBookWithDepartment }) {
     runTriage(preset);
   };
 
+  const handleBookAppointment = () => {
+    if (!result || !onBookWithDepartment) return;
+    onBookWithDepartment({
+      deptId: result.deptId,
+      deptName: result.dept,
+      reason: `[AI Triage: ${result.urgency}] ${symptomText} (${result.suspectedConditions?.[0] || result.dept})`,
+      urgency: result.urgency
+    });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header Banner */}
@@ -118,7 +199,7 @@ export default function AITriageView({ onBookWithDepartment }) {
         background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.12) 100%)',
         border: '1px solid rgba(139, 92, 246, 0.3)',
         borderRadius: 'var(--radius-lg)',
-        padding: '28px',
+        padding: '24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -126,14 +207,14 @@ export default function AITriageView({ onBookWithDepartment }) {
         gap: '16px'
       }}>
         <div style={{ maxWidth: '650px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '20px', color: '#c084fc', fontSize: '0.75rem', fontWeight: '700', marginBottom: '10px' }}>
-            <Sparkles size={14} /> CLINICAL TRIAGE ENGINE
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '20px', color: '#c084fc', fontSize: '0.75rem', fontWeight: '700', marginBottom: '8px' }}>
+            <Sparkles size={14} /> MULTILINGUAL CLINICAL TRIAGE ENGINE
           </div>
-          <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>
-            AI Symptom Screening & Rapid Triage
+          <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>
+            AI लक्षण तपासणी व तात्काळ वर्गीकरण (AI Clinical Triage)
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.5', marginTop: '4px' }}>
-            State-of-the-art diagnostic reasoning system that evaluates patient symptomatology, computes urgency acuity level, and routes directly to the specialized clinical department.
+            मराठी, हिंदी किंवा इंग्रजीत लक्षणे सांगा. सिस्टीम रुग्णाची तीव्रता तपासून तात्काळ योग्य डॉक्टर आणि विभाग सुचवेल.
           </p>
         </div>
 
@@ -147,7 +228,7 @@ export default function AITriageView({ onBookWithDepartment }) {
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>
             Triage Standard
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#38bdf8', marginTop: '2px' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#38bdf8', marginTop: '2px' }}>
             Emergency Severity Index (ESI)
           </div>
         </div>
@@ -156,7 +237,7 @@ export default function AITriageView({ onBookWithDepartment }) {
       {/* Preset Quick Symptoms */}
       <div>
         <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>
-          Test Clinical Scenarios:
+          लक्षणे निवडून त्वरित तपासा (Quick Test Scenarios):
         </div>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {PRESETS.map((p, idx) => (
@@ -172,21 +253,70 @@ export default function AITriageView({ onBookWithDepartment }) {
         </div>
       </div>
 
-      {/* Input Box */}
+      {/* Input Box with Voice Mic Trigger */}
       <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <label className="form-label" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-          Describe Presenting Symptoms, Onset, and Pain Severity:
-        </label>
-        <textarea
-          rows="4"
-          className="form-textarea"
-          placeholder="e.g. Sharp chest pain radiating to left arm for 45 minutes, accompanied by cold sweats..."
-          value={symptomText}
-          onChange={(e) => setSymptomText(e.target.value)}
-          style={{ fontSize: '0.925rem', lineHeight: '1.5' }}
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label className="form-label" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>
+            रुग्णाची लक्षणे, दुखण्याचा प्रकार व वेळ सांगा / लिहा:
+          </label>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            मराठी, हिंदी किंवा English मध्ये टाईप करा किंवा बोला
+          </span>
+        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ position: 'relative' }}>
+          <textarea
+            rows="4"
+            className="form-textarea"
+            placeholder="उदा. छातीत डाव्या बाजूला खूप कळ येत आहे आणि घाम फुटत आहे... किंवा मायक्रोफोन बटण दाबून थेट बोला..."
+            value={symptomText}
+            onChange={(e) => setSymptomText(e.target.value)}
+            style={{ fontSize: '0.925rem', lineHeight: '1.5', paddingRight: '50px' }}
+          />
+
+          {/* Voice Input Mic Button */}
+          <button
+            type="button"
+            onClick={toggleSpeechRecognition}
+            title={isListening ? 'बोलणे थांबवा' : 'मायक्रोफोनने लक्षणे बोला (Voice Input)'}
+            style={{
+              position: 'absolute',
+              right: '12px',
+              bottom: '16px',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              border: isListening ? '2px solid #ef4444' : '1px solid var(--border-subtle)',
+              background: isListening ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: isListening ? '#ef4444' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              animation: isListening ? 'pulse 1.2s infinite' : 'none'
+            }}
+          >
+            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+        </div>
+
+        {isListening && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#ef4444', fontWeight: '600' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', display: 'inline-block', animation: 'ping 1s infinite' }} />
+            ऐकत आहे... कृपया तुमची लक्षणे बोला (Listening in {language === 'mr' ? 'Marathi' : language === 'hi' ? 'Hindi' : 'English'})...
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          {symptomText && (
+            <button
+              onClick={() => { setSymptomText(''); setResult(null); }}
+              className="btn btn-outline btn-sm"
+            >
+              साफ करा (Clear)
+            </button>
+          )}
           <button
             onClick={() => runTriage()}
             disabled={analyzing || !symptomText.trim()}
@@ -195,11 +325,11 @@ export default function AITriageView({ onBookWithDepartment }) {
           >
             {analyzing ? (
               <>
-                <Activity size={16} className="heartbeat-icon" /> Analyzing Triage...
+                <Activity size={16} className="heartbeat-icon" /> AI तपासणी चालू आहे...
               </>
             ) : (
               <>
-                <Sparkles size={16} /> Run Clinical Triage
+                <Sparkles size={16} /> AI Triage ट्रिगर करा
               </>
             )}
           </button>
@@ -212,8 +342,8 @@ export default function AITriageView({ onBookWithDepartment }) {
           className="glass-card"
           style={{
             border: `2px solid ${
-              result.urgency === 'CRITICAL' ? 'rgba(244, 63, 94, 0.5)' :
-              result.urgency === 'HIGH' ? 'rgba(245, 158, 11, 0.5)' : 'rgba(6, 182, 212, 0.5)'
+              result.urgency === 'CRITICAL' ? 'rgba(244, 63, 94, 0.6)' :
+              result.urgency === 'HIGH' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(6, 182, 212, 0.6)'
             }`,
             background: 'linear-gradient(180deg, rgba(18, 28, 46, 0.95) 0%, rgba(13, 21, 36, 0.98) 100%)',
             display: 'flex',
@@ -238,8 +368,8 @@ export default function AITriageView({ onBookWithDepartment }) {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Building2 size={16} color="var(--primary)" />
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Recommended Department:</span>
-              <span style={{ fontWeight: '700', fontSize: '1rem', color: '#38bdf8' }}>{result.dept}</span>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>शिफारस केलेला विभाग:</span>
+              <span style={{ fontWeight: '800', fontSize: '1.05rem', color: '#38bdf8' }}>{result.dept}</span>
             </div>
           </div>
 
@@ -258,7 +388,7 @@ export default function AITriageView({ onBookWithDepartment }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  Differential Diagnosis:
+                  संभाव्य निदान (Differential Diagnosis):
                 </span>
                 {result.suspectedConditions.map((cond, idx) => (
                   <span
@@ -279,7 +409,7 @@ export default function AITriageView({ onBookWithDepartment }) {
 
               {result.estimatedWaitTime && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#fbbf24', fontWeight: '600' }}>
-                  <Clock size={14} /> Priority Wait: {result.estimatedWaitTime}
+                  <Clock size={14} /> प्रतीक्षेचा अंदाजित वेळ: {result.estimatedWaitTime}
                 </div>
               )}
             </div>
@@ -296,7 +426,7 @@ export default function AITriageView({ onBookWithDepartment }) {
             gap: '6px'
           }}>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-muted)' }}>
-              Clinical Diagnostic Assessment
+              क्लिनिकल विश्लेषण (Clinical Diagnostic Assessment)
             </div>
             <p style={{ fontSize: '0.925rem', color: 'var(--text-primary)', lineHeight: '1.5' }}>
               {result.reasoning}
@@ -311,21 +441,21 @@ export default function AITriageView({ onBookWithDepartment }) {
             padding: '14px 16px'
           }}>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: '#fbbf24', marginBottom: '4px' }}>
-              Suggested Immediate First-Aid & Patient Guidance
+              तात्काळ प्रथमोपचार व मार्गदर्शन (Immediate First-Aid Guidance)
             </div>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
               {result.precautions}
             </p>
           </div>
 
-          {/* 1-Click Action to Book */}
+          {/* 1-Click Action to Book with Auto-Fill */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '8px' }}>
             <button
-              onClick={() => onBookWithDepartment(result.deptId)}
+              onClick={handleBookAppointment}
               className="btn btn-primary"
-              style={{ padding: '12px 24px', fontSize: '0.95rem' }}
+              style={{ padding: '12px 24px', fontSize: '0.95rem', gap: '8px' }}
             >
-              Book Immediate Consultation with {result.dept} <ArrowRight size={16} />
+              {result.dept} विभागात तात्काळ अपॉइंटमेंट बुक करा <ArrowRight size={16} />
             </button>
           </div>
         </div>

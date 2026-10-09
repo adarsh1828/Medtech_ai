@@ -243,6 +243,21 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
           {filteredAppointments.map((appt) => {
             const isCompleted = appt.status === 'completed';
             const isInCabin = appt.status === 'in_consultation';
+            const reasonLower = (appt.reason_for_visit || '').toLowerCase();
+            const isCriticalTriage = 
+              appt.reason_for_visit?.includes('CRITICAL') || 
+              reasonLower.includes('chest pain') || 
+              reasonLower.includes('छातीत') ||
+              reasonLower.includes('stroke') ||
+              reasonLower.includes('पक्षाघात') ||
+              reasonLower.includes('heart attack');
+            const isUrgentTriage = !isCriticalTriage && (
+              appt.reason_for_visit?.includes('HIGH') || 
+              reasonLower.includes('fracture') || 
+              reasonLower.includes('फ्रॅक्चर') ||
+              reasonLower.includes('asthma') ||
+              reasonLower.includes('stridor')
+            );
 
             return (
               <div
@@ -253,7 +268,9 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                   flexDirection: 'column',
                   gap: '14px',
                   position: 'relative',
-                  border: isCompleted 
+                  border: isCriticalTriage && !isCompleted
+                    ? '1.5px solid rgba(244, 63, 94, 0.55)'
+                    : isCompleted 
                     ? '1.5px solid rgba(16, 185, 129, 0.4)' 
                     : isInCabin 
                     ? '1.5px solid rgba(6, 182, 212, 0.5)' 
@@ -262,12 +279,14 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     ? 'var(--card-highlight-completed)' 
                     : isInCabin 
                     ? 'var(--card-highlight-cabin)' 
+                    : isCriticalTriage
+                    ? 'linear-gradient(180deg, rgba(244, 63, 94, 0.05) 0%, rgba(13, 21, 36, 0.98) 100%)'
                     : undefined
                 }}
               >
                 {/* Card Top: Token & Status */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.85rem',
@@ -283,6 +302,42 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       APT-{appt.id}
                     </span>
+
+                    {/* AI Clinical Triage Urgency Priority Badges */}
+                    {isCriticalTriage && !isCompleted && (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        background: 'rgba(244, 63, 94, 0.2)',
+                        border: '1px solid rgba(244, 63, 94, 0.6)',
+                        color: '#fb7185',
+                        fontSize: '0.72rem',
+                        fontWeight: '800',
+                        letterSpacing: '0.02em',
+                        animation: 'pulse 1.8s infinite'
+                      }}>
+                        🔴 AI CRITICAL PRIORITY
+                      </span>
+                    )}
+                    {isUrgentTriage && !isCompleted && (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        background: 'rgba(245, 158, 11, 0.2)',
+                        border: '1px solid rgba(245, 158, 11, 0.5)',
+                        color: '#fbbf24',
+                        fontSize: '0.72rem',
+                        fontWeight: '700'
+                      }}>
+                        🟡 AI URGENT
+                      </span>
+                    )}
                   </div>
 
                   {/* Enhanced Status Badges */}

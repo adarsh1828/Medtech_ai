@@ -84,6 +84,7 @@ export default function App() {
   const [activeConsultationAppt, setActiveConsultationAppt] = useState(null);
   const [preselectedDeptId, setPreselectedDeptId] = useState(null);
   const [preselectedDocId, setPreselectedDocId] = useState(null);
+  const [preselectedReason, setPreselectedReason] = useState('');
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(null);
 
   // Key refresh trigger for data synchronization
@@ -250,12 +251,20 @@ export default function App() {
   const handleBookWithDoctor = (doc) => {
     setPreselectedDeptId(doc.department_id);
     setPreselectedDocId(doc.id);
+    setPreselectedReason('');
     setIsBookOpen(true);
   };
 
-  const handleBookWithDepartment = (deptId) => {
-    setPreselectedDeptId(deptId);
-    setPreselectedDocId(null);
+  const handleBookWithDepartment = (triageData) => {
+    if (typeof triageData === 'object' && triageData !== null) {
+      setPreselectedDeptId(triageData.deptId || null);
+      setPreselectedDocId(null);
+      setPreselectedReason(triageData.reason || '');
+    } else {
+      setPreselectedDeptId(triageData);
+      setPreselectedDocId(null);
+      setPreselectedReason('');
+    }
     setIsBookOpen(true);
   };
 
@@ -423,10 +432,14 @@ export default function App() {
 
       <BookAppointmentModal
         isOpen={isBookOpen}
-        onClose={() => setIsBookOpen(false)}
+        onClose={() => {
+          setIsBookOpen(false);
+          setPreselectedReason('');
+        }}
         user={user}
         preselectedDeptId={preselectedDeptId}
         preselectedDocId={preselectedDocId}
+        preselectedReason={preselectedReason}
         onBookingSuccess={() => {
           triggerDataRefresh();
           setActiveTab('appointments');
