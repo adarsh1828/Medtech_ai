@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 const WARDS = ['All', 'ICU', 'Emergency', 'General Ward', 'Semi-Private', 'Pediatric Ward'];
 
@@ -31,9 +30,6 @@ export default function BedsView({ user }) {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
 
-  // Dispatch modal state
-  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
-  const [initialDispatchTab, setInitialDispatchTab] = useState('nurse');
 
   useEffect(() => {
     loadBeds();
@@ -526,13 +522,7 @@ export default function BedsView({ user }) {
         </div>
       )}
 
-      {/* Staff Duty & Task Dispatcher Modal */}
-      <StaffDutyDispatchModal
-        isOpen={isDispatchOpen}
-        onClose={() => setIsDispatchOpen(false)}
-        initialTab={initialDispatchTab}
-        onUpdateSuccess={loadBeds}
-      />
+
     </div>
   );
 }

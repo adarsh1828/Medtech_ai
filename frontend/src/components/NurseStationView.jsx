@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function NurseStationView({ user, hospitalInfo }) {
   const { t } = useLanguage();
@@ -31,7 +30,6 @@ export default function NurseStationView({ user, hospitalInfo }) {
   const [allNurses, setAllNurses] = useState([]);
   const [patientsList, setPatientsList] = useState([]);
   const [bedsList, setBedsList] = useState([]);
-  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Administer dose modal state
@@ -984,13 +982,6 @@ export default function NurseStationView({ user, hospitalInfo }) {
         </div>
       )}
 
-      {/* Staff Duty Dispatch Modal */}
-      <StaffDutyDispatchModal
-        isOpen={isDispatchOpen}
-        onClose={() => setIsDispatchOpen(false)}
-        initialTab="nurse"
-        onUpdateSuccess={loadData}
-      />
     </div>
   );
 }

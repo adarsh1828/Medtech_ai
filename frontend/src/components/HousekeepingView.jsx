@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function HousekeepingView({ user, hospitalInfo }) {
   const { t } = useLanguage();
@@ -31,9 +30,6 @@ export default function HousekeepingView({ user, hospitalInfo }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all' | 'clean' | 'due' | 'overdue'
-
-  // Dispatch modal state
-  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
   // Scan modal state
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
@@ -994,14 +990,6 @@ export default function HousekeepingView({ user, hospitalInfo }) {
           </div>
         </div>
       )}
-
-      {/* Staff Duty & Cleaning Task Dispatcher Modal */}
-      <StaffDutyDispatchModal
-        isOpen={isDispatchModalOpen}
-        onClose={() => setIsDispatchModalOpen(false)}
-        initialTab="housekeeping"
-        onUpdateSuccess={loadData}
-      />
     </div>
   );
 }

@@ -15,7 +15,6 @@ import GlobalSearchModal from './components/GlobalSearchModal';
 import BookAppointmentModal from './components/BookAppointmentModal';
 import ConsultationModal from './components/ConsultationModal';
 import OnboardDoctorModal from './components/OnboardDoctorModal';
-import HospitalSettingsModal from './components/HospitalSettingsModal';
 import EmergencySOSModal from './components/EmergencySOSModal';
 import AuthPage from './components/AuthPage';
 import NurseStationView from './components/NurseStationView';
@@ -78,7 +77,6 @@ export default function App() {
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isOnboardDoctorOpen, setIsOnboardDoctorOpen] = useState(false);
-  const [isHospitalSettingsOpen, setIsHospitalSettingsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
@@ -300,7 +298,6 @@ export default function App() {
           user={user}
           onQuickLogin={handleQuickLogin}
           onLogout={handleLogout}
-          onOpenHospitalSettings={() => setIsHospitalSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenEmergency={() => setIsEmergencyOpen(true)}
           isSidebarCollapsed={isSidebarCollapsed}
@@ -413,16 +410,6 @@ export default function App() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onNavigate={(tab) => setActiveTab(tab)}
-      />
-
-      <HospitalSettingsModal
-        isOpen={isHospitalSettingsOpen}
-        onClose={() => setIsHospitalSettingsOpen(false)}
-        hospitalInfo={hospitalInfo}
-        onSaveSuccess={(updated) => {
-          setHospitalInfo(updated);
-          triggerDataRefresh();
-        }}
       />
 
       <OnboardDoctorModal

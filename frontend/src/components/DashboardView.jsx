@@ -25,13 +25,11 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function DashboardView({ user, setActiveTab, onOpenBookModal, onOpenEmergency }) {
   const { t } = useLanguage();
   const [overview, setOverview] = useState(null);
   const [todayAppointments, setTodayAppointments] = useState([]);
-  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Live Hospital Telemetry Events Feed
@@ -161,15 +159,6 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         </div>
 
         <div className="dashboard-hero-actions" style={{ display: 'flex', gap: '12px', zIndex: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {user?.role === 'admin' && (
-            <button
-              onClick={() => setIsDispatchModalOpen(true)}
-              className="btn btn-outline"
-              style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#38bdf8', background: 'rgba(6, 182, 212, 0.1)', gap: '8px' }}
-            >
-              <HeartPulse size={16} /> ड्युटी व काम वाटप
-            </button>
-          )}
           <button
             onClick={() => setActiveTab('ai-triage')}
             className="btn btn-outline"
@@ -450,48 +439,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         )}
       </div>
 
-      {/* Security Notice: Pending Doctor Registrations */}
-      {overview?.pendingDoctorsCount > 0 && user?.role === 'admin' && (
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.04) 100%)',
-          border: '1px solid rgba(245, 158, 11, 0.35)',
-          borderRadius: 'var(--radius-md)',
-          padding: '14px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              padding: '8px',
-              borderRadius: '8px',
-              background: 'rgba(245, 158, 11, 0.2)',
-              color: '#fbbf24'
-            }}>
-              <ShieldAlert size={22} />
-            </div>
-            <div>
-              <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.94rem' }}>
-                सुरक्षा सूचना: {overview.pendingDoctorsCount} नवीन डॉक्टर नोंदणी मंजुरी प्रलंबित!
-              </div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                New physician registrations await administrative review before being allowed to access patient data and clinical workstations.
-              </div>
-            </div>
-          </div>
-          {setActiveTab && (
-            <button
-              onClick={() => setActiveTab('doctors')}
-              className="btn btn-warning btn-sm"
-              style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              पडताळणी करा (Review & Approve) <ArrowRight size={14} />
-            </button>
-          )}
-        </div>
-      )}
+
 
       {/* Main 2-Column Section: Appointments Queue + Department Bed Distribution */}
       <div className="dashboard-main-grid">
@@ -830,13 +778,6 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           </div>
         </div>
       </div>
-
-      {/* Staff Duty & Cleaning Task Dispatcher Modal */}
-      <StaffDutyDispatchModal
-        isOpen={isDispatchModalOpen}
-        onClose={() => setIsDispatchModalOpen(false)}
-        onUpdateSuccess={loadDashboardData}
-      />
     </div>
   );
 }

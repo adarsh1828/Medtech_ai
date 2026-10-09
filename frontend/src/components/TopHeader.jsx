@@ -29,7 +29,6 @@ export default function TopHeader({
   onLogout, 
   onOpenLogin, 
   onOpenBookModal, 
-  onOpenHospitalSettings, 
   onOpenSearch, 
   onOpenEmergency,
   isSidebarCollapsed, 
@@ -320,18 +319,6 @@ export default function TopHeader({
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-
-        {/* Hospital Settings - Desktop Only */}
-        {user?.role === 'admin' && (
-          <button
-            onClick={onOpenHospitalSettings}
-            className="btn btn-outline btn-sm hide-on-mobile"
-            style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#38bdf8' }}
-            title="Configure Hospital Name and White-label Branding"
-          >
-            <Building2 size={15} /> {t('header.hospitalSettings', 'Hospital Settings')}
-          </button>
-        )}
 
         {/* 24x7 Emergency SOS Button */}
         <button
