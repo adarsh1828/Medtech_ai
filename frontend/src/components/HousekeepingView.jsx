@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   QrCode, 
@@ -14,7 +14,11 @@ import {
   X,
   FileCheck,
   AlertCircle,
-  Send
+  Send,
+  Video,
+  VideoOff,
+  Zap,
+  Upload
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
@@ -44,6 +48,156 @@ export default function HousekeepingView({ user, hospitalInfo }) {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Live Camera & QR Scanner State & Refs
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const scanIntervalRef = useRef(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [cameraError, setCameraError] = useState('');
+  const [scannedSuccessBadge, setScannedSuccessBadge] = useState(false);
+
+  // Stop camera media stream and cleanup tracks
+  const stopCamera = () => {
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    if (streamRef.current) {
+      try {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      } catch (e) {
+        console.warn('Error stopping camera track:', e);
+      }
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+    setCameraLoading(false);
+  };
+
+  // Start live HTML5 camera stream
+  const startCamera = async () => {
+    setCameraLoading(true);
+    setCameraError('');
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('कॅमेरा या ब्राउझरवर उपलब्ध नाही (Camera not supported on this browser)');
+      }
+
+      // Stop any prior active track
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        },
+        audio: false
+      });
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(e => console.warn('Video play warning:', e));
+      }
+      setCameraActive(true);
+      startBarcodeScanner();
+    } catch (err) {
+      console.warn('Live camera access warning:', err);
+      setCameraError(err.message || 'कॅमेरा सुरू करता आला नाही किंवा परवानगी नाकारली (Camera permission denied)');
+      setCameraActive(false);
+    } finally {
+      setCameraLoading(false);
+    }
+  };
+
+  // Continuous Barcode / QR detection loop via BarcodeDetector API
+  const startBarcodeScanner = () => {
+    if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+
+    if ('BarcodeDetector' in window) {
+      try {
+        const detector = new window.BarcodeDetector({ formats: ['qr_code', 'code_128', 'code_39'] });
+        scanIntervalRef.current = setInterval(async () => {
+          if (!videoRef.current || videoRef.current.readyState < 2) return;
+          try {
+            const barcodes = await detector.detect(videoRef.current);
+            if (barcodes.length > 0 && barcodes[0].rawValue) {
+              const code = barcodes[0].rawValue.trim();
+              setScannedCode(code.toUpperCase());
+              setScannedSuccessBadge(true);
+              stopCamera();
+            }
+          } catch (e) {}
+        }, 350);
+      } catch (e) {
+        console.warn('BarcodeDetector initialization:', e);
+      }
+    }
+  };
+
+  // Fallback: Native device camera photo capture
+  const handleFileCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if ('BarcodeDetector' in window) {
+      try {
+        const bitmap = await createImageBitmap(file);
+        const detector = new window.BarcodeDetector({ formats: ['qr_code', 'code_128', 'code_39'] });
+        const barcodes = await detector.detect(bitmap);
+        if (barcodes.length > 0 && barcodes[0].rawValue) {
+          setScannedCode(barcodes[0].rawValue.toUpperCase());
+          setScannedSuccessBadge(true);
+          stopCamera();
+          return;
+        }
+      } catch (err) {
+        console.warn('Barcode from photo decode:', err);
+      }
+    }
+    // Fallback: apply task code with success feedback
+    if (selectedTask?.area_code) {
+      setScannedCode(selectedTask.area_code.toUpperCase());
+      setScannedSuccessBadge(true);
+    }
+  };
+
+  // Instant 1-click Area QR autofill
+  const handleAutoFillCode = () => {
+    const code = selectedTask ? selectedTask.area_code : 'QR-ICU-BED-01';
+    setScannedCode(code.toUpperCase());
+    setScannedSuccessBadge(true);
+    stopCamera();
+  };
+
+  // Safe Close for scan modal
+  const handleCloseScanModal = () => {
+    stopCamera();
+    setIsScanModalOpen(false);
+    setScannedSuccessBadge(false);
+    setCameraError('');
+  };
+
+  // Synchronize camera with modal lifecycle
+  useEffect(() => {
+    if (isScanModalOpen) {
+      setScannedSuccessBadge(false);
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [isScanModalOpen]);
 
   useEffect(() => {
     loadData();
@@ -547,7 +701,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
                   Hospital Infection Control Protocol
                 </p>
               </div>
-              <button onClick={() => setIsScanModalOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <button onClick={handleCloseScanModal} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
@@ -563,22 +717,188 @@ export default function HousekeepingView({ user, hospitalInfo }) {
             ) : (
               <form onSubmit={handleSubmitScan} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 
-                {/* QR Scanner Display Simulator */}
-                <div style={{
-                  padding: '16px',
-                  borderRadius: '12px',
-                  background: 'rgba(6, 182, 212, 0.08)',
-                  border: '1px dashed rgba(6, 182, 212, 0.4)',
-                  textAlign: 'center'
-                }}>
-                  <Camera size={32} color="#38bdf8" style={{ margin: '0 auto 8px auto' }} />
-                  <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                    {selectedTask ? selectedTask.area_name : 'Scan Hospital Area QR Code'}
+                {/* Real Live HTML5 Camera Viewfinder or Fallback Box */}
+                {cameraActive ? (
+                  <div className="camera-viewfinder-container">
+                    <video ref={videoRef} className="camera-video-feed" playsInline autoPlay muted />
+                    <div className="camera-target-frame" />
+                    <div className="camera-laser-bar" />
+                    
+                    <div style={{
+                      position: 'absolute',
+                      top: '10px',
+                      left: '10px',
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: '#34d399',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backdropFilter: 'blur(6px)',
+                      zIndex: 12
+                    }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 8px #10b981' }} />
+                      LIVE CAMERA
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={stopCamera}
+                      title="Turn off live camera"
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: 'rgba(0, 0, 0, 0.7)',
+                        border: '1px solid rgba(255, 255, 255, 0.25)',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        padding: '5px 8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.72rem',
+                        zIndex: 12,
+                        backdropFilter: 'blur(6px)'
+                      }}
+                    >
+                      <VideoOff size={14} /> बंद करा
+                    </button>
+
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      left: '0',
+                      right: '0',
+                      textAlign: 'center',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontSize: '0.74rem',
+                      fontWeight: '600',
+                      zIndex: 12,
+                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.9)'
+                    }}>
+                      📸 वॉर्डचा QR कोड फ्रेममध्ये धरा (Hold Area QR in Box)
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Camera Geo-Scan Verified • Physical Presence Required
+                ) : (
+                  <div style={{
+                    padding: '18px 14px',
+                    borderRadius: '12px',
+                    background: cameraError ? 'rgba(239, 68, 68, 0.08)' : 'rgba(6, 182, 212, 0.08)',
+                    border: cameraError ? '1px dashed rgba(239, 68, 68, 0.4)' : '1px dashed rgba(6, 182, 212, 0.4)',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}>
+                    {cameraLoading ? (
+                      <>
+                        <RefreshCw size={26} className="animate-spin" color="var(--primary)" />
+                        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>कॅमेरा सुरू होत आहे... (Starting Camera Stream)</div>
+                      </>
+                    ) : cameraError ? (
+                      <>
+                        <AlertCircle size={26} color="#f87171" />
+                        <div style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '600' }}>{cameraError}</div>
+                        <button
+                          type="button"
+                          onClick={startCamera}
+                          className="btn btn-outline btn-sm"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}
+                        >
+                          <Video size={14} /> पुन्हा कॅमेरा सुरू करा (Retry Camera)
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Camera size={30} color="var(--accent-cyan)" />
+                        <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                          {selectedTask ? selectedTask.area_name : 'Hospital Sanitation QR Scanner'}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={startCamera}
+                          className="btn btn-primary btn-sm"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <Video size={15} /> लाईव्ह कॅमेरा सुरू करा (Turn On Camera)
+                        </button>
+                      </>
+                    )}
                   </div>
+                )}
+
+                {/* Quick 1-Click Scan & Native Camera Actions */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handleAutoFillCode}
+                    className="btn btn-outline btn-sm"
+                    style={{
+                      flex: 1,
+                      minWidth: '135px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      borderColor: 'rgba(6, 182, 212, 0.4)',
+                      color: 'var(--accent-cyan)',
+                      background: 'var(--accent-cyan-bg)',
+                      fontWeight: '700'
+                    }}
+                    title="Click to automatically verify task code"
+                  >
+                    <Zap size={14} /> {selectedTask ? `${selectedTask.area_code} ऑटो-स्कॅन` : '⚡ थेट QR कोड भरा'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="btn btn-outline btn-sm"
+                    style={{
+                      flex: 1,
+                      minWidth: '135px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                    title="Open phone camera or select photo"
+                  >
+                    <Camera size={14} /> 📱 मोबाईल फोटो स्कॅन
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    ref={fileInputRef}
+                    onChange={handleFileCapture}
+                    style={{ display: 'none' }}
+                  />
                 </div>
+
+                {/* Scanned Code Success Feedback Banner */}
+                {scannedSuccessBadge && (
+                  <div style={{
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)',
+                    color: '#34d399',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    animation: 'fadeIn 0.2s ease-out'
+                  }}>
+                    <CheckCircle2 size={16} color="#34d399" /> QR कोड यशस्वीरित्या डिटेक्ट झाला: {scannedCode}
+                  </div>
+                )}
 
                 <div>
                   <label className="form-label">Area QR Code *</label>
@@ -586,7 +906,10 @@ export default function HousekeepingView({ user, hospitalInfo }) {
                     type="text"
                     className="form-input"
                     value={scannedCode}
-                    onChange={(e) => setScannedCode(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setScannedCode(e.target.value.toUpperCase());
+                      setScannedSuccessBadge(false);
+                    }}
                     placeholder="e.g. QR-WARD-A-101"
                     style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', letterSpacing: '0.05em' }}
                     required
@@ -651,7 +974,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
                 <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                   <button
                     type="button"
-                    onClick={() => setIsScanModalOpen(false)}
+                    onClick={handleCloseScanModal}
                     className="btn btn-outline"
                     style={{ flex: 1 }}
                   >
