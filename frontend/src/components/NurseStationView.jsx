@@ -14,6 +14,7 @@ import {
   RefreshCw,
   X,
   Stethoscope,
+  Building2,
   Users
 } from 'lucide-react';
 import { api } from '../api';
