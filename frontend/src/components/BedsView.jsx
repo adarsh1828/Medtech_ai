@@ -14,10 +14,14 @@ import {
   Sparkles,
   ShieldAlert,
   Send,
-  CheckCircle2
+  CheckCircle2,
+  FileText
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
+import BedAdmissionModal from './BedAdmissionModal';
+import PatientEMRModal from './PatientEMRModal';
 
 const WARDS = ['All', 'ICU', 'Emergency', 'General Ward', 'Semi-Private', 'Pediatric Ward'];
 
@@ -29,6 +33,14 @@ export default function BedsView({ user }) {
   const [statusFilter, setStatusFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+
+  // Modal states
+  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
+  const [initialDispatchTab, setInitialDispatchTab] = useState('nurse');
+  const [isAdmissionOpen, setIsAdmissionOpen] = useState(false);
+  const [selectedBedForAdmission, setSelectedBedForAdmission] = useState(null);
+  const [selectedPatientForEMR, setSelectedPatientForEMR] = useState(null);
+  const [isEMROpen, setIsEMROpen] = useState(false);
 
 
   useEffect(() => {
@@ -454,7 +466,14 @@ export default function BedsView({ user }) {
                 }}>
                   {isOccupied && bed.patient_name ? (
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', fontWeight: '700' }}>
+                      <div 
+                        onClick={() => {
+                          setSelectedPatientForEMR({ id: bed.patient_id, name: bed.patient_name });
+                          setIsEMROpen(true);
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', fontWeight: '700', cursor: 'pointer', color: '#38bdf8' }}
+                        title="Click to view Patient Medical History (EMR)"
+                      >
                         <User size={15} color="#38bdf8" /> {bed.patient_name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -488,7 +507,10 @@ export default function BedsView({ user }) {
                     ) : isAvailable ? (
                       <>
                         <button
-                          onClick={() => handleUpdateStatus(bed.id, 'occupied', 1)}
+                          onClick={() => {
+                            setSelectedBedForAdmission(bed);
+                            setIsAdmissionOpen(true);
+                          }}
                           disabled={updatingId === bed.id}
                           className="btn btn-primary btn-sm"
                           style={{ flex: 1 }}
@@ -522,6 +544,35 @@ export default function BedsView({ user }) {
         </div>
       )}
 
+      {/* Staff Duty & Task Dispatcher Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchOpen}
+        onClose={() => setIsDispatchOpen(false)}
+        initialTab={initialDispatchTab}
+        onUpdateSuccess={loadBeds}
+      />
+
+      {/* Inpatient Bed Admission Modal */}
+      <BedAdmissionModal
+        isOpen={isAdmissionOpen}
+        onClose={() => {
+          setIsAdmissionOpen(false);
+          setSelectedBedForAdmission(null);
+        }}
+        preselectedBed={selectedBedForAdmission}
+        onAdmissionSuccess={loadBeds}
+      />
+
+      {/* Patient EMR Timeline Modal */}
+      <PatientEMRModal
+        isOpen={isEMROpen}
+        onClose={() => {
+          setIsEMROpen(false);
+          setSelectedPatientForEMR(null);
+        }}
+        patientId={selectedPatientForEMR?.id}
+        patientName={selectedPatientForEMR?.name}
+      />
 
     </div>
   );

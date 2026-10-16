@@ -14,11 +14,12 @@ import {
   RefreshCw,
   X,
   Stethoscope,
-  Building2,
   Users
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import StaffDutyDispatchModal from './StaffDutyDispatchModal';
+import PatientEMRModal from './PatientEMRModal';
 
 export default function NurseStationView({ user, hospitalInfo }) {
   const { t } = useLanguage();
@@ -31,6 +32,11 @@ export default function NurseStationView({ user, hospitalInfo }) {
   const [patientsList, setPatientsList] = useState([]);
   const [bedsList, setBedsList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Dispatch and EMR Modals
+  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
+  const [selectedPatientForEMR, setSelectedPatientForEMR] = useState(null);
+  const [isEMROpen, setIsEMROpen] = useState(false);
 
   // Administer dose modal state
   const [selectedMed, setSelectedMed] = useState(null);
@@ -981,6 +987,25 @@ export default function NurseStationView({ user, hospitalInfo }) {
           </div>
         </div>
       )}
+
+      {/* Staff Duty Dispatch Modal */}
+      <StaffDutyDispatchModal
+        isOpen={isDispatchOpen}
+        onClose={() => setIsDispatchOpen(false)}
+        initialTab="nurse"
+        onUpdateSuccess={loadData}
+      />
+
+      {/* Patient EMR Timeline Modal */}
+      <PatientEMRModal
+        isOpen={isEMROpen}
+        onClose={() => {
+          setIsEMROpen(false);
+          setSelectedPatientForEMR(null);
+        }}
+        patientId={selectedPatientForEMR?.id}
+        patientName={selectedPatientForEMR?.name}
+      />
 
     </div>
   );

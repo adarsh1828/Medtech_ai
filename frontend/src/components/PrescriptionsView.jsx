@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import PatientEMRModal from './PatientEMRModal';
 
 export default function PrescriptionsView({ user, selectedPrescriptionId, hospitalInfo }) {
   const { t } = useLanguage();
@@ -25,6 +26,10 @@ export default function PrescriptionsView({ user, selectedPrescriptionId, hospit
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activePrintRx, setActivePrintRx] = useState(null);
+
+  // EMR Modal State
+  const [selectedPatientForEMR, setSelectedPatientForEMR] = useState(null);
+  const [isEMROpen, setIsEMROpen] = useState(false);
 
   const loadPrescriptions = async () => {
     setLoading(true);
@@ -192,6 +197,17 @@ ${medList}
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => {
+                      setSelectedPatientForEMR({ id: rx.patient_id, name: rx.patient_name });
+                      setIsEMROpen(true);
+                    }}
+                    className="btn btn-outline btn-sm"
+                    style={{ borderColor: 'rgba(99, 102, 241, 0.4)', color: '#818cf8', gap: '6px' }}
+                    title="View Patient Electronic Medical History (EMR / EHR)"
+                  >
+                    <FileText size={14} /> EMR Record
+                  </button>
                   <button
                     onClick={() => handleShareWhatsApp(rx)}
                     className="btn btn-outline btn-sm"
@@ -507,6 +523,17 @@ ${medList}
           </div>
         </div>
       )}
+
+      {/* Patient EMR Timeline Modal */}
+      <PatientEMRModal
+        isOpen={isEMROpen}
+        onClose={() => {
+          setIsEMROpen(false);
+          setSelectedPatientForEMR(null);
+        }}
+        patientId={selectedPatientForEMR?.id}
+        patientName={selectedPatientForEMR?.name}
+      />
     </div>
   );
 }

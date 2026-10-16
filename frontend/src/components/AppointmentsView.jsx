@@ -23,6 +23,7 @@ import {
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
 import LiveOPDTracker from './LiveOPDTracker';
+import PatientEMRModal from './PatientEMRModal';
 
 export default function AppointmentsView({ user, onOpenBookModal, onOpenConsultation, onOpenPrescription }) {
   const { t } = useLanguage();
@@ -32,6 +33,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [showTracker, setShowTracker] = useState(true);
+
+  // Patient EMR modal state
+  const [selectedPatientForEMR, setSelectedPatientForEMR] = useState(null);
+  const [isEMROpen, setIsEMROpen] = useState(false);
 
   const isPatient = user?.role === 'patient';
   const isDoctor = user?.role === 'doctor';
@@ -390,8 +395,15 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>
                       रुग्ण तपशील (Patient)
                     </div>
-                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginTop: '2px' }}>
-                      {appt.patient_name}
+                    <div 
+                      onClick={() => {
+                        setSelectedPatientForEMR({ id: appt.patient_id, name: appt.patient_name });
+                        setIsEMROpen(true);
+                      }}
+                      style={{ fontWeight: '700', fontSize: '1rem', color: '#38bdf8', marginTop: '2px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      title="Click to view Patient Medical History (EMR / EHR)"
+                    >
+                      {appt.patient_name} <FileText size={13} style={{ opacity: 0.7 }} />
                     </div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                       Blood: <strong style={{ color: '#fb7185' }}>{appt.patient_blood_group || 'N/A'}</strong> • {appt.patient_gender}
@@ -589,6 +601,17 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
           })}
         </div>
       )}
+
+      {/* Patient EMR Timeline Modal */}
+      <PatientEMRModal
+        isOpen={isEMROpen}
+        onClose={() => {
+          setIsEMROpen(false);
+          setSelectedPatientForEMR(null);
+        }}
+        patientId={selectedPatientForEMR?.id}
+        patientName={selectedPatientForEMR?.name}
+      />
     </div>
   );
 }
