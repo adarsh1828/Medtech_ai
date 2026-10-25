@@ -18,6 +18,9 @@ export function authenticateToken(req, res, next) {
     if (err) {
       return res.status(403).json({ error: 'Invalid or expired session. Please sign in again.' });
     }
+    if (user.role === 'opd_display' && !(req.baseUrl === '/api/opd' && req.method === 'GET' && ['/tracker', '/doctors'].includes(req.path))) {
+      return res.status(403).json({ error: 'Display links can only read public OPD tokens.' });
+    }
     req.user = user;
     next();
   });

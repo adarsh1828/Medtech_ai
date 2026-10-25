@@ -1,12 +1,15 @@
 import express from 'express';
-import { query, getOne, run } from '../db.js';
-import { authenticateToken, requireRole } from '../middleware/auth.js';
+import { query, getOne, run, transaction } from '../db.js';
+import { authenticateToken } from '../middleware/auth.js';
+
+import { snapshot, hospitalDate, sessionFor, fail } from '../services/opd.js';
 
 const router = express.Router();
 
 // GET appointments based on user role
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    if (!['patient','doctor','admin','staff','nurse'].includes(req.user.role)) return res.status(403).json({ error: 'Access denied.' });
     const { date, status, doctor_id, patient_id } = req.query;
     let sql = `
       SELECT a.*, 
@@ -34,7 +37,7 @@ router.get('/', authenticateToken, async (req, res) => {
       if (!doctor) return res.json({ appointments: [] });
       sql += ' AND a.doctor_id = ?';
       params.push(doctor.id);
-    } else if (req.user.role === 'admin' || req.user.role === 'staff') {
+    } else if (req.user.role === 'admin' || req.user.role === 'staff' || req.user.role === 'nurse') {
       if (doctor_id) {
         sql += ' AND a.doctor_id = ?';
         params.push(doctor_id);
@@ -68,144 +71,18 @@ router.get('/', authenticateToken, async (req, res) => {
 // GET Live Queue & OPD Tracker ("Where is my train" style live tracking)
 router.get('/live-tracker', authenticateToken, async (req, res) => {
   try {
-    const { doctor_id } = req.query;
-    const today = new Date().toISOString().split('T')[0];
-
-    // 1. If user is patient, look for their active appointment today
-    let patientAppt = null;
-    let targetDoctorId = doctor_id ? parseInt(doctor_id) : null;
-
-    if (req.user.role === 'patient') {
-      const patient = await getOne('SELECT id FROM Patients WHERE user_id = ?', [req.user.userId]);
-      if (patient) {
-        patientAppt = await getOne(
-          `SELECT a.*, d.full_name as doctor_name, d.specialization as doctor_specialization, 
-                  d.room_number as doctor_room, dep.name as department_name, dep.floor_number as department_floor
-           FROM Appointments a
-           JOIN Doctors d ON a.doctor_id = d.id
-           JOIN Departments dep ON a.department_id = dep.id
-           WHERE a.patient_id = ? AND (a.appointment_date = ? OR a.status IN ('scheduled', 'confirmed', 'in_consultation'))
-           ORDER BY CASE 
-             WHEN a.status = 'in_consultation' THEN 1
-             WHEN a.status = 'confirmed' THEN 2
-             WHEN a.status = 'scheduled' THEN 3
-             WHEN a.status = 'completed' THEN 4
-             ELSE 5 END ASC, a.appointment_date DESC, a.token_number ASC
-           LIMIT 1`,
-          [patient.id, today]
-        );
-        if (patientAppt && !targetDoctorId) {
-          targetDoctorId = patientAppt.doctor_id;
-        }
-      }
-    } else if (req.user.role === 'doctor') {
-      const doctor = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [req.user.userId]);
-      if (doctor) {
-        targetDoctorId = doctor.id;
-      }
+    let doctorId = Number(req.query.doctor_id);
+    let period = req.query.period || 'morning';
+    if (req.user.role === 'patient' && !doctorId) {
+      const own = await getOne(`SELECT a.* FROM Appointments a JOIN Patients p ON p.id = a.patient_id WHERE p.user_id = ? AND a.appointment_date = ? ORDER BY CASE WHEN a.status IN ('completed','cancelled') THEN 1 ELSE 0 END, a.id LIMIT 1`, [req.user.userId, hospitalDate()]);
+      if (own) { doctorId = own.doctor_id; period = sessionFor(own.time_slot); }
     }
-
-    // If still no targetDoctorId, pick first active doctor
-    if (!targetDoctorId) {
-      const firstActiveDoc = await getOne(
-        `SELECT doctor_id FROM Appointments WHERE appointment_date = ? AND status IN ('in_consultation', 'confirmed', 'scheduled') LIMIT 1`,
-        [today]
-      );
-      if (firstActiveDoc) {
-        targetDoctorId = firstActiveDoc.doctor_id;
-      } else {
-        const firstDoc = await getOne('SELECT id FROM Doctors LIMIT 1');
-        targetDoctorId = firstDoc ? firstDoc.id : 1;
-      }
-    }
-
-    // Get doctor info
-    const doctor = await getOne(
-      `SELECT d.*, dep.name as department_name, dep.floor_number as department_floor
-       FROM Doctors d
-       LEFT JOIN Departments dep ON d.department_id = dep.id
-       WHERE d.id = ?`,
-      [targetDoctorId]
-    );
-
-    // Get all appointments for this doctor on this day
-    const apptDate = patientAppt?.appointment_date || today;
-    const docAppointments = await query(
-      `SELECT a.id, a.token_number, a.status, a.time_slot, a.reason_for_visit,
-              a.consultation_started_at, a.completed_at, a.completion_remark,
-              a.patient_id, p.full_name as patient_name
-       FROM Appointments a
-       JOIN Patients p ON a.patient_id = p.id
-       WHERE a.doctor_id = ? AND a.appointment_date = ?
-       ORDER BY a.token_number ASC`,
-      [targetDoctorId, apptDate]
-    );
-
-    // Current patient in consultation
-    const currentlyConsulting = docAppointments.find(a => a.status === 'in_consultation') || null;
-
-    // Last completed consultation
-    const completedList = docAppointments.filter(a => a.status === 'completed');
-    const lastCompleted = completedList.length > 0 ? completedList[completedList.length - 1] : null;
-
-    // Next patient to be called
-    const nextWaiting = docAppointments.find(a => a.status === 'confirmed' || a.status === 'scheduled') || null;
-
-    // For the requesting patient:
-    let patientsAhead = 0;
-    let estimatedWaitMins = 0;
-    let journeyStep = 1; // 1: Booked, 2: Waiting/Arrived, 3: In Cabin, 4: Done
-
-    if (patientAppt) {
-      if (patientAppt.status === 'completed') {
-        patientsAhead = 0;
-        estimatedWaitMins = 0;
-        journeyStep = 4;
-      } else if (patientAppt.status === 'in_consultation') {
-        patientsAhead = 0;
-        estimatedWaitMins = 0;
-        journeyStep = 3;
-      } else {
-        const aheadList = docAppointments.filter(a => 
-          ['in_consultation', 'confirmed', 'scheduled'].includes(a.status) &&
-          a.token_number < patientAppt.token_number
-        );
-        patientsAhead = aheadList.length;
-        estimatedWaitMins = Math.max(5, patientsAhead * 8); // ~8 mins avg per patient
-        journeyStep = patientAppt.status === 'confirmed' ? 2 : 1;
-      }
-    }
-
-    // Active doctors list with counts today
-    const activeDoctors = await query(
-      `SELECT d.id, d.full_name, d.specialization, d.room_number, dep.name as department_name,
-              COUNT(a.id) as total_today,
-              SUM(CASE WHEN a.status = 'completed' THEN 1 ELSE 0 END) as total_completed,
-              SUM(CASE WHEN a.status = 'in_consultation' THEN 1 ELSE 0 END) as in_cabin_count
-       FROM Doctors d
-       LEFT JOIN Departments dep ON d.department_id = dep.id
-       LEFT JOIN Appointments a ON a.doctor_id = d.id AND a.appointment_date = ?
-       GROUP BY d.id
-       ORDER BY total_today DESC`,
-      [today]
-    );
-
-    res.json({
-      doctor,
-      patient_appointment: patientAppt,
-      currently_consulting: currentlyConsulting,
-      last_completed: lastCompleted,
-      next_waiting: nextWaiting,
-      patients_ahead: patientsAhead,
-      estimated_wait_mins: estimatedWaitMins,
-      journey_step: journeyStep,
-      queue_list: docAppointments,
-      active_doctors: activeDoctors
-    });
-  } catch (err) {
-    console.error('Error in live-tracker endpoint:', err);
-    res.status(500).json({ error: 'Failed to fetch live queue tracking data.' });
-  }
+    if (req.user.role === 'doctor') doctorId = (await getOne('SELECT id FROM Doctors WHERE user_id = ?', [req.user.userId]))?.id;
+    if (!doctorId) doctorId = (await getOne("SELECT id FROM Doctors WHERE status = 'approved' OR status IS NULL ORDER BY id LIMIT 1"))?.id;
+    const data = await snapshot(req.user, doctorId, hospitalDate(), period, true);
+    data.active_doctors = await query("SELECT id, full_name, specialization FROM Doctors WHERE status = 'approved' OR status IS NULL ORDER BY full_name");
+    res.json(data);
+  } catch (err) { res.status(err.status || 500).json({ error: err.message }); }
 });
 
 // GET single appointment
@@ -229,6 +106,13 @@ router.get('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found.' });
     }
 
+    if (req.user.role === 'patient') {
+      const patient = await getOne('SELECT id FROM Patients WHERE user_id = ?', [req.user.userId]);
+      if (patient?.id !== appointment.patient_id) return res.status(403).json({ error: 'Access denied.' });
+    } else if (req.user.role === 'doctor') {
+      const doctor = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [req.user.userId]);
+      if (doctor?.id !== appointment.doctor_id) return res.status(403).json({ error: 'Access denied.' });
+    } else if (!['admin','staff','nurse'].includes(req.user.role)) return res.status(403).json({ error: 'Access denied.' });
     res.json({ appointment });
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve appointment details.' });
@@ -268,115 +152,64 @@ router.post('/book', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Selected doctor is unavailable or pending administrative approval.' });
     }
 
-    // Calculate queue token number for this doctor on this day
-    const tokenRecord = await getOne(
-      'SELECT MAX(token_number) as max_token FROM Appointments WHERE doctor_id = ? AND appointment_date = ?',
-      [doctor_id, appointment_date]
-    );
-    const token_number = (tokenRecord?.max_token || 100) + 1;
+    if (Number(doctor.department_id) !== Number(department_id)) return res.status(400).json({ error: 'Doctor does not belong to this department.' });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(appointment_date) || appointment_date < hospitalDate()) return res.status(400).json({ error: 'Choose today or a future date.' });
+    const createdBooking = await transaction(async () => {
+    const session = await getOne('SELECT state FROM OPDSessions WHERE doctor_id = ? AND session_date = ? AND period = ?', [doctor_id, appointment_date, sessionFor(time_slot)]);
+    if (session?.state === 'closed') fail('This OPD session is closed. Choose another session.');
+      // Calculate queue token number for this doctor on this day
+      const tokenRecord = await getOne(
+        'SELECT MAX(token_number) as max_token FROM Appointments WHERE doctor_id = ? AND appointment_date = ?',
+        [doctor_id, appointment_date]
+      );
+      const token_number = (tokenRecord?.max_token || 100) + 1;
 
-    const result = await run(
-      `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit)
-       VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?)`,
-      [patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, reason_for_visit || 'General consultation']
-    );
+      const result = await run(
+        `INSERT INTO Appointments (patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, status, reason_for_visit)
+         VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?)`,
+        [patient_id, doctor_id, department_id, appointment_date, time_slot, token_number, reason_for_visit || 'General consultation']
+      );
 
-    const created = await getOne(
-      `SELECT a.*, d.full_name as doctor_name, dep.name as department_name
-       FROM Appointments a
-       JOIN Doctors d ON a.doctor_id = d.id
-       JOIN Departments dep ON a.department_id = dep.id
-       WHERE a.id = ?`,
-      [result.lastID]
-    );
+      const created = await getOne(
+        `SELECT a.*, d.full_name as doctor_name, dep.name as department_name
+         FROM Appointments a
+         JOIN Doctors d ON a.doctor_id = d.id
+         JOIN Departments dep ON a.department_id = dep.id
+         WHERE a.id = ?`,
+        [result.lastID]
+      );
 
+      return { created, token_number };
+    });
     res.status(201).json({
-      message: 'Appointment confirmed successfully!',
-      appointment: created,
-      token_number
+      message: 'Appointment booked successfully!',
+      appointment: createdBooking.created,
+      token_number: createdBooking.token_number
     });
   } catch (err) {
     console.error('Error booking appointment:', err);
-    res.status(500).json({ error: 'Failed to book appointment. Please try again.' });
+    res.status(err.status || 500).json({ error: err.status ? err.message : 'Failed to book appointment. Please try again.' });
   }
 });
 
 // PATCH update appointment status / vitals (Doctor or Admin)
 router.patch('/:id/status', authenticateToken, async (req, res) => {
   try {
-    const { status, vitals_bp, vitals_pulse, vitals_temp, vitals_weight, completion_remark } = req.body;
-    const appointmentId = req.params.id;
-
-    const appointment = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);
-    if (!appointment) {
-      return res.status(404).json({ error: 'Appointment not found.' });
-    }
-
-    // Role-based authorization for appointment status
-    if (req.user.role === 'patient') {
-      const patient = await getOne('SELECT id FROM Patients WHERE user_id = ?', [req.user.userId]);
-      if (!patient || appointment.patient_id !== patient.id) {
-        return res.status(403).json({ error: 'Unauthorized: You can only manage your own appointments.' });
+    if (req.user.role !== 'patient' || req.body.status !== 'cancelled') return res.status(403).json({ error: 'Use the assigned assistant OPD panel for queue changes.' });
+    await transaction(async () => {
+      const appointment = await getOne('SELECT a.* FROM Appointments a JOIN Patients p ON p.id = a.patient_id WHERE a.id = ? AND p.user_id = ?', [req.params.id, req.user.userId]);
+      if (!appointment) fail('Appointment not found.', 404);
+      const entry = await getOne('SELECT * FROM OPDEntries WHERE appointment_id = ?', [appointment.id]);
+      if (['in_consultation','completed'].includes(appointment.status) || ['called','in_consultation','completed'].includes(entry?.state)) fail('This appointment can no longer be cancelled online.');
+      await run("UPDATE Appointments SET status = 'cancelled' WHERE id = ?", [appointment.id]);
+      if (entry) {
+        await run("UPDATE OPDEntries SET state = 'cancelled' WHERE appointment_id = ?", [appointment.id]);
+        await run('UPDATE OPDSessions SET version = version + 1, updated_at = ? WHERE id = ?', [new Date().toISOString(), entry.session_id]);
+        await run("INSERT INTO OPDEvents (session_id, appointment_id, actor_id, action, created_at) VALUES (?, ?, ?, 'patient_cancel', ?)", [entry.session_id, appointment.id, req.user.userId, new Date().toISOString()]);
       }
-      if (status !== 'cancelled') {
-        return res.status(403).json({ error: 'Patients can only cancel appointments.' });
-      }
-    }
-
-    const validStatuses = ['scheduled', 'confirmed', 'in_consultation', 'completed', 'cancelled'];
-    if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status value.' });
-    }
-
-    const nowIso = new Date().toISOString();
-    const timeFormatted = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    let startedAt = null;
-    let completedAt = null;
-    let finalRemark = completion_remark || null;
-
-    if (status === 'in_consultation') {
-      startedAt = nowIso;
-      if (!finalRemark) {
-        finalRemark = `डॉक्टरांच्या केबिनमध्ये तपासणी सुरू (${timeFormatted})`;
-      }
-    } else if (status === 'completed') {
-      completedAt = nowIso;
-      if (!finalRemark) {
-        finalRemark = `तपासणी यशस्वीरित्या पूर्ण झाली (Completed at ${timeFormatted})`;
-      }
-    }
-
-    await run(
-      `UPDATE Appointments
-       SET status = COALESCE(?, status),
-           vitals_bp = COALESCE(?, vitals_bp),
-           vitals_pulse = COALESCE(?, vitals_pulse),
-           vitals_temp = COALESCE(?, vitals_temp),
-           vitals_weight = COALESCE(?, vitals_weight),
-           consultation_started_at = COALESCE(?, consultation_started_at),
-           completed_at = COALESCE(?, completed_at),
-           completion_remark = COALESCE(?, completion_remark)
-       WHERE id = ?`,
-      [
-        status || null,
-        vitals_bp || null,
-        vitals_pulse || null,
-        vitals_temp || null,
-        vitals_weight || null,
-        startedAt,
-        completedAt,
-        finalRemark,
-        appointmentId
-      ]
-    );
-
-    const updated = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointmentId]);
-    res.json({ message: 'Appointment updated successfully', appointment: updated });
-  } catch (err) {
-    console.error('Error updating appointment:', err);
-    res.status(500).json({ error: 'Failed to update appointment.' });
-  }
+    });
+    res.json({ message: 'Appointment cancelled.' });
+  } catch (err) { res.status(err.status || 500).json({ error: err.message }); }
 });
 
 // PATCH update appointment vitals specifically (Doctor Consultation Flow)
@@ -390,6 +223,11 @@ router.patch('/:id/vitals', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found.' });
     }
 
+    if (!['admin','doctor','nurse'].includes(req.user.role)) return res.status(403).json({ error: 'Clinical access required.' });
+    if (req.user.role === 'doctor') {
+      const doctor = await getOne('SELECT id FROM Doctors WHERE user_id = ?', [req.user.userId]);
+      if (doctor?.id !== appointment.doctor_id) return res.status(403).json({ error: 'Access denied.' });
+    }
     const bpVal = vitals_bp || bp || appointment.vitals_bp;
     const pulseVal = vitals_pulse || pulse || appointment.vitals_pulse;
     const tempVal = vitals_temp || temp || appointment.vitals_temp;

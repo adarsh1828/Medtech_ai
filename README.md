@@ -47,6 +47,10 @@ A clinical-grade Hospital Management System (HMS) developed with modern web stan
 
 ---
 
+## OPD operations
+
+See [OPD_WORKFLOW.md](OPD_WORKFLOW.md) for assistant assignment, pause/resume, skipped-patient returns, read-only TV setup, storage requirements, and verification commands.
+
 ## Project Setup & Local Development
 
 ### Prerequisites

@@ -63,6 +63,8 @@ export default function TopHeader({
 
   const getRoleBadge = (role) => {
     switch(role) {
+      case 'staff':
+        return <span className="badge badge-cyan"><UserCheck size={12} /> OPD ASSISTANT</span>;
       case 'admin':
         return <span className="badge badge-rose"><Shield size={12} /> {t('header.admin', 'ADMIN')}</span>;
       case 'doctor':

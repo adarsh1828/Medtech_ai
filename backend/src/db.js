@@ -4,6 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import os from 'os';
+import { hospitalDate } from './utils/hospitalTime.js';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { seedRichPrototypeData } from './seedDemoData.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,9 +27,10 @@ if (isTursoEnabled) {
   });
 } else {
   const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-  const dbPath = isVercel
+  if (isVercel && !process.env.MEDTECH_TEST_DB) throw new Error('Persistent OPD storage required: configure TURSO_DATABASE_URL and TURSO_AUTH_TOKEN before deploying.');
+  const dbPath = process.env.MEDTECH_TEST_DB || (isVercel
     ? ':memory:'
-    : path.resolve(__dirname, '../../medtech.db');
+    : path.resolve(__dirname, '../../medtech.db'));
 
   const verboseSqlite = sqlite3.verbose();
   localDb = new verboseSqlite.Database(dbPath, (err) => {
@@ -53,7 +56,7 @@ if (isTursoEnabled) {
 export const db = localDb;
 
 // Promise wrappers for async/await (routes call query, getOne, run)
-export const query = async (sql, params = []) => {
+const queryRaw = async (sql, params = []) => {
   if (isTursoEnabled) {
     const res = await tursoClient.execute({ sql, args: params });
     return Array.from(res.rows).map(row => ({ ...row }));
@@ -66,7 +69,7 @@ export const query = async (sql, params = []) => {
   });
 };
 
-export const getOne = async (sql, params = []) => {
+const getOneRaw = async (sql, params = []) => {
   if (isTursoEnabled) {
     const res = await tursoClient.execute({ sql, args: params });
     return res.rows.length > 0 ? { ...res.rows[0] } : null;
@@ -79,7 +82,7 @@ export const getOne = async (sql, params = []) => {
   });
 };
 
-export const run = async (sql, params = []) => {
+const runRaw = async (sql, params = []) => {
   if (isTursoEnabled) {
     const res = await tursoClient.execute({ sql, args: params });
     return {
@@ -94,6 +97,52 @@ export const run = async (sql, params = []) => {
     });
   });
 };
+
+// All local statements share this gate so unrelated requests cannot accidentally
+// join another request's SQLite transaction. Turso uses its own transaction client.
+const transactionContext = new AsyncLocalStorage();
+let databaseTail = Promise.resolve();
+async function exclusive(fn) {
+  const previous = databaseTail;
+  let release;
+  databaseTail = new Promise(resolve => { release = resolve; });
+  await previous;
+  try { return await fn(); } finally { release(); }
+}
+async function statement(kind, sql, params) {
+  const context = transactionContext.getStore();
+  if (context?.client) {
+    const result = await context.client.execute({ sql, args: params });
+    if (kind === 'run') return { lastID: Number(result.lastInsertRowid || 0), changes: result.rowsAffected || 0 };
+    const rows = Array.from(result.rows).map(row => ({ ...row }));
+    return kind === 'one' ? rows[0] || null : rows;
+  }
+  const execute = () => (kind === 'run' ? runRaw : kind === 'one' ? getOneRaw : queryRaw)(sql, params);
+  return context || isTursoEnabled ? execute() : exclusive(execute);
+}
+export const query = (sql, params = []) => statement('query', sql, params);
+export const getOne = (sql, params = []) => statement('one', sql, params);
+export const run = (sql, params = []) => statement('run', sql, params);
+export async function transaction(fn) {
+  if (transactionContext.getStore()) return fn();
+  if (isTursoEnabled) {
+    const client = await tursoClient.transaction('write');
+    try {
+      const result = await transactionContext.run({ client }, fn);
+      await client.commit();
+      return result;
+    } catch (error) { await client.rollback(); throw error; }
+    finally { client.close(); }
+  }
+  return exclusive(async () => {
+    await runRaw('BEGIN IMMEDIATE');
+    try {
+      const result = await transactionContext.run({ local: true }, fn);
+      await runRaw('COMMIT');
+      return result;
+    } catch (error) { await runRaw('ROLLBACK'); throw error; }
+  });
+}
 
 let isSchemaVerified = false;
 let isPasswordCalibrated = false;
@@ -1301,7 +1350,7 @@ async function seedDefaultData() {
   // 6. Seed Appointments (if empty)
   const existingAppts = await getOne('SELECT COUNT(*) as count FROM Appointments');
   const apptCount = existingAppts ? (existingAppts.count ?? existingAppts['count'] ?? 0) : 0;
-  const today = new Date().toISOString().split('T')[0];
+  const today = hospitalDate();
 
   let appt3Id = null;
   if (Number(apptCount) === 0) {
@@ -1369,7 +1418,7 @@ async function seedDefaultData() {
       [
         pat1Id,
         test2Id,
-        doc1Id,
+        docRajeshId,
         today,
         'Total: 184 mg/dL | LDL: 98 mg/dL | HDL: 56 mg/dL',
         'Total < 200 mg/dL, LDL < 100 mg/dL',
@@ -1383,7 +1432,7 @@ async function seedDefaultData() {
       [
         pat1Id,
         test4Id,
-        doc1Id,
+        docRajeshId,
         today,
         'Normal Sinus Rhythm, PR interval 148ms, QRS 86ms, Rate 72 bpm',
         'Sinus Rhythm (60-100 bpm)',
@@ -1449,7 +1498,7 @@ async function seedDefaultInvoices() {
   if (!pat1 || !doc1) return;
 
   console.log('Seeding initial hospital billing invoices...');
-  const today = new Date().toISOString().split('T')[0];
+  const today = hospitalDate();
 
   // Invoice 1: Sophia Kim (Completed OPD + Lab + Meds) - Paid via UPI
   const existingInv1 = await getOne('SELECT id FROM Invoices WHERE invoice_number = ?', ['INV-2026-0001']);
@@ -1651,7 +1700,7 @@ async function seedStaffAndSanitation() {
   // 3. Seed Default Hospital Operations / Reception Staff (Priya Deshmukh)
   const existingStaff = await getOne("SELECT id FROM Users WHERE email = 'staff@medtech.ai'");
   if (!existingStaff) {
-    const staffHash = await bcrypt.hash('staff123', salt);
+    const staffHash = await bcrypt.hash('staff123', 10);
     const staffUser = await run(
       "INSERT INTO Users (email, password_hash, role, full_name, phone) VALUES ('staff@medtech.ai', ?, 'staff', 'Priya Deshmukh', '+91 98200 66773')",
       [staffHash]

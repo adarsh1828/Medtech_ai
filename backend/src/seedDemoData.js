@@ -1,4 +1,5 @@
 import { query, getOne, run } from './db.js';
+import { hospitalDate } from './utils/hospitalTime.js';
 
 export async function seedRichPrototypeData() {
   console.log('🏥 Calibrating rich prototype demo data (Prescriptions, Lab Reports, Vitals, Queue)...');
@@ -49,7 +50,7 @@ export async function seedRichPrototypeData() {
     const patElena = await getOne("SELECT id, full_name FROM Patients WHERE full_name LIKE '%Elena%' LIMIT 1");
     const patJames = await getOne("SELECT id, full_name FROM Patients WHERE full_name LIKE '%James%' LIMIT 1");
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = hospitalDate();
 
     // 1. Seed Extra LabTests if missing
     let testCbc = await getOne("SELECT id FROM LabTests WHERE test_code = 'CBC-01'");

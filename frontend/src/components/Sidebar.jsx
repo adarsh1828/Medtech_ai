@@ -37,6 +37,7 @@ export default function Sidebar({
   const userRole = user?.role || 'patient';
 
   const allNavItems = [
+    { id: 'opd-assistant', label: 'OPD Assistant Desk', icon: UserCheck, roles: ['admin','staff','nurse'] },
     { 
       id: 'dashboard', 
       label: t('nav.dashboard', 'Command Center'), 
@@ -48,7 +49,7 @@ export default function Sidebar({
       label: t('nav.liveQueue', 'Live OPD Queue TV'), 
       icon: Tv, 
       badge: 'LIVE',
-      roles: ['admin']
+      roles: ['admin','staff']
     },
     { 
       id: 'billing', 
@@ -66,7 +67,7 @@ export default function Sidebar({
         ? t('nav.opdQueue', 'OPD Queue & Consultations') 
         : t('nav.appointments', 'Appointments & OPD'), 
       icon: Calendar,
-      roles: ['admin', 'doctor', 'patient']
+      roles: ['admin', 'doctor', 'patient', 'staff']
     },
     { 
       id: 'nurse-station', 
@@ -123,6 +124,8 @@ export default function Sidebar({
 
   const getRoleSectionHeader = () => {
     switch (userRole) {
+      case 'staff':
+        return 'OPD ASSISTANT DESK';
       case 'patient':
         return t('brand.patientPortal', 'PATIENT HEALTH PORTAL');
       case 'doctor':
@@ -139,6 +142,8 @@ export default function Sidebar({
 
   const getRoleBadge = (role) => {
     switch(role) {
+      case 'staff':
+        return <span className="badge badge-cyan">OPD ASSISTANT</span>;
       case 'admin':
         return (
           <span style={{

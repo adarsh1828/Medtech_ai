@@ -10,7 +10,7 @@ export const getStoredUser = () => {
     const raw = localStorage.getItem('medtech_user');
     if (!raw) return null;
     const user = JSON.parse(raw);
-    const validRoles = ['admin', 'doctor', 'patient', 'nurse', 'cleaning'];
+    const validRoles = ['admin', 'doctor', 'patient', 'nurse', 'cleaning', 'staff'];
     if (!user || typeof user !== 'object' || !validRoles.includes(user.role)) {
       localStorage.removeItem('medtech_user');
       localStorage.removeItem('medtech_token');
@@ -29,7 +29,8 @@ export const setStoredUser = (user) => localStorage.setItem('medtech_user', JSON
 export const removeStoredUser = () => localStorage.removeItem('medtech_user');
 
 async function request(endpoint, options = {}) {
-  const token = getStoredToken();
+  const { authToken, ...fetchOptions } = options;
+  const token = authToken || getStoredToken();
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {})
@@ -40,7 +41,7 @@ async function request(endpoint, options = {}) {
   }
 
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
+    ...fetchOptions,
     headers
   });
 
@@ -56,6 +57,13 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
+  getOPDDoctors: (period = 'morning', authToken) => request(`/opd/doctors?period=${period}`, { authToken }),
+  createOPDDisplayToken: period => request('/opd/display-token', { method: 'POST', body: JSON.stringify({ period }) }),
+  getOPDAssistants: () => request('/opd/assistants'),
+  getOPDSession: (doctorId, period = 'morning') => request(`/opd/session?doctor_id=${doctorId}&period=${period}`),
+  getOPDTracker: (doctorId = '', period = '', authToken) => request(`/opd/tracker?doctor_id=${doctorId}&period=${period}`, { authToken }),
+  opdSessionAction: (id, payload) => request(`/opd/sessions/${id}/action`, { method: 'POST', body: JSON.stringify(payload) }),
+  opdEntryAction: (id, payload) => request(`/opd/appointments/${id}/action`, { method: 'POST', body: JSON.stringify(payload) }),
   // Auth
   login: (email, password) => request('/auth/login', {
     method: 'POST',

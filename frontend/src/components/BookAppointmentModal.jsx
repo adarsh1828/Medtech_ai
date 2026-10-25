@@ -26,7 +26,7 @@ export default function BookAppointmentModal({
   const [departmentId, setDepartmentId] = useState('');
   const [doctorId, setDoctorId] = useState('');
   const [patientId, setPatientId] = useState('');
-  const [appointmentDate, setAppointmentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [appointmentDate, setAppointmentDate] = useState(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()));
   const [timeSlot, setTimeSlot] = useState('09:30 AM');
   const [reason, setReason] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState(null);
@@ -105,7 +105,7 @@ export default function BookAppointmentModal({
       }
 
       // If admin or doctor, load patients list
-      if (user?.role === 'admin' || user?.role === 'doctor') {
+      if (user?.role === 'admin' || user?.role === 'staff') {
         const patsRes = await api.getPatients().catch(() => ({ patients: [] }));
         setPatients(patsRes.patients || []);
         if (patsRes.patients?.length > 0) {
@@ -155,7 +155,7 @@ export default function BookAppointmentModal({
         reason_for_visit: reason.trim()
       };
 
-      if ((user?.role === 'admin' || user?.role === 'doctor') && patientId) {
+      if ((user?.role === 'admin' || user?.role === 'staff') && patientId) {
         payload.patient_id = Number(patientId);
       }
 
@@ -229,7 +229,7 @@ export default function BookAppointmentModal({
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {/* Patient Selector for Admin / Doctor */}
-          {(user?.role === 'admin' || user?.role === 'doctor') && (
+          {(user?.role === 'admin' || user?.role === 'staff') && (
             <div className="form-group">
               <label className="form-label">Consulting Patient</label>
               <select
@@ -293,7 +293,7 @@ export default function BookAppointmentModal({
               required
               className="form-input"
               value={appointmentDate}
-              min={new Date().toISOString().split('T')[0]}
+              min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())}
               onChange={(e) => setAppointmentDate(e.target.value)}
             />
           </div>

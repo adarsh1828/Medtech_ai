@@ -17,6 +17,8 @@ import aiRouter from './routes/ai.js';
 import housekeepingRouter from './routes/housekeeping.js';
 import nurseRouter from './routes/nurse.js';
 import emergencyRouter from './routes/emergency.js';
+import opdRouter from './routes/opd.js';
+import { initializeOPD } from './services/opd.js';
 
 dotenv.config();
 
@@ -71,7 +73,7 @@ app.use(express.json());
 let dbInitPromise = null;
 const ensureDb = () => {
   if (!dbInitPromise) {
-    dbInitPromise = initializeDatabase().catch(err => {
+    dbInitPromise = initializeDatabase().then(initializeOPD).catch(err => {
       console.error('Failed to initialize database:', err);
       dbInitPromise = null;
       throw err;
@@ -92,6 +94,7 @@ app.use(async (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/opd', opdRouter);
 app.use('/api/departments', departmentsRouter);
 app.use('/api/doctors', doctorsRouter);
 app.use('/api/patients', patientsRouter);

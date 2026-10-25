@@ -1,5 +1,5 @@
 import express from 'express';
-import { query, getOne, run } from '../db.js';
+import { query, getOne, run, transaction } from '../db.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -108,65 +108,62 @@ router.post('/', authenticateToken, requireRole(['doctor']), async (req, res) =>
       return res.status(403).json({ error: 'Only certified doctors can issue prescriptions.' });
     }
 
-    if (!patient_id || !diagnosis) {
+    if (!patient_id || typeof diagnosis !== 'string' || !diagnosis.trim()) {
       return res.status(400).json({ error: 'Patient ID and clinical diagnosis are required.' });
     }
 
-    // If an appointment is provided, ensure it exists and update its status
-    if (appointment_id) {
-      const completedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      await run(
-        `UPDATE Appointments 
-         SET status = 'completed',
-             completed_at = CURRENT_TIMESTAMP,
-             completion_remark = COALESCE(completion_remark, ?),
-             vitals_bp = COALESCE(?, vitals_bp),
-             vitals_pulse = COALESCE(?, vitals_pulse),
-             vitals_temp = COALESCE(?, vitals_temp),
-             vitals_weight = COALESCE(?, vitals_weight)
-         WHERE id = ?`,
-        [`तपासणी पूर्ण आणि प्रिस्क्रिप्शन जारी (${completedTime})`, vitals?.bp || null, vitals?.pulse || null, vitals?.temp || null, vitals?.weight || null, appointment_id]
-      );
+    if (medicines !== undefined && (!Array.isArray(medicines) || medicines.some(med => !med || typeof med.medicine_name !== 'string' || typeof med.dosage !== 'string' || !med.medicine_name.trim() || !med.dosage.trim()))) {
+      return res.status(400).json({ error: 'Each medicine needs a name and dosage.' });
     }
+    const created = await transaction(async () => {
+      if (appointment_id) {
+        const appointment = await getOne('SELECT * FROM Appointments WHERE id = ?', [appointment_id]);
+        if (!appointment || appointment.doctor_id !== doctor.id || appointment.patient_id !== Number(patient_id)) {
+          throw Object.assign(new Error('Appointment does not belong to this doctor and patient.'), { status: 403 });
+        }
+        if (!['in_consultation', 'completed'].includes(appointment.status)) throw Object.assign(new Error('Patient must be in consultation or have a finished visit.'), { status: 409 });
+        if (await getOne('SELECT id FROM Prescriptions WHERE appointment_id = ?', [appointment_id])) throw Object.assign(new Error('Prescription already issued for this visit.'), { status: 409 });
+      }
+      const rxResult = await run(
+        `INSERT INTO Prescriptions (appointment_id, patient_id, doctor_id, diagnosis, clinical_notes, advice, follow_up_date)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [appointment_id || null, patient_id, doctor.id, diagnosis.trim(), clinical_notes || '', advice || '', follow_up_date || null]
+      );
 
-    const rxResult = await run(
-      `INSERT INTO Prescriptions (appointment_id, patient_id, doctor_id, diagnosis, clinical_notes, advice, follow_up_date)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [appointment_id || null, patient_id, doctor.id, diagnosis.trim(), clinical_notes || '', advice || '', follow_up_date || null]
-    );
+      const prescriptionId = rxResult.lastID;
 
-    const prescriptionId = rxResult.lastID;
-
-    // Add medicines if provided
-    if (Array.isArray(medicines) && medicines.length > 0) {
-      for (const med of medicines) {
-        if (med.medicine_name && med.dosage) {
-          await run(
-            `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-              prescriptionId,
-              med.medicine_name.trim(),
-              med.dosage.trim(),
-              med.frequency || 'Once daily',
-              med.duration || '5 days',
-              med.instructions || 'After meals'
-            ]
-          );
+      // Add medicines if provided
+      if (Array.isArray(medicines) && medicines.length > 0) {
+        for (const med of medicines) {
+          if (med.medicine_name && med.dosage) {
+            await run(
+              `INSERT INTO Medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
+               VALUES (?, ?, ?, ?, ?, ?)`,
+              [
+                prescriptionId,
+                med.medicine_name.trim(),
+                med.dosage.trim(),
+                med.frequency || 'Once daily',
+                med.duration || '5 days',
+                med.instructions || 'After meals'
+              ]
+            );
+          }
         }
       }
-    }
 
-    const created = await getOne('SELECT * FROM Prescriptions WHERE id = ?', [prescriptionId]);
-    created.medicines = await query('SELECT * FROM Medicines WHERE prescription_id = ?', [prescriptionId]);
+      const created = await getOne('SELECT * FROM Prescriptions WHERE id = ?', [prescriptionId]);
+      created.medicines = await query('SELECT * FROM Medicines WHERE prescription_id = ?', [prescriptionId]);
 
+      return created;
+    });
     res.status(201).json({
       message: 'Prescription recorded and synced with patient record.',
       prescription: created
     });
   } catch (err) {
     console.error('Error issuing prescription:', err);
-    res.status(500).json({ error: 'Failed to record prescription. Please try again.' });
+    res.status(err.status || 500).json({ error: err.status ? err.message : 'Failed to record prescription. Please try again.' });
   }
 });
 

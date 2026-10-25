@@ -6,6 +6,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
+    "test": "node --test test/opd.test.js test/opd-startup.test.js",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },

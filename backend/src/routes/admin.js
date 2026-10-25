@@ -1,5 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import { hospitalDate } from '../utils/hospitalTime.js';
 import { query, getOne, run } from '../db.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
@@ -11,7 +12,7 @@ router.use(authenticateToken, requireRole(['admin']));
 // GET Admin Dashboard KPI Overview
 router.get('/overview', async (req, res) => {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = hospitalDate();
 
     // Total Patients registered
     const totalPatientsRow = await getOne('SELECT COUNT(*) as count FROM Patients');

@@ -2,23 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
   Clock, 
-  User, 
   Stethoscope, 
-  Activity, 
   Plus, 
-  CheckCircle, 
   CheckCircle2,
   XCircle, 
   FileText, 
   Search, 
-  Filter, 
-  Check, 
   Compass, 
   Radio, 
-  Sparkles,
   ChevronDown,
   ChevronUp,
-  MessageSquare
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
@@ -40,7 +33,6 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
 
   const isPatient = user?.role === 'patient';
   const isDoctor = user?.role === 'doctor';
-  const isAdmin = user?.role === 'admin';
 
   const loadAppointments = async (isBackground = false) => {
     if (!isBackground) setLoading(true);
@@ -521,55 +513,22 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
 
                 {/* Actions Footer */}
                 <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
-                  {/* Call to Doctor Cabin (For Doctor & Admin) */}
-                  {(appt.status === 'scheduled' || appt.status === 'confirmed') && (isDoctor || isAdmin) && (
-                    <button
-                      onClick={() => handleUpdateStatus(appt.id, 'in_consultation', 'डॉक्टरांच्या केबिनमध्ये तपासणी सुरू')}
-                      disabled={actionLoading === appt.id}
-                      className="btn btn-cyan btn-sm"
-                      style={{ flex: 1, fontWeight: '700', fontSize: '0.8rem' }}
-                      title="Call into Cabin"
-                    >
-                      <Stethoscope size={14} /> केबिनमध्ये बोलवा (Call In)
-                    </button>
-                  )}
-
-                  {/* In Cabin Actions: Write Prescription or Mark Complete */}
-                  {isInCabin && (isDoctor || isAdmin) && (
+                  {/* Clinical documentation is independent of patient exit. */}
+                  {(isInCabin || isCompleted) && isDoctor && !appt.prescription_id && (
                     <>
                       <button
                         onClick={() => onOpenConsultation(appt)}
                         className="btn btn-emerald btn-sm"
                         style={{ flex: 1, fontWeight: '700', fontSize: '0.8rem' }}
                       >
-                        <Stethoscope size={14} /> प्रिस्क्रिप्शन & तपासणी पूर्ण करा
+                        <Stethoscope size={14} /> प्रिस्क्रिप्शन लिहा (Write Rx)
                       </button>
-                      <button
-                        onClick={() => handleUpdateStatus(appt.id, 'completed', 'तपासणी यशस्वीरित्या पूर्ण झाली (Consultation Completed)')}
-                        disabled={actionLoading === appt.id}
-                        className="btn btn-outline btn-sm"
-                        style={{ color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)', fontSize: '0.8rem' }}
-                        title="Mark Completed directly"
-                      >
-                        <Check size={14} /> पूर्ण झाले
-                      </button>
+
                     </>
                   )}
 
-                  {/* Confirmation button for scheduled */}
-                  {appt.status === 'scheduled' && (isAdmin || isDoctor) && (
-                    <button
-                      onClick={() => handleUpdateStatus(appt.id, 'confirmed')}
-                      disabled={actionLoading === appt.id}
-                      className="btn btn-outline btn-sm"
-                      style={{ color: '#38bdf8', borderColor: 'rgba(6, 182, 212, 0.4)' }}
-                    >
-                      <Check size={14} /> हजर नोंदवा (Confirm)
-                    </button>
-                  )}
-
-                  {/* View Prescription if completed */}
-                  {isCompleted && (
+                  {/* Only show Rx when it has actually been issued. */}
+                  {appt.prescription_id && (
                     <button
                       onClick={() => onOpenPrescription(appt.id)}
                       className="btn btn-outline btn-sm"
@@ -580,7 +539,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                   )}
 
                   {/* Cancel button */}
-                  {appt.status !== 'cancelled' && !isCompleted && !isInCabin && (
+                  {isPatient && appt.status !== 'cancelled' && !isCompleted && !isInCabin && (
                     <button
                       onClick={() => {
                         if (window.confirm('तुम्हाला ही अपॉइंटमेंट रद्द करायची आहे का? (Are you sure you want to cancel this appointment?)')) {

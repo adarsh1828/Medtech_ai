@@ -10,6 +10,7 @@ import PrescriptionsView from './components/PrescriptionsView';
 import LabReportsView from './components/LabReportsView';
 import AITriageView from './components/AITriageView';
 import BillingView from './components/BillingView';
+import OPDAssistantView from './components/OPDAssistantView';
 import LiveQueueView from './components/LiveQueueView';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import BookAppointmentModal from './components/BookAppointmentModal';
@@ -35,11 +36,12 @@ import {
   Clock
 } from 'lucide-react';
 
-export default function App() {
+function HospitalApp() {
   const [user, setUser] = useState(() => getStoredUser());
   const [activeTab, setActiveTab] = useState(() => {
     const stored = getStoredUser();
     if (!stored) return 'dashboard';
+    if (stored.role === 'staff') return 'opd-assistant';
     if (stored.role === 'nurse') return 'nurse-station';
     if (stored.role === 'cleaning') return 'housekeeping';
     if (stored.role === 'patient' || stored.role === 'doctor') return 'appointments';
@@ -117,8 +119,10 @@ export default function App() {
   // Guard activeTab based on user role to prevent accessing unauthorized views
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'nurse') {
-      const allowed = ['nurse-station', 'beds', 'prescriptions', 'lab-reports'];
+    if (user.role === 'staff') {
+      if (!['opd-assistant', 'appointments', 'live-queue'].includes(activeTab)) setActiveTab('opd-assistant');
+    } else if (user.role === 'nurse') {
+      const allowed = ['nurse-station', 'beds', 'prescriptions', 'lab-reports', 'opd-assistant'];
       if (!allowed.includes(activeTab)) {
         setActiveTab('nurse-station');
       }
@@ -156,7 +160,9 @@ export default function App() {
     if (hospital) {
       setHospitalInfo(hospital);
     }
-    if (loggedUser.role === 'nurse') {
+    if (loggedUser.role === 'staff') {
+      setActiveTab('opd-assistant');
+    } else if (loggedUser.role === 'nurse') {
       setActiveTab('nurse-station');
     } else if (loggedUser.role === 'cleaning') {
       setActiveTab('housekeeping');
@@ -174,7 +180,9 @@ export default function App() {
       setStoredToken(res.token);
       setStoredUser(res.user);
       setUser(res.user);
-      if (res.user.role === 'nurse') {
+      if (res.user.role === 'staff') {
+        setActiveTab('opd-assistant');
+      } else if (res.user.role === 'nurse') {
         setActiveTab('nurse-station');
       } else if (res.user.role === 'cleaning') {
         setActiveTab('housekeeping');
@@ -319,6 +327,8 @@ export default function App() {
         />
 
         <main className="content-inner" key={refreshKey}>
+          {activeTab === 'opd-assistant' && ['admin','staff','nurse'].includes(user?.role) && <OPDAssistantView user={user} />}
+
           {activeTab === 'dashboard' && user?.role === 'admin' && (
             <DashboardView
               user={user}
@@ -328,7 +338,7 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'live-queue' && user?.role === 'admin' && (
+          {activeTab === 'live-queue' && ['admin', 'staff'].includes(user?.role) && (
             <LiveQueueView
               user={user}
               hospitalInfo={hospitalInfo}
@@ -402,7 +412,7 @@ export default function App() {
 
           {/* Safe fallback for any unmatched or restricted activeTab */}
           {((activeTab === 'dashboard' && user?.role !== 'admin') ||
-            (activeTab === 'live-queue' && user?.role !== 'admin') ||
+            (activeTab === 'live-queue' && !['admin','staff'].includes(user?.role)) ||
             (activeTab === 'doctors' && user?.role !== 'admin')) && (
             <AppointmentsView
               user={user}
@@ -568,6 +578,8 @@ export default function App() {
 
       {/* Mobile Bottom Navigation Bar (Smartphones <= 768px) */}
       <nav className="mobile-bottom-nav">
+        {['admin','staff','nurse'].includes(user?.role) && <button className={`mobile-nav-item ${activeTab === 'opd-assistant' ? 'active' : ''}`} onClick={() => setActiveTab('opd-assistant')}><Calendar size={18} /><span>OPD Desk</span></button>}
+
         {user?.role === 'patient' && (
           <>
             <button
@@ -736,4 +748,14 @@ export default function App() {
       </nav>
     </div>
   );
+}
+
+// A dedicated TV page has no staff navigation, stored-login access or inactivity logout.
+export default function App() {
+  if (new URLSearchParams(window.location.search).get('opdDisplay') === '1') {
+    const token = new URLSearchParams(window.location.hash.slice(1)).get('token');
+    if (!token) return <main className="content-inner"><p>Ask reception for a valid OPD display link.</p></main>;
+    return <main className="content-inner"><LiveQueueView user={{role:'opd_display'}} displayToken={token} /></main>;
+  }
+  return <HospitalApp />;
 }

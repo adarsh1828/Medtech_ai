@@ -309,18 +309,10 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
         medicines: validMedicines
       });
 
-      // 4. Set explicit completion remark for Admin & Reception visibility
-      const completedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      await api.updateAppointmentStatus(
-        appointment.id,
-        'completed',
-        `तपासणी यशस्वीरित्या पूर्ण झाली • निदान: ${diagnosis.trim()} • Rx जारी (${completedTime})`
-      );
-
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err.message || 'Failed to complete consultation.');
+      setError(err.message || 'Failed to save prescription.');
     } finally {
       setSubmitting(false);
     }
@@ -797,7 +789,7 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
             className="btn btn-emerald"
             style={{ width: '100%', marginTop: '8px' }}
           >
-            {submitting ? 'Finalizing Consultation...' : 'Complete Consultation & Issue Prescription'}
+            {submitting ? 'Saving prescription...' : 'Save & Issue Prescription'}
           </button>
         </form>
       </div>
