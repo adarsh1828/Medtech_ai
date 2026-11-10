@@ -35,6 +35,9 @@ export async function seedRichPrototypeData() {
       )
     `).catch(() => {});
 
+    // Ensure active prototype doctors have approved status so OPD tracker and consultations function out-of-the-box
+    await run("UPDATE Doctors SET status = 'approved', is_on_duty = 1, approved_at = COALESCE(approved_at, CURRENT_TIMESTAMP) WHERE full_name LIKE '%Ramesh%' OR full_name LIKE '%Rajesh%' OR full_name LIKE '%Sunita%' OR full_name LIKE '%Arjun%' OR full_name LIKE '%Vikram%'");
+
     // Lookup Doctors
     const docRamesh = await getOne("SELECT id, full_name, department_id FROM Doctors WHERE full_name LIKE '%Ramesh%' LIMIT 1");
     const docRajesh = await getOne("SELECT id, full_name, department_id FROM Doctors WHERE full_name LIKE '%Rajesh%' LIMIT 1");

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
 import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 import PatientEMRModal from './PatientEMRModal';
 
@@ -140,7 +141,7 @@ export default function NurseStationView({ user, hospitalInfo }) {
       await loadData();
       setIsDoseModalOpen(false);
     } catch (err) {
-      alert(err.message || 'Failed to record dose');
+      showToast(err.message || 'Failed to record dose', 'error');
     } finally {
       setSubmittingDose(false);
     }
@@ -157,14 +158,14 @@ export default function NurseStationView({ user, hospitalInfo }) {
       await loadData();
       setIsAddVitalsOpen(false);
     } catch (err) {
-      alert(err.message || 'Failed to record vitals');
+      showToast(err.message || 'Failed to record vitals', 'error');
     }
   };
 
   const handleSubmitHandover = async (e) => {
     e.preventDefault();
     if (!handoverForm.incoming_nurse_name) {
-      alert('Please specify the incoming nurse accepting the handover.');
+      showToast('कृपया जबाबदारी स्वीकारणाऱ्या नर्सचे नाव निवडा.', 'warning');
       return;
     }
     try {
@@ -172,7 +173,7 @@ export default function NurseStationView({ user, hospitalInfo }) {
       await loadData();
       setIsHandoverOpen(false);
     } catch (err) {
-      alert(err.message || 'Failed to submit shift handover');
+      showToast(err.message || 'Failed to submit shift handover', 'error');
     }
   };
 

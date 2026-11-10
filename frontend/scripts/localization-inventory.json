@@ -1,0 +1,11013 @@
+[
+  {
+    "id": 0,
+    "text": "सत्र सुरक्षा चेतावणी (Auto-Logout Warning)",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1,
+    "text": "सुरक्षा कारणास्तव, १४ मिनिटांपासून कोणतीही हालचाल नसल्याने तुमचे सत्र आपोआप बंद (Auto-Logout) होणार आहे.",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 2,
+    "text": "सत्र बंद होण्यास उर्वरित वेळ:",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 3,
+    "text": "सेकंद",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 4,
+    "text": "लॉगआउट करा",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 5,
+    "text": "सत्र सुरू ठेवा",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 6,
+    "text": "OPD Desk",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 7,
+    "text": "Visits",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 8,
+    "text": "Rx",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 9,
+    "text": "Labs",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 10,
+    "text": "Bills",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 11,
+    "text": "AI",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 12,
+    "text": "OPD",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 13,
+    "text": "Beds",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 14,
+    "text": "Center",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 15,
+    "text": "Queue",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 16,
+    "text": "Staff",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 17,
+    "text": "Station",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 18,
+    "text": "Rx Meds",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 19,
+    "text": "QR Clean",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 20,
+    "text": "Ask reception for a valid OPD display link.",
+    "files": [
+      "src/App.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 21,
+    "text": "❤️ छातीत कळ व घाम (Cardiac)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 22,
+    "text": "🧠 तीव्र डोकेदुखी व पक्षाघात (Neuro)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 23,
+    "text": "🦴 फ्रॅक्चर व पाय मुरगळणे (Ortho)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 24,
+    "text": "👶 बाळाला ताप व धाप (Pediatric)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 25,
+    "text": "💨 दमा व श्वास घेण्यास त्रास (Pulmonology)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 26,
+    "text": "🔥 पोटदुखी व उलट्या (Gastro)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 27,
+    "text": "MULTILINGUAL CLINICAL TRIAGE ENGINE",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 28,
+    "text": "AI लक्षण तपासणी व तात्काळ वर्गीकरण (AI Clinical Triage)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 29,
+    "text": "मराठी, हिंदी किंवा इंग्रजीत लक्षणे सांगा. सिस्टीम रुग्णाची तीव्रता तपासून तात्काळ योग्य डॉक्टर आणि विभाग सुचवेल.",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 30,
+    "text": "Triage Standard",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 31,
+    "text": "Emergency Severity Index (ESI)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 32,
+    "text": "लक्षणे निवडून त्वरित तपासा (Quick Test Scenarios):",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 33,
+    "text": "रुग्णाची लक्षणे, दुखण्याचा प्रकार व वेळ सांगा / लिहा:",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 34,
+    "text": "मराठी, हिंदी किंवा English मध्ये टाईप करा किंवा बोला",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 35,
+    "text": "उदा. छातीत डाव्या बाजूला खूप कळ येत आहे आणि घाम फुटत आहे... किंवा मायक्रोफोन बटण दाबून थेट बोला...",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 36,
+    "text": "बोलणे थांबवा",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 37,
+    "text": "मायक्रोफोनने लक्षणे बोला (Voice Input)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 38,
+    "text": "pulse 1.2s infinite",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 39,
+    "text": "ऐकत आहे... कृपया तुमची लक्षणे बोला (Listening in",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 40,
+    "text": "Marathi",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 41,
+    "text": "Hindi",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 42,
+    "text": "English",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 43,
+    "text": "साफ करा (Clear)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 44,
+    "text": "AI तपासणी चालू आहे...",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 45,
+    "text": "AI Triage ट्रिगर करा",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 46,
+    "text": "URGENCY",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 47,
+    "text": "AI Diagnostic Confidence:",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 48,
+    "text": "शिफारस केलेला विभाग:",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 49,
+    "text": "संभाव्य निदान (Differential Diagnosis):",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 50,
+    "text": "प्रतीक्षेचा अंदाजित वेळ:",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 51,
+    "text": "क्लिनिकल विश्लेषण (Clinical Diagnostic Assessment)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 52,
+    "text": "तात्काळ प्रथमोपचार व मार्गदर्शन (Immediate First-Aid Guidance)",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 53,
+    "text": "विभागात तात्काळ अपॉइंटमेंट बुक करा",
+    "files": [
+      "src/components/AITriageView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 54,
+    "text": "TOKEN #",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 55,
+    "text": "APT-",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 56,
+    "text": "🔴 AI CRITICAL PRIORITY",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 57,
+    "text": "🟡 AI URGENT",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 58,
+    "text": "तपासणी पूर्ण (Done)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 59,
+    "text": "🩺 केबिनमध्ये तपासणी चालू",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 60,
+    "text": "निश्चित (Waiting)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 61,
+    "text": "रुग्ण तपशील (Patient)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 62,
+    "text": "Click to view Patient Medical History (EMR / EHR)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 63,
+    "text": "Blood:",
+    "files": [
+      "src/components/AppointmentsView.jsx",
+      "src/components/BedsView.jsx",
+      "src/components/ConsultationModal.jsx",
+      "src/components/DashboardView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 64,
+    "text": "⚠️ Allergies:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 65,
+    "text": "उपचार करणारे डॉक्टर (Physician)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 66,
+    "text": "(रूम",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 67,
+    "text": "तक्रार / कारण:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 68,
+    "text": "तपासणी पूर्ण शेरा (Admin Remark):",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 69,
+    "text": "पूर्ण झालेली वेळ:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 70,
+    "text": "डॉक्टरांच्या केबिनमध्ये तपासणी सुरू आहे",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 71,
+    "text": "सुरू झालेली वेळ:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 72,
+    "text": "BP:",
+    "files": [
+      "src/components/AppointmentsView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 73,
+    "text": "Pulse:",
+    "files": [
+      "src/components/AppointmentsView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 74,
+    "text": "Temp:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 75,
+    "text": "Weight:",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 76,
+    "text": "प्रिस्क्रिप्शन लिहा (Write Rx)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 77,
+    "text": "प्रिस्क्रिप्शन पहा (View Rx)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 78,
+    "text": "रुग्णाकडून रद्द करण्यात आले (Cancelled by patient)",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 79,
+    "text": "अपॉइंटमेंट रद्द केली",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 80,
+    "text": "Cancel Appointment",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ],
+    "known": [
+      "Cancel Appointment",
+      "अपॉइंटमेंट रद्द करा",
+      "अपॉइंटमेंट रद्द करें"
+    ]
+  },
+  {
+    "id": 81,
+    "text": "रद्द करा",
+    "files": [
+      "src/components/AppointmentsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Cancel",
+      "रद्द करा",
+      "रद्द करें"
+    ]
+  },
+  {
+    "id": 82,
+    "text": "अर्ज प्रशासकीय मान्यतेसाठी प्रलंबित आहे (Pending Approval)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 83,
+    "text": "डॉक्टर नोंदणी अर्ज दाखल झाला! (Physician Application Submitted)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 84,
+    "text": "परिचारिका (Nurse) नोंदणी अर्ज दाखल झाला!",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 85,
+    "text": "स्वच्छता कर्मचारी नोंदणी अर्ज दाखल झाला!",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 86,
+    "text": "MEDTECH AI",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 87,
+    "text": "Switch to Light Mode",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 88,
+    "text": "Switch to Dark Mode",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 89,
+    "text": "🟢 24/7 CLINICAL OS • NABH LEVEL-1 ACCREDITED",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 90,
+    "text": "Smart Clinical",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 91,
+    "text": "Hospital Operating System",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 92,
+    "text": "A paperless, enterprise-grade clinical management ecosystem featuring AI symptom triage, digital e-prescriptions with drug-drug contraindication shields, and live OPD queue broadcasting.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 93,
+    "text": "PATIENT CARE TELEMETRY",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 94,
+    "text": "Active Vitals Monitoring & OPD Tokens",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 95,
+    "text": "AI Clinical Triage",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "AI Clinical Triage",
+      "एआय क्लिनिकल ट्रायज",
+      "एआई क्लिनिकल ट्रायज"
+    ]
+  },
+  {
+    "id": 96,
+    "text": "Automated symptom severity analysis & drug contraindication warnings.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 97,
+    "text": "Zero-Wait Queue",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 98,
+    "text": "Live waiting hall token broadcasting with Web Audio chimes.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 99,
+    "text": "UPI QR Settlement",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 100,
+    "text": "Instant digital payments in ₹ INR via PhonePe, GPay, Paytm.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 101,
+    "text": "Cyber Hardened",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 102,
+    "text": "10-attempt lockout, audit logs & idle session auto-clearance.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 103,
+    "text": "Password Recovery / पासवर्ड रीसेट",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 104,
+    "text": "Secure 3-step verification to reset your medical portal password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 105,
+    "text": "क्लिक करा माहिती भरण्यासाठी (डायरेक्ट लॉगिन नाही)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 106,
+    "text": "👤 Patient",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 107,
+    "text": "Rahul P.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 108,
+    "text": "🩺 Doctor",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 109,
+    "text": "Dr. Ramesh S.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 110,
+    "text": "👩‍⚕️ Nurse",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 111,
+    "text": "Sister Sunita",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 112,
+    "text": "🧹 Cleaning",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 113,
+    "text": "Ramesh S.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 114,
+    "text": "🛡️ Admin",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 115,
+    "text": "Adarsh S.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 116,
+    "text": "लॉगिन करण्यासाठी खालील",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 117,
+    "text": "\"Sign In to Hospital Portal\"",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 118,
+    "text": "बटण दाबा.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 119,
+    "text": "← Back to Sign In / लॉगिनकडे परत जा",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 120,
+    "text": "Step",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 121,
+    "text": "of 3",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 122,
+    "text": "1. Email",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 123,
+    "text": "2. 6-Digit OTP",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 124,
+    "text": "3. New Password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 125,
+    "text": "नोंदणीकृत ईमेल:",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 126,
+    "text": "⚠️ चेतावणी: तुमच्याकडे अजून",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 127,
+    "text": "प्रयत्न शिल्लक आहेत!",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 128,
+    "text": "/10 संधी",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 129,
+    "text": "सायबर सुरक्षा नियम:",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 130,
+    "text": "१० वेळा चुकीचा पासवर्ड प्रविष्ट केल्यास तुमचा IP ॲड्रेस १५ मिनिटांसाठी ब्लॉक केला जाईल.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 131,
+    "text": "🚫 सायबर सुरक्षा: IP ॲड्रेस तात्पुरता ब्लॉक केला आहे!",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 132,
+    "text": "सलग १० वेळा चुकीचा पासवर्ड टाकल्यामुळे सायबर सुरक्षेसाठी तुमचा IP पुढील",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 133,
+    "text": "मिनिटांसाठी",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 134,
+    "text": "ब्लॉक करण्यात आला आहे.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 135,
+    "text": "💡 पासवर्ड आठवत नसल्यास खालील",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 136,
+    "text": "\"पासवर्ड विसरलात का? (Forgot Password)\"",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 137,
+    "text": "वर क्लिक करून OTP द्वारे त्वरित रीसेट करू शकता.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 138,
+    "text": "Email Address",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 139,
+    "text": "Password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Password",
+      "पासवर्ड",
+      "पासवर्ड"
+    ]
+  },
+  {
+    "id": 140,
+    "text": "Hide Password / पासवर्ड लपवा",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 141,
+    "text": "Show Password / पासवर्ड पाहा",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 142,
+    "text": "Hide Password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 143,
+    "text": "Show Password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 144,
+    "text": "Forgot Password? / पासवर्ड विसरलात?",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 145,
+    "text": "Authenticating...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 146,
+    "text": "Sign In to Hospital Portal",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 147,
+    "text": "नोंदणीकृत ईमेल प्रविष्ट करा. पासवर्ड रीसेट करण्यासाठी आम्ही ६-अंकी व्हेरिफिकेशन OTP पाठवू.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 148,
+    "text": "Registered Email Address *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 149,
+    "text": "e.g. staff@medtech.ai or doctor@medtech.ai",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 150,
+    "text": "Checking & Sending OTP...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 151,
+    "text": "Send Verification OTP Code →",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 152,
+    "text": "६-अंकी कोड",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 153,
+    "text": "वर पाठवला आहे. (Valid for 10 minutes)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 154,
+    "text": "Instant Demo OTP:",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 155,
+    "text": "Auto-Fill",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 156,
+    "text": "6-Digit OTP Code *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 157,
+    "text": "Change Email ID",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 158,
+    "text": "Resend Code in {0}s",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 159,
+    "text": "Resend Code",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 160,
+    "text": "Verifying OTP...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 161,
+    "text": "Verify Code & Set New Password →",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 162,
+    "text": "OTP Verified! Enter a new secure password for",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 163,
+    "text": "New Password (नवीन पासवर्ड) *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 164,
+    "text": "Min. 6 characters",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 165,
+    "text": "Confirm New Password (पासवर्डची पुन्हा खात्री करा) *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 166,
+    "text": "Re-enter new password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 167,
+    "text": "Updating Password...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 168,
+    "text": "Save & Reset Password",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 169,
+    "text": "Full Name *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 170,
+    "text": "e.g. Elena Rodriguez",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 171,
+    "text": "Email Address *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 172,
+    "text": "Account Password *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 173,
+    "text": "Phone Number *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 174,
+    "text": "Date of Birth",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Date of Birth",
+      "जन्मतारीख",
+      "जन्म तिथि"
+    ]
+  },
+  {
+    "id": 175,
+    "text": "Gender",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Gender",
+      "लिंग",
+      "लिंग"
+    ]
+  },
+  {
+    "id": 176,
+    "text": "Female",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 177,
+    "text": "Male",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 178,
+    "text": "Other",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 179,
+    "text": "Blood Group",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Blood Group",
+      "रक्तगट",
+      "रक्त समूह"
+    ]
+  },
+  {
+    "id": 180,
+    "text": "A+",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 181,
+    "text": "A-",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 182,
+    "text": "B+",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 183,
+    "text": "B-",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 184,
+    "text": "AB+",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 185,
+    "text": "AB-",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 186,
+    "text": "O+",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 187,
+    "text": "O-",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 188,
+    "text": "Known Allergies",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 189,
+    "text": "e.g. Penicillin, Peanuts, None",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 190,
+    "text": "Creating Patient Account...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 191,
+    "text": "Create Patient Account & Access Portal",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 192,
+    "text": "नोंदणी अर्ज सुरक्षित दाखल झाला!",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 193,
+    "text": "Awaiting Hospital Administrator Approval",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 194,
+    "text": "सुरक्षेच्या कारणास्तव आणि रुग्णांच्या डेटा सुरक्षिततेसाठी, ॲडमिन कडून तुमच्या प्रमाणपत्रांची व माहितीची पडताळणी झाल्यानंतरच डॉक्टर पोर्टल सक्रिय केले जाईल.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 195,
+    "text": "लॉगिन पृष्ठावर जा (Go to Login)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 196,
+    "text": "सुरक्षा सूचना:",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 197,
+    "text": "नवीन नोंदणीकृत डॉक्टरांचे खाते हॉस्पिटल ॲडमिनच्या मंजुरीनंतरच (Approval) सक्रिय होईल.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 198,
+    "text": "Doctor Full Name (with Title) *",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 199,
+    "text": "e.g. Dr. Rajesh Sharma, MD",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 200,
+    "text": "Professional Email Address *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 201,
+    "text": "Clinical Department *",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 202,
+    "text": "Qualifications (Degree) *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 203,
+    "text": "MBBS, MD, DM",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 204,
+    "text": "Specialization *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 205,
+    "text": "Interventional Cardiology",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 206,
+    "text": "Experience (Years)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 207,
+    "text": "OPD Consultation Fee (₹ INR)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 208,
+    "text": "OPD Room Number",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 209,
+    "text": "Room 201",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 210,
+    "text": "Submitting Application...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 211,
+    "text": "Submit Physician Application for Admin Review",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 212,
+    "text": "Administrator privileges provide full authority over clinical operations, hospital revenue, billing, staff, and live queue displays.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 213,
+    "text": "Executive Full Name *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 214,
+    "text": "e.g. Dr. Ramesh Surye",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 215,
+    "text": "Official Admin Email *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 216,
+    "text": "Admin Password *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 217,
+    "text": "Executive Designation",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 218,
+    "text": "Medical Director / CEO",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 219,
+    "text": "Setup Secret Key *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 220,
+    "text": "MEDTECH-ADMIN-2026",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 221,
+    "text": "Authorizing Administrator...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 222,
+    "text": "Authorize Admin & Open Command Center",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 223,
+    "text": "Staff Nurse Portal • Live Medication Administration, Patient Vitals Monitoring & Digital Shift Handovers.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 224,
+    "text": "Nurse Full Name *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 225,
+    "text": "e.g. Sister Sunita Sharma",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 226,
+    "text": "Official Email Address *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 227,
+    "text": "Contact Phone",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 228,
+    "text": "Assigned Ward / Department *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 229,
+    "text": "General Ward & ICU",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 230,
+    "text": "ICU & Critical Care",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "ICU & Critical Care",
+      "आयसीयू आणि क्रिटिकल केअर",
+      "आईसीयू और क्रिटिकल केयर"
+    ]
+  },
+  {
+    "id": 231,
+    "text": "Emergency & Triage",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 232,
+    "text": "Pediatric Ward",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/BedsView.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text",
+      "label"
+    ]
+  },
+  {
+    "id": 233,
+    "text": "Surgical Recovery (OT)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 234,
+    "text": "Maternity Ward",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 235,
+    "text": "Nursing Qualification",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 236,
+    "text": "B.Sc Nursing",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 237,
+    "text": "GNM (General Nursing & Midwifery)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 238,
+    "text": "Post-Basic B.Sc Nursing",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 239,
+    "text": "M.Sc Critical Care Nursing",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 240,
+    "text": "ANM",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 241,
+    "text": "Shift Timings",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/OnboardDoctorModal.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 242,
+    "text": "Morning Shift (08:00 AM - 04:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 243,
+    "text": "Evening Shift (04:00 PM - 12:00 AM)",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text",
+      "label"
+    ]
+  },
+  {
+    "id": 244,
+    "text": "Night Shift (12:00 AM - 08:00 AM)",
+    "files": [
+      "src/components/AuthPage.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text",
+      "label"
+    ]
+  },
+  {
+    "id": 245,
+    "text": "General Shift (09:00 AM - 05:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 246,
+    "text": "Registering Staff Nurse...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 247,
+    "text": "Register Nurse & Open Clinical Station",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 248,
+    "text": "Hospital Sanitation & Housekeeping • Physical QR Inspection, Anti-Negligence Checklist & Area Audit Logs.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 249,
+    "text": "Staff Member Full Name *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 250,
+    "text": "e.g. Ramesh Shinde",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 251,
+    "text": "Staff Email Address *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 252,
+    "text": "Staff Password *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 253,
+    "text": "Assigned Cleaning Zone *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 254,
+    "text": "General Ward & Restrooms",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 255,
+    "text": "ICU & Critical Care Sterile Zone",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 256,
+    "text": "Emergency & Trauma Unit",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 257,
+    "text": "OPD Corridors & Waiting Areas",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 258,
+    "text": "Operation Theatre Complex",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 259,
+    "text": "Bio-waste & Sanitization Dept",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 260,
+    "text": "Assigned Shift",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 261,
+    "text": "Morning Shift (07:00 AM - 03:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 262,
+    "text": "Evening Shift (03:00 PM - 11:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 263,
+    "text": "Night Shift (11:00 PM - 07:00 AM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 264,
+    "text": "Registering Cleaning Staff...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 265,
+    "text": "Register Cleaning Staff & Start QR Audits",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 266,
+    "text": "Hospital Front Desk & Operational Staff • Reception, Patient Queue, Ward Beds & Billing Invoices.",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 267,
+    "text": "e.g. Priya Deshmukh",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 268,
+    "text": "Password *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 269,
+    "text": "Designation / Role *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 270,
+    "text": "Reception & Patient Coordinator",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 271,
+    "text": "Billing & Discharge Executive",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 272,
+    "text": "OPD Desk Officer",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 273,
+    "text": "Diagnostic Lab Assistant",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 274,
+    "text": "Hospital Operations Assistant",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 275,
+    "text": "Hospital Department *",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 276,
+    "text": "Front Desk & Patient Services",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 277,
+    "text": "Accounts & Billing Department",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 278,
+    "text": "Outpatient (OPD) Desk",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 279,
+    "text": "Central Registration",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 280,
+    "text": "General Administration",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 281,
+    "text": "Regular Shift (09:00 AM - 05:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 282,
+    "text": "Evening Shift (01:00 PM - 09:00 PM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 283,
+    "text": "Night Shift (09:00 PM - 07:00 AM)",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 284,
+    "text": "Registering Staff Member...",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 285,
+    "text": "Register Hospital Staff Account",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 286,
+    "text": "24x7 Emergency Ready",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 287,
+    "text": "HIPAA & HL7 Compliant",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 288,
+    "text": "Multi-Tenant Role Isolation",
+    "files": [
+      "src/components/AuthPage.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 289,
+    "text": "Close",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/PrescriptionsView.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "attr",
+      "text"
+    ],
+    "known": [
+      "Close",
+      "बंद करा",
+      "बंद करें"
+    ]
+  },
+  {
+    "id": 290,
+    "text": "Allocated Hospital Bed *",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 291,
+    "text": "(Floor",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/BookAppointmentModal.jsx",
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 292,
+    "text": "Vacant / Sterilized",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 293,
+    "text": "Selected",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 294,
+    "text": "Select Patient for Admission *",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 295,
+    "text": "Search patient by name, phone, or email...",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 296,
+    "text": "No matching registered patients found.",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 297,
+    "text": ", Blood:",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 298,
+    "text": "Primary Clinical Reason / Diagnosis *",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 299,
+    "text": "e.g. Acute Coronary Syndrome / Post-Op Recovery",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 300,
+    "text": "Admission Urgency Priority",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 301,
+    "text": "Routine Inpatient",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 302,
+    "text": "⚠️ Urgent / Acute Care",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 303,
+    "text": "🚨 Critical ICU Trauma",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 304,
+    "text": "Post-Surgical Observation",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 305,
+    "text": "Baseline Admission Vitals",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 306,
+    "text": "BP (mmHg)",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 307,
+    "text": "Pulse (bpm)",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 308,
+    "text": "SpO2 (%)",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 309,
+    "text": "Temp (°F)",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 310,
+    "text": "Attending Nursing / Clinical Instructions",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 311,
+    "text": "e.g. Hourly vitals monitoring, oxygen support on standby, NPO until morning...",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 312,
+    "text": "Cancel",
+    "files": [
+      "src/components/BedAdmissionModal.jsx",
+      "src/components/BillingView.jsx",
+      "src/components/HousekeepingView.jsx",
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Cancel",
+      "रद्द करा",
+      "रद्द करें"
+    ]
+  },
+  {
+    "id": 313,
+    "text": "Admitting Patient...",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 314,
+    "text": "Confirm Inpatient Admission",
+    "files": [
+      "src/components/BedAdmissionModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 315,
+    "text": "General Ward",
+    "files": [
+      "src/components/BedsView.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ],
+    "known": [
+      "General Ward",
+      "जनरल वॉर्ड",
+      "जनरल वार्ड"
+    ]
+  },
+  {
+    "id": 316,
+    "text": "Sterilized and ready for admission",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 317,
+    "text": "नर्स वॉर्ड/ICU वाटप (Nurse Duty)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 318,
+    "text": "सफाई काम वाटप (Housekeeping)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 319,
+    "text": "Refresh Bed Grid",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 320,
+    "text": "ICU क्रिटिकल अलर्ट:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 321,
+    "text": "ICU मध्ये सध्या फक्त",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 322,
+    "text": "रिकामे बेड (Vacant Bed)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 323,
+    "text": "उपलब्ध आहे. आपत्कालीन परिस्थितीसाठी नवीन बेड रिकामे करा किंवा सॅनिटायझेशन पूर्ण करा.",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 324,
+    "text": "सफाई टास्क पाठवा",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 325,
+    "text": "Total Registered Beds (एकूण बेड्स)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 326,
+    "text": "उपलब्ध रिकामे बेड्स (Vacant Beds)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 327,
+    "text": "दाखल करण्यासाठी सज्ज (Ready for Admission)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 328,
+    "text": "भरलेले बेड्स (Occupied Beds)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 329,
+    "text": "सध्या उपचार घेत असलेले रुग्ण",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 330,
+    "text": "एकूण ऑक्युपन्सी (Occupancy Rate)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 331,
+    "text": "वॉर्डनुसार रिकामे बेड्स ट्रॅकर (Live Vacant Bed Availability by Ward)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 332,
+    "text": "कोणत्या वॉर्डमध्ये किती रिकामे बेड्स शिल्लक आहेत याची थेट माहिती:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 333,
+    "text": "All",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ],
+    "known": [
+      "All",
+      "सर्व",
+      "सभी"
+    ]
+  },
+  {
+    "id": 334,
+    "text": "Filtered",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 335,
+    "text": "Filter",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ],
+    "known": [
+      "Filter",
+      "फिल्टर",
+      "फ़िल्टर"
+    ]
+  },
+  {
+    "id": 336,
+    "text": "रिकामे (Vacant)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 337,
+    "text": "एकूण",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 338,
+    "text": "भरलेले:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 339,
+    "text": "मेंटेनन्स:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 340,
+    "text": "WARD:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 341,
+    "text": "STATUS:",
+    "files": [
+      "src/components/BedsView.jsx",
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 342,
+    "text": "Loading live hospital beds...",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 343,
+    "text": "No Beds Found in this Filter",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 344,
+    "text": "• Floor",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 345,
+    "text": "Department:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 346,
+    "text": "Click to view Patient Medical History (EMR)",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 347,
+    "text": "Note:",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 348,
+    "text": "Sterilized and ready for emergency patient intake",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 349,
+    "text": "Undergoing maintenance & disinfection",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 350,
+    "text": "Discharge & Sanitize",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 351,
+    "text": "Admit Patient",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 352,
+    "text": "Set Under Maintenance",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 353,
+    "text": "Finish Maintenance",
+    "files": [
+      "src/components/BedsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 354,
+    "text": "Specialist OPD Consultation Fee",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 355,
+    "text": "Generate New Invoice",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 356,
+    "text": "TOTAL REVENUE COLLECTED",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 357,
+    "text": "settled invoices",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 358,
+    "text": "OUTSTANDING RECEIVABLES",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 359,
+    "text": "pending payment(s)",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 360,
+    "text": "TOTAL TRANSACTIONS",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 361,
+    "text": "Electronic clinical billing",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 362,
+    "text": "PAYMENT CLEARANCE RATE",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 363,
+    "text": "Cashless UPI & card adoption",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 364,
+    "text": "All Invoices",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 365,
+    "text": "Paid & Cleared",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "label",
+      "text"
+    ]
+  },
+  {
+    "id": 366,
+    "text": "Pending Payment",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "label",
+      "text"
+    ]
+  },
+  {
+    "id": 367,
+    "text": "Search invoice number, patient, doctor...",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 368,
+    "text": "Loading hospital invoices...",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 369,
+    "text": "No invoices found",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 370,
+    "text": "Generate a new invoice or adjust your search filter.",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 371,
+    "text": "Patient:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 372,
+    "text": "• Dr:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 373,
+    "text": "Date:",
+    "files": [
+      "src/components/BillingView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 374,
+    "text": "Today",
+    "files": [
+      "src/components/BillingView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 375,
+    "text": "line item(s) • Method:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 376,
+    "text": "discount",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 377,
+    "text": "Collect payment now",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 378,
+    "text": "Pay Now",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 379,
+    "text": "View Receipt",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 380,
+    "text": "Official Hospital Tax Invoice",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 381,
+    "text": "Print / Save PDF",
+    "files": [
+      "src/components/BillingView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 382,
+    "text": "Lic:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 383,
+    "text": "• Tel:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 384,
+    "text": "TAX INVOICE / RECEIPT",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 385,
+    "text": "BILLED TO PATIENT",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 386,
+    "text": "Phone:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 387,
+    "text": "• Gender:",
+    "files": [
+      "src/components/BillingView.jsx",
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 388,
+    "text": "ATTENDING PHYSICIAN / DEPT",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 389,
+    "text": "Dept:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 390,
+    "text": "Description / Clinical Service",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 391,
+    "text": "Category",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Category",
+      "श्रेणी",
+      "श्रेणी"
+    ]
+  },
+  {
+    "id": 392,
+    "text": "Qty",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text",
+      "attr"
+    ]
+  },
+  {
+    "id": 393,
+    "text": "Unit Rate",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 394,
+    "text": "Total",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 395,
+    "text": "UPI Payment QR Code",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 396,
+    "text": "SCAN TO PAY",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 397,
+    "text": "Direct Mobile UPI Settlement:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 398,
+    "text": "Scan via GPay, PhonePe, or Banking App for instant digital clearance.",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 399,
+    "text": "VPA: hospital.medtech@upi",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 400,
+    "text": "Ref:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 401,
+    "text": "Gross Subtotal:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 402,
+    "text": "Hospital Subsidy / Discount:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 403,
+    "text": "Healthcare Tax / Levies:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 404,
+    "text": "Net Amount Due:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 405,
+    "text": "This is a computer generated clinical tax invoice. No manual signature required.",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 406,
+    "text": "Thank you for placing your medical trust with",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 407,
+    "text": "Authorized Signatory",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 408,
+    "text": "Create Hospital Bill / Invoice",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 409,
+    "text": "Patient *",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 410,
+    "text": "Select patient",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 411,
+    "text": "Doctor / Clinician",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 412,
+    "text": "Hospital general / NA",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 413,
+    "text": "Billable Items & Services",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 414,
+    "text": "+ Add Item",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 415,
+    "text": "Service / Item name",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 416,
+    "text": "Consultation",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 417,
+    "text": "Lab Test",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 418,
+    "text": "Ward/Bed",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 419,
+    "text": "Medicine",
+    "files": [
+      "src/components/BillingView.jsx",
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 420,
+    "text": "Procedure",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 421,
+    "text": "Price",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 422,
+    "text": "Discount (",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 423,
+    "text": "Tax Rate (%)",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 424,
+    "text": "Payment Method",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 425,
+    "text": "UPI / QR Code",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 426,
+    "text": "Cash",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 427,
+    "text": "Credit/Debit Card",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 428,
+    "text": "Health Insurance",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 429,
+    "text": "Initial Status",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 430,
+    "text": "Clinical / Billing Remarks",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 431,
+    "text": "e.g. OPD cardiology checkup",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 432,
+    "text": "Calculated Total:",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 433,
+    "text": "Generating...",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 434,
+    "text": "Save & Issue Invoice",
+    "files": [
+      "src/components/BillingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 435,
+    "text": "Consulting Patient",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 436,
+    "text": "• On Duty",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 437,
+    "text": "• Off Duty",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 438,
+    "text": "AI शिफारस: लक्षणांनुसार",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 439,
+    "text": "विभाग योग्य वाटतो.",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 440,
+    "text": "विभागात बदला",
+    "files": [
+      "src/components/BookAppointmentModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 441,
+    "text": "1 Tab",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 442,
+    "text": "5 days",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 443,
+    "text": "Doctor Consultation & Digital Prescription",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 444,
+    "text": "Recording vitals, clinical observations, and digital medication for Token #",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 445,
+    "text": "• Phone:",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 446,
+    "text": "Reason for Visit:",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 447,
+    "text": "Patient Triage Vitals",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 448,
+    "text": "Blood Pressure",
+    "files": [
+      "src/components/ConsultationModal.jsx",
+      "src/components/NurseStationView.jsx",
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Blood Pressure",
+      "रक्तदाब (BP)",
+      "रक्तचाप (BP)"
+    ]
+  },
+  {
+    "id": 449,
+    "text": "120/80 mmHg",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 450,
+    "text": "Pulse Rate",
+    "files": [
+      "src/components/ConsultationModal.jsx",
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 451,
+    "text": "72 bpm",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 452,
+    "text": "Body Temp",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 453,
+    "text": "98.6 F",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 454,
+    "text": "Weight",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 455,
+    "text": "65 kg",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 456,
+    "text": "Clinical Diagnosis *",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 457,
+    "text": "ऐकत आहे (Recording...)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 458,
+    "text": "बोलून लिहा (Voice)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 459,
+    "text": "e.g. Acute Bronchitis / Stage 1 Essential Hypertension",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 460,
+    "text": "Clinical Examination Notes",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 461,
+    "text": "ऐकत आहे",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 462,
+    "text": "Voice",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 463,
+    "text": "Findings from auscultation, patient history...",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 464,
+    "text": "Lifestyle Advice & Precautions",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 465,
+    "text": "Hydration, dietary instructions, rest...",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 466,
+    "text": "⚠️ रुग्ण औषध ॲलर्जी रडार अलर्ट (ALLERGY CONFLICT DETECTED)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 467,
+    "text": "शिफारस: कृपया हे औषध बदलून ॲलर्जी-मुक्त सुरक्षित पर्याय निवडा.",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 468,
+    "text": "Prescribed Medications",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Prescribed Medications",
+      "विहित केलेली औषधे (Medicines)",
+      "निर्धारित दवाएं (Medicines)"
+    ]
+  },
+  {
+    "id": 469,
+    "text": "Medicines",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 470,
+    "text": "बोलून औषधे डिक्टेट करा",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 471,
+    "text": "डिक्टेशन थांबवा (Stop)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 472,
+    "text": "🎙️ AI बोलून लिहा (Voice Rx)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 473,
+    "text": "Add Row",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 474,
+    "text": "AI व्हॉईस डिक्टेशन चालू आहे (Listening live speech)...",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 475,
+    "text": "✓ टेबलमध्ये भरा (Add to Table)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 476,
+    "text": "💡 टीप: डॉक्टर औषधाचे नाव, डोस (उदा. 500mg), फ्रिक्वेन्सी (twice daily) आणि दिवस (3 days) स्पष्ट बोला.",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 477,
+    "text": "Medicine Name",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ],
+    "known": [
+      "Medicine Name",
+      "औषधाचे नाव",
+      "दवा का नाम"
+    ]
+  },
+  {
+    "id": 478,
+    "text": "Dosage (500mg)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 479,
+    "text": "Frequency (Twice daily)",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 480,
+    "text": "Duration",
+    "files": [
+      "src/components/ConsultationModal.jsx",
+      "src/components/PatientEMRModal.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "attr",
+      "text"
+    ],
+    "known": [
+      "Duration",
+      "कालावधी",
+      "अवधि (Duration)"
+    ]
+  },
+  {
+    "id": 481,
+    "text": "Instructions",
+    "files": [
+      "src/components/ConsultationModal.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "attr",
+      "text"
+    ]
+  },
+  {
+    "id": 482,
+    "text": "Remove",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 483,
+    "text": "AI CLINICAL ALERT: DRUG-DRUG CONTRAINDICATION DETECTED",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 484,
+    "text": "Recommendation:",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 485,
+    "text": "AI Clinical Safety: Verified no major adverse pharmacotherapy conflicts detected.",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 486,
+    "text": "Recommended Follow-up Date",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 487,
+    "text": "Saving prescription...",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 488,
+    "text": "Save & Issue Prescription",
+    "files": [
+      "src/components/ConsultationModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 489,
+    "text": "Dr. Ramesh Surye generated NMC-stamped Digital Rx with QR for Token #103",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 490,
+    "text": "Bed #ICU-03 reserved for Post-Op Critical Observation (Cardiology)",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 491,
+    "text": "Token #104 checked into OPD Room 408 with Dr. Arjun Mehta",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 492,
+    "text": "24x7 Emergency Ambulance Dispatch Center: All 4 ALS Units on Standby",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 493,
+    "text": "NABH LEVEL-1 ACCREDITED • 100% UPTIME",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 494,
+    "text": "एकूण नोंदणीकृत रुग्ण (Total Patients)",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 495,
+    "text": "रिअल-टाइम ईएचआर रेकॉर्ड्स",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 496,
+    "text": "आजच्या ओपीडी भेटी (Today's Visits)",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 497,
+    "text": "कन्सल्टेशन आणि टोकन ट्रॅकिंग",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 498,
+    "text": "ड्युटीवर डॉक्टर्स (On-Duty Doctors)",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 499,
+    "text": "बोर्ड सर्टिफाइड तज्ज्ञ डॉक्टर",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 500,
+    "text": "बेड ऑक्युपन्सी (Bed Occupancy)",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 501,
+    "text": "ॲडमिट •",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 502,
+    "text": "रिकामे बेड्स",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 503,
+    "text": "Doctor Station",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 504,
+    "text": "Live OPD Consultations",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 505,
+    "text": "Ward & ICU Beds",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 506,
+    "text": "Live Bed Allocator",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 507,
+    "text": "OPD Queue TV",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 508,
+    "text": "Waiting Room Display",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 509,
+    "text": "Digital Rx & QR",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 510,
+    "text": "WhatsApp Rx Sender",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 511,
+    "text": "SOS 108 Center",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 512,
+    "text": "Code Red Dispatch",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 513,
+    "text": "Token",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Token",
+      "टोकन",
+      "टोकन"
+    ]
+  },
+  {
+    "id": 514,
+    "text": "Patient",
+    "files": [
+      "src/components/DashboardView.jsx",
+      "src/components/NurseStationView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Patient",
+      "रुग्ण",
+      "मरीज"
+    ]
+  },
+  {
+    "id": 515,
+    "text": "Department / Doctor",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 516,
+    "text": "Time",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 517,
+    "text": "Status",
+    "files": [
+      "src/components/DashboardView.jsx",
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Status",
+      "स्थिती",
+      "स्थिति"
+    ]
+  },
+  {
+    "id": 518,
+    "text": "No appointments scheduled yet.",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 519,
+    "text": "(Room",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 520,
+    "text": "common.{0}",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 521,
+    "text": "MedTech Clinical AI",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 522,
+    "text": "Hospital Trust & Doctor Advantage",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 523,
+    "text": "Why Doctors & Multispecialty Hospitals Choose MedTech OS",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 524,
+    "text": "✓ NABH & ABDM Ready",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 525,
+    "text": "✓ 256-Bit Encrypted",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 526,
+    "text": "1-Click WhatsApp & QR Digital Rx",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 527,
+    "text": "Doctors generate official digital prescriptions stamped with their NMC/MMC registration and verifiable SVG QR code, deliverable instantly to patient WhatsApp in 1 click.",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 528,
+    "text": "2FA Security & Admin Approval",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 529,
+    "text": "Eliminates fake registrations and quacks. Every registering physician undergoes OTP verification and requires administrative approval before gaining access to hospital data.",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 530,
+    "text": "Live Ward & ICU Bed Telemetry",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 531,
+    "text": "Zero bed confusion. Real-time ward telemetry across ICU, Cardiology, and General beds prevents double allocations and gives hospital directors live revenue metrics.",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 532,
+    "text": "24x7 SOS 108 & AI Clinical Triage",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 533,
+    "text": "Immediate emergency patient handling with direct 108 ambulance hotline, Code Red ICU broadcast, and clinical AI symptom triage routing patients to the right specialist.",
+    "files": [
+      "src/components/DashboardView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 534,
+    "text": "Onboard New Doctor",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 535,
+    "text": "Active Physicians (",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 536,
+    "text": "Staff Approvals",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 537,
+    "text": "सुरक्षा पडताळणी (Security Verification):",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 538,
+    "text": "डॉक्टर, परिचारिका (Nurse), किंवा स्वच्छता कर्मचाऱ्याने ऑनलाइन अर्ज केल्यावर तुम्ही \"Approve\" करेपर्यंत ते हॉस्पिटलच्या ॲपमध्ये लॉगिन करू शकत नाहीत.",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 539,
+    "text": "🩺 Doctors (",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 540,
+    "text": "👩‍⚕️ Nurses (",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 541,
+    "text": "🧹 Sanitation Staff (",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 542,
+    "text": "Loading pending staff applications...",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 543,
+    "text": "सर्व डॉक्टर खाती पडताळलेली आहेत!",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 544,
+    "text": "There are currently no doctor registration applications awaiting approval.",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 545,
+    "text": "PENDING",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 546,
+    "text": "DEPARTMENT",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 547,
+    "text": "OPD ROOM",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 548,
+    "text": "EXPERIENCE",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 549,
+    "text": "Years",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 550,
+    "text": "CONSULTATION FEE",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 551,
+    "text": "doctor-{0}",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 552,
+    "text": "Approving...",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 553,
+    "text": "Approve & Grant Access",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 554,
+    "text": "Declining...",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 555,
+    "text": "Decline",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 556,
+    "text": "सर्व परिचारिका (Nurse) खाती पडताळलेली आहेत!",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 557,
+    "text": "There are currently no nurse registration applications awaiting approval.",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 558,
+    "text": "👩‍⚕️ Staff Nurse",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 559,
+    "text": "ASSIGNED WARD",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 560,
+    "text": "SHIFT TIMINGS",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 561,
+    "text": "nurse-{0}",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 562,
+    "text": "Approve Nurse",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 563,
+    "text": "सर्व स्वच्छता कर्मचारी खाती पडताळलेली आहेत!",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 564,
+    "text": "There are currently no sanitation staff registration applications awaiting approval.",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 565,
+    "text": "🧹 Housekeeping & Hygiene",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 566,
+    "text": "Hospital Sanitation Staff",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 567,
+    "text": "ASSIGNED AREA",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 568,
+    "text": "cleaning-{0}",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 569,
+    "text": "Approve Staff",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 570,
+    "text": "Search physician or specialty...",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 571,
+    "text": "Loading medical staff directory...",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 572,
+    "text": "No Physicians Found",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 573,
+    "text": "ON DUTY",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 574,
+    "text": "OFF DUTY",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 575,
+    "text": "ROOM NUMBER",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 576,
+    "text": "Room",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 577,
+    "text": "Shift:",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 578,
+    "text": "Book Consultation",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 579,
+    "text": "Toggle Duty Status",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 580,
+    "text": "Set Off-Duty",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 581,
+    "text": "Set On-Duty",
+    "files": [
+      "src/components/DoctorsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 582,
+    "text": "24x7 EMERGENCY & AMBULANCE SOS",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 583,
+    "text": "• Rapid Trauma Response",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 584,
+    "text": "🚨 EMERGENCY CODE RED BROADCASTED!",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 585,
+    "text": "हॉस्पिटल इमर्जन्सी वार्ड व ॲम्ब्युलन्स टीमला अलर्ट पाठवण्यात आला आहे.",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 586,
+    "text": "इन्सिडेंट ट्रॅकिंग आयडी:",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 587,
+    "text": "रुग्णाचे नाव:",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 588,
+    "text": "समस्या:",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 589,
+    "text": "प्राथमिकता:",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 590,
+    "text": "LEVEL-1 IMMEDIATE TRAUMA",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 591,
+    "text": "हॉस्पिटल हेल्पलाइन:",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 592,
+    "text": "Close (बंद करा)",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 593,
+    "text": "मोफत ॲम्ब्युलन्स सेवा (Free Ambulance)",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 594,
+    "text": "राष्ट्रीय आपत्कालीन सेवा (National SOS)",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 595,
+    "text": "HOSPITAL DIRECT TRAUMA ROOM",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 596,
+    "text": "Call Now",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 597,
+    "text": "समस्येचा प्रकार निवडा (Select Emergency Condition):",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 598,
+    "text": "Cardiac / Chest Pain",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 599,
+    "text": "Accident / Trauma",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 600,
+    "text": "Severe Breathlessness",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 601,
+    "text": "High Fever / Unconscious",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 602,
+    "text": "spin",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 603,
+    "text": "Broadcasting Code Red Alert...",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 604,
+    "text": "BROADCAST EMERGENCY SOS TO HOSPITAL ICU",
+    "files": [
+      "src/components/EmergencySOSModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 605,
+    "text": "काहीतरी तांत्रिक अडचण आली (Display Error)",
+    "files": [
+      "src/components/ErrorBoundary.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 606,
+    "text": "ॲप्लिकेशन रेंडर होताना अनपेक्षित त्रुटी आली आहे. खालील बटनावर क्लिक करून तुम्ही कॅशे (Cache) क्लिअर करून ॲप रीस्टार्ट करू शकता.",
+    "files": [
+      "src/components/ErrorBoundary.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 607,
+    "text": "रीलोड (Reload)",
+    "files": [
+      "src/components/ErrorBoundary.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 608,
+    "text": "कॅशे रीसेट (Reset & Clear)",
+    "files": [
+      "src/components/ErrorBoundary.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 609,
+    "text": "Command Center Dashboard",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 610,
+    "text": "Live OPD Queue TV Broadcast",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 611,
+    "text": "Hospital Invoicing & Payments",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 612,
+    "text": "AI Clinical Triage Diagnostic",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 613,
+    "text": "Ward & ICU Bed Manager",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 614,
+    "text": "Appointments Registry",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 615,
+    "text": "Digital Prescriptions & Rx",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 616,
+    "text": "Search patients, doctors, beds, invoices, or jump to section...",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 617,
+    "text": "ESC",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 618,
+    "text": "No matches found for \"",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 619,
+    "text": "↑↓ Navigate",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 620,
+    "text": "↵ Select",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 621,
+    "text": "ESC Close",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 622,
+    "text": "Global Hospital Search",
+    "files": [
+      "src/components/GlobalSearchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 623,
+    "text": "QR-ICU-BED-01",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 624,
+    "text": "HOSPITAL INFECTION CONTROL & SANITATION",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 625,
+    "text": "Housekeeping & Cleanliness Command",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 626,
+    "text": "Anti-negligence QR verification system. Every hospital ward, ICU cabin, and restroom requires physical presence verification with tamper-proof checklists.",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 627,
+    "text": "काम वाटप करा (Dispatch Tasks)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 628,
+    "text": "Scan Area QR Code",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 629,
+    "text": "Refresh Live Status",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 630,
+    "text": "Total Hygiene Areas",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 631,
+    "text": "Sanitized & Safe",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 632,
+    "text": "Due for Cleaning",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 633,
+    "text": "Overdue Alerts (लाल सूचना)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 634,
+    "text": "सफाई काम वाटप व प्रगती (Dispatched Staff Tasks & Hygiene Board)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 635,
+    "text": "Admin कडून सफाई कामगारांना सोपवलेली विशिष्ट कामे व त्यांचे रिअल-टाइम स्टेटस",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 636,
+    "text": "नवीन काम वाटप (Assign Task)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 637,
+    "text": "सध्या कोणतेही विशेष सफाई कार्य प्रलंबित नाही. सर्व स्वच्छता सामान्य वेळेनुसार सुरू आहे.",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 638,
+    "text": "सफाई कर्मचारी:",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 639,
+    "text": "✓ पूर्ण (Completed)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 640,
+    "text": "⏳ काम सुरू (In-Progress)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 641,
+    "text": "🟡 प्रलंबित (Pending)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 642,
+    "text": "काम सुरू करा",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 643,
+    "text": "QR स्कॅन",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 644,
+    "text": "All Areas ({0})",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 645,
+    "text": "🟢 Cleaned ({0})",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 646,
+    "text": "🟡 Due Soon ({0})",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 647,
+    "text": "🔴 Overdue Warnings ({0})",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 648,
+    "text": "Location QR:",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 649,
+    "text": "Protocol:",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 650,
+    "text": "Every",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 651,
+    "text": "h",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 652,
+    "text": "Last cleaned:",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 653,
+    "text": "Never",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 654,
+    "text": "by {0}",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 655,
+    "text": "minutes overdue! Immediate sanitization needed.",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 656,
+    "text": "Verify Sanitization (Scan QR)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 657,
+    "text": "Live Audit Trail: Recent Cleaning Verifications",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 658,
+    "text": "Timestamp",
+    "files": [
+      "src/components/HousekeepingView.jsx",
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 659,
+    "text": "Area Name",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 660,
+    "text": "QR Code",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 661,
+    "text": "Staff Member",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 662,
+    "text": "Mopping",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 663,
+    "text": "Linen",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 664,
+    "text": "Dustbin",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 665,
+    "text": "Sanitizer",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 666,
+    "text": "No cleaning logs recorded today.",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 667,
+    "text": "Verified",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 668,
+    "text": "Anti-Negligence QR Verification",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 669,
+    "text": "Hospital Infection Control Protocol",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 670,
+    "text": "Tamper-proof audit record committed to hospital database.",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 671,
+    "text": "LIVE CAMERA",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 672,
+    "text": "Turn off live camera",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 673,
+    "text": "बंद करा",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Close",
+      "बंद करा",
+      "बंद करें"
+    ]
+  },
+  {
+    "id": 674,
+    "text": "📸 वॉर्डचा QR कोड फ्रेममध्ये धरा (Hold Area QR in Box)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 675,
+    "text": "कॅमेरा सुरू होत आहे... (Starting Camera Stream)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 676,
+    "text": "पुन्हा कॅमेरा सुरू करा (Retry Camera)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 677,
+    "text": "Hospital Sanitation QR Scanner",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 678,
+    "text": "लाईव्ह कॅमेरा सुरू करा (Turn On Camera)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 679,
+    "text": "Click to automatically verify task code",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 680,
+    "text": "{0} ऑटो-स्कॅन",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 681,
+    "text": "⚡ थेट QR कोड भरा",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 682,
+    "text": "Open phone camera or select photo",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 683,
+    "text": "📱 मोबाईल फोटो स्कॅन",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 684,
+    "text": "QR कोड यशस्वीरित्या डिटेक्ट झाला:",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 685,
+    "text": "Area QR Code *",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 686,
+    "text": "e.g. QR-WARD-A-101",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 687,
+    "text": "Mandatory Sanitization Checklist (सर्व तपासण्या पूर्ण करा) *",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 688,
+    "text": "🧼 फरशी फिनाईलने पुसली (Floor Mopped with Disinfectant)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 689,
+    "text": "🛏️ बेडशीट व पिलो कव्हर बदलले (Linen & Pillow Cleaned)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 690,
+    "text": "🗑️ बायोमेडिकल कचरा पेटी रिकामी केली (Dustbin Emptied)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 691,
+    "text": "🧴 हँड सॅनिटायझर रिफिल केले (Sanitizer Refilled & Checked)",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 692,
+    "text": "Cleaner Remarks / Special Observation",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 693,
+    "text": "e.g. Room fully sanitized and ready for patient",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 694,
+    "text": "Verifying...",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 695,
+    "text": "Submit QR Verification",
+    "files": [
+      "src/components/HousekeepingView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 696,
+    "text": "आहारात लोहयुक्त (Iron-rich) पदार्थ वाढवा: पालक, बीट, खजूर, डाळिंब आणि गूळ-शेंगदाणे खा.",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 697,
+    "text": "अति मीठ आणि पेनकिलर (Painkiller) औषधांचे सेवन त्वरित टाळा.",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 698,
+    "text": "प्रथिनांचे (Protein) प्रमाण डॉक्टरांच्या सल्ल्याने नियंत्रित ठेवा.",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 699,
+    "text": "रुग्ण किंवा टेस्ट शोधा...",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 700,
+    "text": "प्रयोगशाळा निकाल लोड होत आहेत... (Loading laboratory records)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 701,
+    "text": "कोणतेही लॅब रिपोर्ट्स आढळले नाहीत",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 702,
+    "text": "निवडलेल्या फिल्टरनुसार कोणतेही अहवाल उपलब्ध नाहीत.",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 703,
+    "text": "PATIENT",
+    "files": [
+      "src/components/LabReportsView.jsx",
+      "src/components/Sidebar.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 704,
+    "text": "ORDERING DOCTOR",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 705,
+    "text": "TEST DATE",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 706,
+    "text": "LAB CODE",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 707,
+    "text": "Observed Diagnostic Value",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 708,
+    "text": "Reference Range:",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 709,
+    "text": "Clinical Remarks:",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 710,
+    "text": "🤖 AI द्वारे अहवाल समजावून घ्या (AI Explainer)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 711,
+    "text": "नवीन लॅब चाचणी निकाल नोंदवा (Add Lab Result)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 712,
+    "text": "रुग्ण निवडा (Select Patient) *",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 713,
+    "text": "-- रुग्ण निवडा --",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 714,
+    "text": "लॅब टेस्ट निवडा (Select Test) *",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 715,
+    "text": "-- चाचणी निवडा --",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 716,
+    "text": "चाचणी निकाल (Result Value) *",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 717,
+    "text": "उदा. 14.5 g/dL किंवा 105 mg/dL",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 718,
+    "text": "चाचणी तारीख (Date) *",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 719,
+    "text": "Reference Range",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 720,
+    "text": "उदा. 12.0 - 16.0 g/dL",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 721,
+    "text": "स्थिती (Status) *",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 722,
+    "text": "Completed (पूर्ण)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 723,
+    "text": "Pending (प्रलंबित)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 724,
+    "text": "Clinical Remarks / शेरा",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 725,
+    "text": "उदा. Within normal physiological limits. No acute abnormality.",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 726,
+    "text": "रद्द करा (Cancel)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 727,
+    "text": "जतन करत आहे...",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 728,
+    "text": "निकाल जतन करा (Save Result)",
+    "files": [
+      "src/components/LabReportsView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 729,
+    "text": "Loading OPD",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 730,
+    "text": "Doctor temporarily unavailable · OPD paused",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 731,
+    "text": "OPD session closed",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 732,
+    "text": "OPD has not started",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 733,
+    "text": "OPD running",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 734,
+    "text": "No appointment in this session",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 735,
+    "text": "Please check in with the OPD assistant on arrival",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 736,
+    "text": "You were absent when called. Report to the assistant to rejoin.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 737,
+    "text": "Your token has been called. Please report to the cabin.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 738,
+    "text": "Appointment cancelled",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 739,
+    "text": "Visit finished",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional",
+      "label"
+    ]
+  },
+  {
+    "id": 740,
+    "text": "Your consultation is in progress",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 741,
+    "text": "Your consultation is interrupted and preserved",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 742,
+    "text": "Live OPD tracker",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 743,
+    "text": "थेट ओपीडी ट्रॅकर · Live OPD Tracker",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 744,
+    "text": "Updated {0}",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 745,
+    "text": "Connecting…",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 746,
+    "text": "Mute chime",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 747,
+    "text": "Enable chime",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 748,
+    "text": "Doctor",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text",
+      "attr"
+    ],
+    "known": [
+      "Doctor",
+      "डॉक्टर",
+      "डॉक्टर"
+    ]
+  },
+  {
+    "id": 749,
+    "text": "My appointment today",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 750,
+    "text": "Select doctor",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 751,
+    "text": "Session",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/LiveQueueView.jsx",
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text",
+      "attr"
+    ]
+  },
+  {
+    "id": 752,
+    "text": "My appointment session",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 753,
+    "text": "Morning",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 754,
+    "text": "Morning / AM",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 755,
+    "text": "Afternoon & evening / PM",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 756,
+    "text": "Connection unavailable. Displayed information may be outdated. Retrying automatically.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 757,
+    "text": "{0} {1}. Waiting for staff confirmation.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 758,
+    "text": "Return delayed. Previous estimate:",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 759,
+    "text": "Expected return:",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 760,
+    "text": "Return time not confirmed. Waiting estimate is unavailable.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 761,
+    "text": "Contact reception to arrange another session for a pending visit.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 762,
+    "text": "Preserved patient",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 763,
+    "text": "Called token · report to cabin",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 764,
+    "text": "Currently in cabin",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 765,
+    "text": "No patient currently called or in consultation",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 766,
+    "text": "Awaiting patient entry",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 767,
+    "text": "Consultation in progress",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 768,
+    "text": "Consultation interrupted",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 769,
+    "text": "Your token",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 770,
+    "text": "Next waiting token",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 771,
+    "text": "{0} checked-in patients waiting",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 772,
+    "text": "Estimated wait",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 773,
+    "text": "{0}–{1} min",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 774,
+    "text": "Awaiting update",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 775,
+    "text": "Approximate; consultation times may vary.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 776,
+    "text": "An estimate appears once you are checked in and OPD is running.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 777,
+    "text": "Token booked",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 778,
+    "text": "Checked in / waiting",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 779,
+    "text": "In cabin",
+    "files": [
+      "src/components/LiveOPDTracker.jsx",
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 780,
+    "text": "current",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 781,
+    "text": "Actual serving order",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 782,
+    "text": ". Token #",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 783,
+    "text": "No checked-in patients waiting.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 784,
+    "text": "View prescription",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 785,
+    "text": "Visit finished · prescription has not been issued yet.",
+    "files": [
+      "src/components/LiveOPDTracker.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 786,
+    "text": "Live OPD Hall Display",
+    "files": [
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 787,
+    "text": "Fullscreen",
+    "files": [
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 788,
+    "text": "Create read-only TV link",
+    "files": [
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 789,
+    "text": "Open dedicated TV display",
+    "files": [
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 790,
+    "text": "Follow the called token and room. Names and clinical information are hidden.",
+    "files": [
+      "src/components/LiveQueueView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 791,
+    "text": "CLINICAL NURSE STATION • 24x7 INPATIENT MONITORING",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 792,
+    "text": "Ward & Medication Command",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 793,
+    "text": "Anti-negligence medication timers, vital signs tracking, and digital shift accountability handover.",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 794,
+    "text": "नर्स ड्युटी वाटप (Duty Dispatch)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 795,
+    "text": "Record Patient Vitals",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 796,
+    "text": "Shift Handover Lock",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 797,
+    "text": "Pending Medication Doses",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 798,
+    "text": "Doses Administered Today",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 799,
+    "text": "Vitals Logs Recorded",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 800,
+    "text": "Digital Shift Handovers",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 801,
+    "text": "💊 Medication Schedules (",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 802,
+    "text": "Due)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 803,
+    "text": "📊 Patient Vitals Telemetry (",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 804,
+    "text": "🤝 Shift Handover Logs (",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 805,
+    "text": "🏥 नर्स वॉर्ड/ICU वाटप व रोस्टर (",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 806,
+    "text": "On Duty)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 807,
+    "text": "✅ ADMINISTERED",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 808,
+    "text": "🟡 DUE DOSE",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 809,
+    "text": "Dosage:",
+    "files": [
+      "src/components/NurseStationView.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 810,
+    "text": "• Time:",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 811,
+    "text": "Prescribing Physician:",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 812,
+    "text": "✓ Given at",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 813,
+    "text": "by",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 814,
+    "text": "Administer Dose & Verify Vitals",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 815,
+    "text": "Patient Clinical Vitals Telemetry",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 816,
+    "text": "New Vitals Entry",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 817,
+    "text": "Bed Number",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Bed Number",
+      "बेड क्रमांक",
+      "बेड नंबर"
+    ]
+  },
+  {
+    "id": 818,
+    "text": "Pulse",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 819,
+    "text": "Temp",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 820,
+    "text": "SpO2",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 821,
+    "text": "Blood Sugar",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 822,
+    "text": "Recorded By",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 823,
+    "text": "Digital Shift Handover Audit Trail",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 824,
+    "text": "Transfer Shift Handover",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 825,
+    "text": "No shift handovers logged yet.",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 826,
+    "text": "Clinical Notes:",
+    "files": [
+      "src/components/NurseStationView.jsx",
+      "src/components/PatientEMRModal.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 827,
+    "text": "Handed over by",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 828,
+    "text": "to",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 829,
+    "text": "(Digitally Locked)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 830,
+    "text": "नर्स वॉर्ड/ICU वाटप व ड्युटी रोस्टर (Clinical Nursing Duty Matrix)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 831,
+    "text": "कोणती नर्स कोणत्या ICU किंवा वॉर्डमध्ये कार्यरत आहे याची संपूर्ण माहिती",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 832,
+    "text": "ड्युटी बदला (Reassign Nurse Duty)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 833,
+    "text": "Nurse Name & Contact",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 834,
+    "text": "Assigned Ward / ICU",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 835,
+    "text": "Shift Timing",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 836,
+    "text": "Duty Status",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 837,
+    "text": "No nurses registered.",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 838,
+    "text": "🟢 On Duty",
+    "files": [
+      "src/components/NurseStationView.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text",
+      "conditional"
+    ]
+  },
+  {
+    "id": 839,
+    "text": "⚪ Off Duty",
+    "files": [
+      "src/components/NurseStationView.jsx",
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text",
+      "conditional"
+    ]
+  },
+  {
+    "id": 840,
+    "text": "Administer Medication Dose",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 841,
+    "text": "Scheduled Dosage:",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 842,
+    "text": "PATIENT VITALS VERIFICATION (औषध देण्यापूर्वी व्हायटल्स तपासणी)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 843,
+    "text": "Blood Pressure (BP) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 844,
+    "text": "Pulse (bpm) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 845,
+    "text": "Oxygen SpO2 (%) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 846,
+    "text": "Temperature (°F)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 847,
+    "text": "Nurse Observation Notes",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 848,
+    "text": "Recording...",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 849,
+    "text": "Confirm Dose Administered",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 850,
+    "text": "Record Patient Clinical Vitals",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 851,
+    "text": "Patient Name (रुग्ण) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 852,
+    "text": "-- रुग्ण निवडा (Select Patient) --",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 853,
+    "text": "Enter patient name",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 854,
+    "text": "Bed Number (बेड) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 855,
+    "text": "-- बेड निवडा --",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 856,
+    "text": "उदा. Bed 101",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 857,
+    "text": "Blood Sugar (mg/dL)",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 858,
+    "text": "Clinical Observations",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 859,
+    "text": "Save Vitals to Chart",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 860,
+    "text": "Digital Shift Handover Transfer",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 861,
+    "text": "Outgoing Nurse (Sign-off) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 862,
+    "text": "Incoming Nurse (Taking Charge) *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 863,
+    "text": "e.g. Sister Priya Kulkarni",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 864,
+    "text": "Ward / Unit *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 865,
+    "text": "Shift Type *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 866,
+    "text": "Critical Patient Status & Pending Doses *",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 867,
+    "text": "Lock Shift Transfer",
+    "files": [
+      "src/components/NurseStationView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 868,
+    "text": "Onboard New Physician to Hospital",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 869,
+    "text": "Register attending clinicians, assign department floor and consultation room",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 870,
+    "text": "e.g. Dr. Priya Nair, MD, DM",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 871,
+    "text": "Hospital Email Address *",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 872,
+    "text": "Temporary Password *",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 873,
+    "text": "Phone Contact",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 874,
+    "text": "Degree & Qualifications *",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 875,
+    "text": "e.g. MBBS, MD (Medicine), DM (Neuro)",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 876,
+    "text": "Specialization Area *",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 877,
+    "text": "e.g. Cognitive Neurology & Stroke",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 878,
+    "text": "Years of Experience",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 879,
+    "text": "Consultation Fee (₹)",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 880,
+    "text": "Consultation Room",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 881,
+    "text": "Room 205",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 882,
+    "text": "09:00 AM - 05:00 PM",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 883,
+    "text": "Onboarding Physician...",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 884,
+    "text": "Confirm & Onboard Doctor to Staff",
+    "files": [
+      "src/components/OnboardDoctorModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 885,
+    "text": "Booked · not arrived",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 886,
+    "text": "Waiting",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 887,
+    "text": "Called · awaiting entry",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 888,
+    "text": "Skipped · not present",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 889,
+    "text": "Cancelled",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ],
+    "known": [
+      "Cancelled",
+      "रद्द केले",
+      "रद्द"
+    ]
+  },
+  {
+    "id": 890,
+    "text": "OPD Assistant Desk",
+    "files": [
+      "src/components/OPDAssistantView.jsx",
+      "src/components/Sidebar.jsx"
+    ],
+    "kinds": [
+      "text",
+      "label"
+    ]
+  },
+  {
+    "id": 891,
+    "text": "Doctor handles clinical care. The assigned cabin assistant manages patient movement and availability.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 892,
+    "text": "Refresh",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Refresh",
+      "रिफ्रेश करा",
+      "रीफ्रेश करें"
+    ]
+  },
+  {
+    "id": 893,
+    "text": "Morning / AM appointments",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 894,
+    "text": "Afternoon & evening / PM appointments",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 895,
+    "text": "Select assigned doctor",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 896,
+    "text": "· not assigned",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 897,
+    "text": "Last updated {0}",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 898,
+    "text": "Waiting for session",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 899,
+    "text": "Reload queue",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 900,
+    "text": "An admin must assign a primary and backup assistant for each doctor and session. Select an assigned doctor to begin.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 901,
+    "text": "Primary:",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 902,
+    "text": "· Backup:",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 903,
+    "text": "· Operating:",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 904,
+    "text": "Primary assistant",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text",
+      "attr"
+    ]
+  },
+  {
+    "id": 905,
+    "text": "Choose primary",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 906,
+    "text": "Backup assistant",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text",
+      "attr"
+    ]
+  },
+  {
+    "id": 907,
+    "text": "No backup",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 908,
+    "text": "Save assignment",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 909,
+    "text": "Take control before updating. A takeover stops the previous operator from changing this queue.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 910,
+    "text": "Take control / Backup takeover",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 911,
+    "text": "Start OPD",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 912,
+    "text": "Doctor unavailable · Pause now",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 913,
+    "text": "Doctor returned · Resume",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 914,
+    "text": "Close session",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 915,
+    "text": "Internal reason (optional for pause)",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 916,
+    "text": "Emergency duty / break / meeting",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 917,
+    "text": "Expected return (optional)",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 918,
+    "text": "Doctor temporarily unavailable. Current visit is preserved; calling and entry are blocked.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 919,
+    "text": "Expected return: {0}. Return must be confirmed manually.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 920,
+    "text": "Return time not yet confirmed.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 921,
+    "text": "Session closed. Pending patients retain their tokens. Cancel the old visit and book the agreed new session from Appointments.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 922,
+    "text": "Long consultation: verify doctor availability. The system has preserved the current patient.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 923,
+    "text": "Current cabin / called patient",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 924,
+    "text": "Waiting · actual serving order",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 925,
+    "text": "Skipped · awaiting return",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 926,
+    "text": "Booked · check in on arrival",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 927,
+    "text": "Finished / cancelled",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 928,
+    "text": "No patients",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 929,
+    "text": "· returned patient",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 930,
+    "text": "· Rx ready",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 931,
+    "text": "· Rx not issued",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 932,
+    "text": "Hajar nondva · Check in",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 933,
+    "text": "Call patient",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 934,
+    "text": "Recall patient",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 935,
+    "text": "Patient In",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 936,
+    "text": "Patient Out · Visit finished",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 937,
+    "text": "Not present · Skip",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 938,
+    "text": "Patient returned",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 939,
+    "text": "Clinical priority (reason required)",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 940,
+    "text": "Cancel visit",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 941,
+    "text": "Recent queue activity",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 942,
+    "text": "· visit {0}",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "template"
+    ]
+  },
+  {
+    "id": 943,
+    "text": "Returned patients keep their token and join after one regular waiting patient. Multiple returned patients are separated by regular patients where available.",
+    "files": [
+      "src/components/OPDAssistantView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 944,
+    "text": "• Blood Group:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 945,
+    "text": "Print Summary",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 946,
+    "text": "Clinical Profile & Vitals",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 947,
+    "text": "Prescriptions & Rx (",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 948,
+    "text": "Lab Tests & Diagnostics (",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 949,
+    "text": "Vitals Timeline (",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 950,
+    "text": "Loading patient electronic record...",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 951,
+    "text": "Gender & DOB",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 952,
+    "text": "Emergency Contact",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 953,
+    "text": "Drug Allergies & Hypersensitivity Flags:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 954,
+    "text": "Medical History Summary & Chronic Conditions",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 955,
+    "text": "Recent Doctor Consultations & Appointments (",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 956,
+    "text": "No prior appointments recorded.",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 957,
+    "text": "Reason:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 958,
+    "text": "Remark:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 959,
+    "text": "No digital prescriptions issued for this patient.",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 960,
+    "text": "Rx #",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 961,
+    "text": "Diagnosis:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 962,
+    "text": "Dosage",
+    "files": [
+      "src/components/PatientEMRModal.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Dosage",
+      "डोस",
+      "खुराक (Dose)"
+    ]
+  },
+  {
+    "id": 963,
+    "text": "Frequency",
+    "files": [
+      "src/components/PatientEMRModal.jsx",
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Frequency",
+      "वारंवारता",
+      "आवृत्ति (Frequency)"
+    ]
+  },
+  {
+    "id": 964,
+    "text": "💡 Doctor's Advice:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 965,
+    "text": "No lab diagnostic tests recorded.",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 966,
+    "text": "Result:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 967,
+    "text": "• Normal Range:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 968,
+    "text": "Remarks:",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 969,
+    "text": "Completed",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Completed",
+      "पूर्ण",
+      "पूर्ण"
+    ]
+  },
+  {
+    "id": 970,
+    "text": "No clinical vitals recorded yet.",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 971,
+    "text": "bpm",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 972,
+    "text": "Oxygen SpO2",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 973,
+    "text": "Temperature",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Temperature",
+      "तापमान (Temp)",
+      "तापमान (Temp)"
+    ]
+  },
+  {
+    "id": 974,
+    "text": "°F",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 975,
+    "text": "Recorded At",
+    "files": [
+      "src/components/PatientEMRModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 976,
+    "text": "RX-",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 977,
+    "text": "View Patient Electronic Medical History (EMR / EHR)",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 978,
+    "text": "EMR Record",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 979,
+    "text": "Share Prescription via WhatsApp",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 980,
+    "text": "WhatsApp",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 981,
+    "text": "Formal Rx",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 982,
+    "text": "Physician",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 983,
+    "text": "Baseline Vitals",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 984,
+    "text": "• Pulse:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 985,
+    "text": "Advice:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 986,
+    "text": "Medication",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 987,
+    "text": "Verified Clinical Order #RX-",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 988,
+    "text": "WhatsApp Rx",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 989,
+    "text": "• 📞 24x7 Emergency:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 990,
+    "text": "License:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 991,
+    "text": "• Govt. NABH Accredited",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 992,
+    "text": "Dept of",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 993,
+    "text": "✓ NMC / MMC REG. PRACTITIONER",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 994,
+    "text": "PATIENT:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 995,
+    "text": "BLOOD GROUP:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 996,
+    "text": "DATE & TIME:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 997,
+    "text": "PRESCRIPTION NO:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 998,
+    "text": "Blood Pressure:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 999,
+    "text": "Temperature:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1000,
+    "text": "98.6°F",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1001,
+    "text": "Clinical Diagnosis:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1002,
+    "text": "Medication & Dosage",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1003,
+    "text": "Intake Schedule",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1004,
+    "text": "Physician Advice & Dietary Instructions:",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1005,
+    "text": "Scan to Verify Digital Rx",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1006,
+    "text": "Cryptographically signed e-Prescription",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1007,
+    "text": "✓ Hospital Secure EHR Validated",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1008,
+    "text": "★ MMC / NMC ★",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1009,
+    "text": "VERIFIED",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1010,
+    "text": "PRACTITIONER",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1011,
+    "text": "Authorized Medical Practitioner",
+    "files": [
+      "src/components/PrescriptionsView.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1012,
+    "text": "OPD ASSISTANT",
+    "files": [
+      "src/components/Sidebar.jsx",
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1013,
+    "text": "ADMIN",
+    "files": [
+      "src/components/Sidebar.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1014,
+    "text": "DOCTOR",
+    "files": [
+      "src/components/Sidebar.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1015,
+    "text": "NURSE",
+    "files": [
+      "src/components/Sidebar.jsx",
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1016,
+    "text": "CLEANING",
+    "files": [
+      "src/components/Sidebar.jsx",
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1017,
+    "text": "Unfold Sidebar (Expand Menu)",
+    "files": [
+      "src/components/Sidebar.jsx",
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1018,
+    "text": "Fold Sidebar (Maximize Dashboard)",
+    "files": [
+      "src/components/Sidebar.jsx",
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1019,
+    "text": "Close Menu",
+    "files": [
+      "src/components/Sidebar.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1020,
+    "text": "Emergency / Trauma Ward",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1021,
+    "text": "Semi-Private Ward",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1022,
+    "text": "Operation Theater (OT)",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1023,
+    "text": "Day Shift (08:00 AM - 04:00 PM)",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1024,
+    "text": "24x7 Emergency On-Call",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1025,
+    "text": "ICU Ward & Isolation Rooms",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1026,
+    "text": "Emergency & Trauma Ward",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1027,
+    "text": "General Ward Beds & Washrooms",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1028,
+    "text": "OPD Waiting Hall & Reception",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1029,
+    "text": "Operation Theater (OT) Sterilization",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1030,
+    "text": "Pathology Lab & Blood Collection Area",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1031,
+    "text": "Hospital Corridors & Elevators",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "label"
+    ]
+  },
+  {
+    "id": 1032,
+    "text": "नर्स वॉर्ड/ICU वाटप (",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1033,
+    "text": "Nurses)",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1034,
+    "text": "सफाई काम वाटप व टास्क (",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1035,
+    "text": "Staff)",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1036,
+    "text": "Loading staff roster...",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1037,
+    "text": "Select Staff Nurse",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1038,
+    "text": "currently on duty",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1039,
+    "text": "No registered nurses found.",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1040,
+    "text": "On Duty",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1041,
+    "text": "Off Duty",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ],
+    "known": [
+      "Off Duty",
+      "कर्तव्यावर नाही",
+      "ड्यूटी पर नहीं"
+    ]
+  },
+  {
+    "id": 1042,
+    "text": "Assign Ward & Shift Timings",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1043,
+    "text": "Assigned Ward / ICU Station *",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1044,
+    "text": "Shift Timings *",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1045,
+    "text": "Active Duty Status",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1046,
+    "text": "Nurse is currently on active clinical rotation",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1047,
+    "text": "Saving...",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1048,
+    "text": "Confirm Ward & Shift Assignment",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1049,
+    "text": "Sanitation Staff Allocation",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1050,
+    "text": "No housekeeping personnel registered.",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1051,
+    "text": "Assigned Cleaning Area",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1052,
+    "text": "Update Staff Shift",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1053,
+    "text": "तातडीने टास्क पाठवा (Dispatch Cleaning Task)",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1054,
+    "text": "Target Area & Room/Bed Code *",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1055,
+    "text": "e.g. ICU Bed 102 Disinfection",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1056,
+    "text": "QR / Area Code *",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1057,
+    "text": "e.g. ICU-B102",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1058,
+    "text": "Urgency Level",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1059,
+    "text": "🚨 Urgent / Emergency",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1060,
+    "text": "⚠️ High Priority",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1061,
+    "text": "Routine Cleaning",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1062,
+    "text": "Clinical Sanitation Instructions",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1063,
+    "text": "Provide disinfection instructions...",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1064,
+    "text": "Dispatching...",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1065,
+    "text": "Dispatch Cleaning Task",
+    "files": [
+      "src/components/StaffDutyDispatchModal.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1066,
+    "text": "Toggle Sidebar",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1067,
+    "text": "MedTech AI",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1068,
+    "text": "NABH LEVEL-1 • 24x7 CLINICAL NETWORK",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1069,
+    "text": "Spotlight Search (Ctrl + K)",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1070,
+    "text": "Search...",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ],
+    "known": [
+      "Search...",
+      "शोधा...",
+      "खोजें..."
+    ]
+  },
+  {
+    "id": 1071,
+    "text": "Ctrl K",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  },
+  {
+    "id": 1072,
+    "text": "rotate(180deg)",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1073,
+    "text": "Switch to Day Mode",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1074,
+    "text": "Switch to Night Mode",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "conditional"
+    ]
+  },
+  {
+    "id": 1075,
+    "text": "24x7 Ambulance & Emergency Trauma Center",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "attr"
+    ]
+  },
+  {
+    "id": 1076,
+    "text": "🚨 SOS 108",
+    "files": [
+      "src/components/TopHeader.jsx"
+    ],
+    "kinds": [
+      "text"
+    ]
+  }
+]

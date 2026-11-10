@@ -24,6 +24,7 @@ import {
 import { api } from '../api';
 import { formatCurrency } from '../utils/currency';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
 
 export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDoctor, hospitalInfo }) {
   const { t } = useLanguage();
@@ -112,7 +113,7 @@ export default function DoctorsView({ user, onBookWithDoctor, onOpenOnboardDocto
       await api.updateDoctorDuty(docId, !currentDuty);
       await loadData();
     } catch (err) {
-      alert(err.message || 'Failed to update duty status');
+      showToast(err.message || 'Failed to update duty status', 'error');
     } finally {
       setTogglingId(null);
     }

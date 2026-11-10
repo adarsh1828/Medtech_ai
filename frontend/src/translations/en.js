@@ -31,6 +31,13 @@ export const en = {
     emergencySos: 'Emergency SOS Triage'
   },
 
+  navSection: {
+    clinical: 'Clinical Operations',
+    facilities: 'Inpatient & Wards',
+    records: 'Billing & Records',
+    intelligence: 'Clinical AI & Admin',
+  },
+
   // Header
   header: {
     liveClock: 'LIVE',

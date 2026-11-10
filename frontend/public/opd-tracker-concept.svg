@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Live OPD Tracker concept</title>
+  <desc id="desc">A polished dark navy outpatient clinic dashboard showing today's doctor, evening session, OPD not started status, cabin availability and a simple visit navigation bar.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071522"/><stop offset="1" stop-color="#111e34"/></linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#142b3d"/><stop offset="1" stop-color="#17223b"/></linearGradient>
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#19c5a1"/><stop offset="1" stop-color="#52dfb5"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#020812" flood-opacity=".32"/></filter>
+    <style>
+      text{font-family:'Segoe UI',Arial,sans-serif;fill:#f5f8ff}.muted{fill:#95a8bf}.small{font-size:16px}.body{font-size:19px}.title{font-size:30px;font-weight:700}.label{font-size:15px;font-weight:700;letter-spacing:1.3px;fill:#9cb1c8}.card{fill:#111e30;stroke:#26374c;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1440" height="1000" fill="url(#bg)"/>
+  <circle cx="1320" cy="110" r="190" fill="#1dc9a5" opacity=".045"/><circle cx="115" cy="870" r="200" fill="#5389ff" opacity=".045"/>
+  <g filter="url(#shadow)"><rect x="82" y="56" width="1276" height="850" rx="30" fill="#0c1727" stroke="#25344a" stroke-width="2"/></g>
+  <rect x="82" y="56" width="1276" height="8" rx="4" fill="url(#mint)"/>
+  <!-- header -->
+  <rect x="126" y="98" width="54" height="54" rx="17" fill="#123a3a" stroke="#1f766d"/>
+  <text x="153" y="135" text-anchor="middle" font-size="27">🩺</text>
+  <text x="198" y="119" font-size="16" font-weight="700" fill="#63e0bd">थेट ओपीडी ट्रॅकर</text>
+  <text x="198" y="148" class="title">Live OPD Tracker</text>
+  <circle cx="1118" cy="122" r="6" fill="#45d6a8"/><text x="1134" y="128" class="small" fill="#b7c9d9">Live updates</text>
+  <rect x="1254" y="98" width="58" height="48" rx="14" fill="#14243a" stroke="#30435a"/><text x="1283" y="129" text-anchor="middle" font-size="20">🔔</text>
+  <text x="126" y="190" class="small muted">Updated 10:41 AM</text>
+  <line x1="126" y1="214" x2="1314" y2="214" stroke="#223147"/>
+  <!-- selector panels -->
+  <text x="126" y="258" class="label">👨‍⚕️  DOCTOR</text>
+  <rect x="126" y="274" width="566" height="78" rx="17" class="card"/>
+  <circle cx="164" cy="313" r="23" fill="#213a50"/><text x="164" y="321" text-anchor="middle" font-size="23">👨‍⚕️</text>
+  <text x="203" y="308" class="small muted">Selected doctor</text><text x="203" y="333" class="body" font-weight="700">My appointment today</text>
+  <path d="m653 307 9 9 9-9" fill="none" stroke="#9fb3c8" stroke-width="2.5"/>
+  <text x="738" y="258" class="label">🕒  SESSION</text>
+  <rect x="738" y="274" width="576" height="78" rx="17" class="card"/>
+  <circle cx="776" cy="313" r="23" fill="#3c3024"/><text x="776" y="321" text-anchor="middle" font-size="22">🌇</text>
+  <text x="815" y="308" class="small muted">Clinic session</text><text x="815" y="333" class="body" font-weight="700">My appointment session</text>
+  <path d="m1275 307 9 9 9-9" fill="none" stroke="#9fb3c8" stroke-width="2.5"/>
+  <!-- status hero -->
+  <rect x="126" y="382" width="1188" height="220" rx="24" fill="url(#hero)" stroke="#38445a" stroke-width="1.5"/>
+  <rect x="126" y="382" width="7" height="220" rx="3.5" fill="#f5a742"/>
+  <rect x="163" y="414" width="46" height="46" rx="15" fill="#503c20"/><text x="186" y="445" text-anchor="middle" font-size="24">⏳</text>
+  <text x="226" y="435" class="label" fill="#efbd73">CLINIC STATUS</text>
+  <text x="163" y="499" font-size="34" font-weight="700">OPD has not started</text>
+  <text x="163" y="538" class="body muted">The evening session will appear here when the clinic opens.</text>
+  <rect x="1044" y="434" width="226" height="45" rx="22.5" fill="#503b20" stroke="#8c642a"/>
+  <circle cx="1070" cy="456" r="6" fill="#ffbd5d"/><text x="1087" y="462" font-size="15" font-weight="700" fill="#ffd18a">WAITING TO OPEN</text>
+  <!-- doctor row -->
+  <rect x="126" y="628" width="1188" height="94" rx="20" fill="#111e30" stroke="#26374c"/>
+  <circle cx="174" cy="675" r="25" fill="#183745"/><text x="174" y="683" text-anchor="middle" font-size="23">🩺</text>
+  <text x="218" y="667" class="body" font-weight="700">Dr. Ramesh Ganeshrao Surya</text>
+  <text x="218" y="694" class="small muted">General physician  ·  Room 201  ·  Evening session</text>
+  <rect x="1101" y="652" width="178" height="43" rx="21" fill="#172a37" stroke="#31534f"/><text x="1190" y="679" text-anchor="middle" font-size="14" font-weight="700" fill="#80ddc3">📅  30 OCT 2026</text>
+  <!-- cabin and waiting -->
+  <rect x="126" y="750" width="568" height="118" rx="20" class="card"/>
+  <text x="158" y="789" class="label">🚪  CURRENTLY IN CABIN</text>
+  <text x="158" y="835" font-size="32" font-weight="700">—</text><text x="205" y="831" class="small muted">No patient called just yet</text>
+  <rect x="738" y="750" width="576" height="118" rx="20" class="card"/>
+  <text x="770" y="789" class="label">🧑‍🤝‍🧑  UP NEXT</text>
+  <text x="770" y="833" class="body" font-weight="700">Ready when the clinic opens</text><text x="770" y="853" font-size="14" class="muted">Your live queue status will show here</text>
+  <!-- footer nav -->
+  <line x1="126" y1="889" x2="1314" y2="889" stroke="#223147"/>
+  <g font-size="14" text-anchor="middle"><text x="246" y="926" fill="#55d5bb">📅</text><text x="246" y="951" fill="#55d5bb" font-weight="700">Visits</text><text x="483" y="926">💊</text><text x="483" y="951" class="muted">Rx</text><text x="720" y="926">🧪</text><text x="720" y="951" class="muted">Labs</text><text x="957" y="926">🧾</text><text x="957" y="951" class="muted">Bills</text><text x="1194" y="926">✨</text><text x="1194" y="951" class="muted">AI</text></g>
+</svg>

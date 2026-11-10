@@ -12,7 +12,7 @@ export const ThemeProvider = ({ children }) => {
     } catch (e) {
       console.warn('Unable to access localStorage for theme:', e);
     }
-    return 'dark'; // Default dark cyber-medical theme
+    return 'light'; // Calm clinical workspace is the first-run default
   });
 
   useEffect(() => {

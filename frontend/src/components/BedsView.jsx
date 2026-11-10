@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
 import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 import BedAdmissionModal from './BedAdmissionModal';
 import PatientEMRModal from './PatientEMRModal';
@@ -70,7 +71,7 @@ export default function BedsView({ user }) {
       });
       await loadBeds();
     } catch (err) {
-      alert(err.message || 'Failed to update bed status');
+      showToast(err.message || 'Failed to update bed status', 'error');
     } finally {
       setUpdatingId(null);
     }
@@ -391,8 +392,10 @@ export default function BedsView({ user }) {
 
       {/* Bed Matrix Grid */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-          Loading live hospital beds...
+        <div className="beds-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton-card skeleton-shimmer" style={{ minHeight: '180px' }} />
+          ))}
         </div>
       ) : filteredBeds.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '48px' }}>

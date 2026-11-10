@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
 import StaffDutyDispatchModal from './StaffDutyDispatchModal';
 
 export default function HousekeepingView({ user, hospitalInfo }) {
@@ -230,7 +231,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
       });
       await loadData();
     } catch (err) {
-      alert(err.message || 'Failed to update task status');
+      showToast(err.message || 'Failed to update task status', 'error');
     }
   };
 
@@ -246,7 +247,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
   const handleSubmitScan = async (e) => {
     e.preventDefault();
     if (!scannedCode) {
-      alert('Please enter or scan an area QR code.');
+      showToast('कृपया स्वच्छता QR कोड स्कॅन करा किंवा एंटर करा.', 'warning');
       return;
     }
 
@@ -267,7 +268,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
         setSuccessMessage('');
       }, 1500);
     } catch (err) {
-      alert(err.message || 'QR Verification failed');
+      showToast(err.message || 'QR Verification failed', 'error');
     } finally {
       setSubmitting(false);
     }

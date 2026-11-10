@@ -4,22 +4,28 @@ import {
   Clock, 
   Stethoscope, 
   Plus, 
-  CheckCircle2,
+  CheckCircle2, 
   XCircle, 
   FileText, 
   Search, 
   Compass, 
   Radio, 
-  ChevronDown,
+  ChevronDown, 
   ChevronUp,
+  User,
+  Activity,
+  HeartPulse,
+  AlertCircle
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
 import LiveOPDTracker from './LiveOPDTracker';
 import PatientEMRModal from './PatientEMRModal';
 
 export default function AppointmentsView({ user, onOpenBookModal, onOpenConsultation, onOpenPrescription }) {
   const { t } = useLanguage();
+  const { showToast } = useToast();
   const [appointments, setAppointments] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +55,6 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
   useEffect(() => {
     loadAppointments();
 
-    // Auto-refresh appointments every 7 seconds to keep everyone in sync
     const interval = setInterval(() => {
       loadAppointments(true);
     }, 7000);
@@ -61,9 +66,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
     setActionLoading(id);
     try {
       await api.updateAppointmentStatus(id, newStatus, customRemark);
+      showToast(`Appointment status updated to ${newStatus}`, 'success');
       await loadAppointments(true);
     } catch (err) {
-      alert(err.message || 'Failed to update status');
+      showToast(err.message || 'Failed to update status', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -80,7 +86,6 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
     return matchesStatus && matchesSearch;
   });
 
-  // Calculate status counts for quick pills
   const statusCounts = {
     all: appointments.length,
     scheduled: appointments.filter(a => a.status === 'scheduled').length,
@@ -91,12 +96,12 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.25s ease-out' }}>
       {/* Header Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
+            <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', fontWeight: '800', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
               {isPatient ? t('nav.myAppointments', 'My Appointments & Health') : t('appointments.title', 'Clinical Appointments & OPD Queue')}
             </h2>
             <button
@@ -112,15 +117,16 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
             >
               <Compass size={14} />
-              <span>{showTracker ? (t('common.close', 'Hide Tracker')) : (t('nav.liveQueue', 'Open Live OPD Tracker'))}</span>
+              <span>{showTracker ? (t('common.close', 'Hide Live Tracker')) : (t('nav.liveQueue', 'Open Live OPD Tracker'))}</span>
               {showTracker ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', marginTop: '3px' }}>
             {t('appointments.subtitle', 'Manage outpatient visits, live consultation tokens, vitals, and physician schedules.')}
           </p>
         </div>
@@ -128,12 +134,13 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
         <button
           onClick={onOpenBookModal}
           className="btn btn-primary"
+          style={{ fontWeight: '700' }}
         >
           <Plus size={16} /> {t('appointments.bookNewBtn', 'Book New Appointment')}
         </button>
       </div>
 
-      {/* Live "Where is my train" OPD Tracker Hero Component */}
+      {/* Live OPD Tracker Hero Component */}
       {showTracker && (
         <LiveOPDTracker
           user={user}
@@ -151,7 +158,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
         gap: '12px',
         background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-md)',
+        borderRadius: '12px',
         padding: '12px 16px'
       }}>
         {/* Status Pills with Dynamic Counts */}
@@ -172,15 +179,15 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                 onClick={() => setStatusFilter(key)}
                 style={{
                   padding: '6px 14px',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   fontSize: '0.8rem',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
                   border: '1px solid',
                   borderColor: isSelected ? 'var(--primary)' : 'var(--border-subtle)',
-                  background: isSelected ? 'rgba(6, 182, 212, 0.18)' : 'transparent',
-                  color: isSelected ? '#38bdf8' : 'var(--text-secondary)',
-                  display: 'flex',
+                  background: isSelected ? 'rgba(6, 182, 212, 0.16)' : 'transparent',
+                  color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                   transition: 'all 0.15s ease'
@@ -188,11 +195,11 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
               >
                 <span>{label}</span>
                 <span style={{
+                  fontSize: '0.7rem',
                   padding: '1px 6px',
                   borderRadius: '10px',
-                  fontSize: '0.72rem',
-                  background: isSelected ? 'rgba(6, 182, 212, 0.3)' : 'rgba(255, 255, 255, 0.06)',
-                  color: isSelected ? '#fff' : 'var(--text-muted)'
+                  background: isSelected ? 'rgba(6, 182, 212, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                  color: isSelected ? '#ffffff' : 'var(--text-muted)'
                 }}>
                   {count}
                 </span>
@@ -210,20 +217,24 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="form-input"
-            style={{ paddingLeft: '36px', paddingRight: '12px', fontSize: '0.85rem', height: '38px' }}
+            style={{ paddingLeft: '36px', paddingRight: '12px', fontSize: '0.85rem', height: '38px', borderRadius: '8px' }}
           />
         </div>
       </div>
 
-      {/* Appointments List */}
+      {/* Appointments List / Skeletons */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-          {t('common.loading', 'Loading clinical appointments...')}
+        <div className="appointments-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton-card skeleton-shimmer" style={{ minHeight: '220px' }} />
+          ))}
         </div>
       ) : filteredAppointments.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
-          <Calendar size={42} color="var(--text-muted)" style={{ margin: '0 auto 12px auto' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>{t('appointments.noAppointments', 'No clinical appointments found')}</h3>
+          <Calendar size={44} color="var(--primary)" style={{ margin: '0 auto 12px auto', opacity: 0.6 }} />
+          <h3 style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+            {t('appointments.noAppointments', 'No clinical appointments found')}
+          </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '4px' }}>
             {t('appointments.subtitle', 'No visits found for the selected filter.')}
           </p>
@@ -277,7 +288,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     : isInCabin 
                     ? 'var(--card-highlight-cabin)' 
                     : isCriticalTriage
-                    ? 'linear-gradient(180deg, rgba(244, 63, 94, 0.05) 0%, rgba(13, 21, 36, 0.98) 100%)'
+                    ? 'linear-gradient(180deg, rgba(244, 63, 94, 0.06) 0%, rgba(13, 21, 36, 0.98) 100%)'
                     : undefined
                 }}
               >
@@ -296,7 +307,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     }}>
                       TOKEN #{appt.token_number}
                     </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       APT-{appt.id}
                     </span>
 
@@ -312,9 +323,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                         border: '1px solid rgba(244, 63, 94, 0.6)',
                         color: '#fb7185',
                         fontSize: '0.72rem',
-                        fontWeight: '800',
-                        letterSpacing: '0.02em',
-                        animation: 'pulse 1.8s infinite'
+                        fontWeight: '800'
                       }}>
                         🔴 AI CRITICAL PRIORITY
                       </span>
@@ -337,7 +346,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     )}
                   </div>
 
-                  {/* Enhanced Status Badges */}
+                  {/* Status Badges */}
                   {isCompleted ? (
                     <span style={{
                       display: 'inline-flex',
@@ -348,12 +357,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                       background: 'rgba(16, 185, 129, 0.2)',
                       border: '1.5px solid rgba(16, 185, 129, 0.5)',
                       color: '#34d399',
-                      fontSize: '0.78rem',
-                      fontWeight: '800',
-                      letterSpacing: '0.02em',
-                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
+                      fontSize: '0.76rem',
+                      fontWeight: '800'
                     }}>
-                      <CheckCircle2 size={14} /> तपासणी पूर्ण (Done)
+                      <CheckCircle2 size={13} /> तपासणी पूर्ण (Done)
                     </span>
                   ) : isInCabin ? (
                     <span style={{
@@ -365,11 +372,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                       background: 'rgba(6, 182, 212, 0.2)',
                       border: '1.5px solid rgba(6, 182, 212, 0.5)',
                       color: '#38bdf8',
-                      fontSize: '0.78rem',
-                      fontWeight: '800',
-                      animation: 'pulse 2s infinite'
+                      fontSize: '0.76rem',
+                      fontWeight: '800'
                     }}>
-                      <Radio size={14} /> 🩺 केबिनमध्ये तपासणी चालू
+                      <Radio size={13} className="heartbeat-icon" /> 🩺 केबिनमध्ये तपासणी चालू
                     </span>
                   ) : (
                     <span className={`badge ${
@@ -381,10 +387,10 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                   )}
                 </div>
 
-                {/* Patient & Doctor info */}
+                {/* Patient & Doctor Info */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '700' }}>
                       रुग्ण तपशील (Patient)
                     </div>
                     <div 
@@ -392,29 +398,29 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                         setSelectedPatientForEMR({ id: appt.patient_id, name: appt.patient_name });
                         setIsEMROpen(true);
                       }}
-                      style={{ fontWeight: '700', fontSize: '1rem', color: '#38bdf8', marginTop: '2px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      style={{ fontWeight: '700', fontSize: '0.96rem', color: '#38bdf8', marginTop: '2px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       title="Click to view Patient Medical History (EMR / EHR)"
                     >
                       {appt.patient_name} <FileText size={13} style={{ opacity: 0.7 }} />
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                       Blood: <strong style={{ color: '#fb7185' }}>{appt.patient_blood_group || 'N/A'}</strong> • {appt.patient_gender}
                     </div>
                     {appt.patient_allergies && appt.patient_allergies !== 'None' && (
-                      <div style={{ fontSize: '0.72rem', color: '#fb7185', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#fb7185', marginTop: '2px', fontWeight: '600' }}>
                         ⚠️ Allergies: {appt.patient_allergies}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '700' }}>
                       उपचार करणारे डॉक्टर (Physician)
                     </div>
-                    <div style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--text-primary)', marginTop: '2px' }}>
+                    <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)', marginTop: '2px' }}>
                       {appt.doctor_name}
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                       {appt.department_name} (रूम {appt.doctor_room})
                     </div>
                   </div>
@@ -429,7 +435,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                   border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   padding: '8px 12px',
-                  fontSize: '0.825rem'
+                  fontSize: '0.82rem'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
                     <Calendar size={14} color="var(--primary)" />
@@ -442,53 +448,43 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                 </div>
 
                 {/* Reason for visit */}
-                <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
-                  <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>तक्रार / कारण: </span>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>तक्रार / कारण: </span>
                   {appt.reason_for_visit}
                 </div>
 
-                {/* COMPLETED REMARK BANNER (Prominent for Admin, Reception & Doctor) */}
+                {/* Completed Remark Banner */}
                 {isCompleted && (
                   <div style={{
                     background: 'rgba(16, 185, 129, 0.1)',
                     border: '1px solid rgba(16, 185, 129, 0.35)',
-                    borderRadius: '10px',
-                    padding: '10px 14px',
-                    fontSize: '0.82rem'
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399', fontWeight: '800' }}>
-                      <CheckCircle2 size={16} />
-                      <span>तपासणी पूर्ण शेरा (Admin Remark):</span>
+                      <CheckCircle2 size={15} />
+                      <span>तपासणी पूर्ण शेरा:</span>
                     </div>
-                    <div style={{ color: '#f0fdf4', marginTop: '3px', fontWeight: '600' }}>
+                    <div style={{ color: '#f0fdf4', marginTop: '2px', fontWeight: '600' }}>
                       {appt.completion_remark || 'तपासणी यशस्वीरित्या पूर्ण झाली (Consultation Completed)'}
                     </div>
-                    {appt.completed_at && (
-                      <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.72rem', marginTop: '4px' }}>
-                        पूर्ण झालेली वेळ: {new Date(appt.completed_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* IN-CABIN LIVE CONSULTATION BANNER */}
+                {/* In-Cabin Banner */}
                 {isInCabin && (
                   <div style={{
                     background: 'rgba(6, 182, 212, 0.1)',
                     border: '1px solid rgba(6, 182, 212, 0.4)',
-                    borderRadius: '10px',
-                    padding: '10px 14px',
-                    fontSize: '0.82rem'
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontWeight: '800' }}>
-                      <Radio size={16} className="animate-spin" />
+                      <Radio size={15} className="heartbeat-icon" />
                       <span>डॉक्टरांच्या केबिनमध्ये तपासणी सुरू आहे</span>
                     </div>
-                    {appt.consultation_started_at && (
-                      <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.74rem', marginTop: '3px' }}>
-                        सुरू झालेली वेळ: {new Date(appt.consultation_started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -498,11 +494,12 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: '10px',
-                    padding: '8px 12px',
+                    padding: '6px 10px',
                     background: 'rgba(6, 182, 212, 0.05)',
                     border: '1px solid rgba(6, 182, 212, 0.15)',
-                    borderRadius: '8px',
-                    fontSize: '0.75rem'
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontFamily: 'var(--font-mono)'
                   }}>
                     {appt.vitals_bp && <div>BP: <strong>{appt.vitals_bp}</strong></div>}
                     {appt.vitals_pulse && <div>Pulse: <strong>{appt.vitals_pulse}</strong></div>}
@@ -513,37 +510,31 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
 
                 {/* Actions Footer */}
                 <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
-                  {/* Clinical documentation is independent of patient exit. */}
                   {(isInCabin || isCompleted) && isDoctor && !appt.prescription_id && (
-                    <>
-                      <button
-                        onClick={() => onOpenConsultation(appt)}
-                        className="btn btn-emerald btn-sm"
-                        style={{ flex: 1, fontWeight: '700', fontSize: '0.8rem' }}
-                      >
-                        <Stethoscope size={14} /> प्रिस्क्रिप्शन लिहा (Write Rx)
-                      </button>
-
-                    </>
+                    <button
+                      onClick={() => onOpenConsultation(appt)}
+                      className="btn btn-emerald btn-sm"
+                      style={{ flex: 1, fontWeight: '700', fontSize: '0.8rem' }}
+                    >
+                      <Stethoscope size={14} /> प्रिस्क्रिप्शन लिहा (Write Rx)
+                    </button>
                   )}
 
-                  {/* Only show Rx when it has actually been issued. */}
                   {appt.prescription_id && (
                     <button
                       onClick={() => onOpenPrescription(appt.id)}
                       className="btn btn-outline btn-sm"
-                      style={{ flex: 1, color: '#38bdf8', borderColor: 'rgba(6, 182, 212, 0.3)', fontWeight: '600' }}
+                      style={{ flex: 1, color: '#38bdf8', borderColor: 'rgba(6, 182, 212, 0.3)', fontWeight: '700' }}
                     >
                       <FileText size={14} /> प्रिस्क्रिप्शन पहा (View Rx)
                     </button>
                   )}
 
-                  {/* Cancel button */}
                   {isPatient && appt.status !== 'cancelled' && !isCompleted && !isInCabin && (
                     <button
                       onClick={() => {
                         if (window.confirm('तुम्हाला ही अपॉइंटमेंट रद्द करायची आहे का? (Are you sure you want to cancel this appointment?)')) {
-                          handleUpdateStatus(appt.id, 'cancelled', isPatient ? 'रुग्णाकडून रद्द करण्यात आले (Cancelled by patient)' : 'अपॉइंटमेंट रद्द केली');
+                          handleUpdateStatus(appt.id, 'cancelled', 'रुग्णाकडून रद्द करण्यात आले (Cancelled by patient)');
                         }
                       }}
                       disabled={actionLoading === appt.id}

@@ -7,18 +7,20 @@ import {
   FileText, 
   FlaskConical, 
   Sparkles, 
-  ShieldCheck,
-  Activity,
-  HeartPulse,
-  Receipt,
-  Tv,
-  UserCheck,
-  Shield,
-  User,
-  Building2,
-  X,
-  PanelLeftClose,
-  PanelLeftOpen
+  ShieldCheck, 
+  Activity, 
+  HeartPulse, 
+  Receipt, 
+  Tv, 
+  UserCheck, 
+  Shield, 
+  User, 
+  Building2, 
+  X, 
+  PanelLeftClose, 
+  PanelLeftOpen,
+  ChevronRight,
+  ClipboardList
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -28,205 +30,164 @@ export default function Sidebar({
   user, 
   hospitalInfo, 
   isMobileOpen, 
-  onCloseMobile,
-  isCollapsed,
-  onToggleCollapse
+  onCloseMobile, 
+  isCollapsed, 
+  onToggleCollapse 
 }) {
   const { t } = useLanguage();
 
   const userRole = user?.role || 'patient';
 
   const allNavItems = [
-    { id: 'opd-assistant', label: 'OPD Assistant Desk', icon: UserCheck, roles: ['admin','staff','nurse'] },
+    // Clinical Workflows
     { 
-      id: 'dashboard', 
-      label: t('nav.dashboard', 'Command Center'), 
-      icon: LayoutDashboard,
-      roles: ['admin'] 
+      id: 'opd-assistant', 
+      label: 'OPD Assistant Desk', 
+      icon: UserCheck, 
+      roles: ['admin', 'staff', 'nurse'],
+      category: 'clinical',
+      badge: 'DESK'
+    },
+    { 
+      id: 'appointments', 
+      label: userRole === 'patient' 
+        ? t('nav.myAppointments', 'My Appointments') 
+        : userRole === 'doctor' 
+        ? t('nav.opdQueue', 'OPD Queue & Visits') 
+        : t('nav.appointments', 'Appointments & OPD'), 
+      icon: Calendar, 
+      roles: ['admin', 'doctor', 'patient', 'staff'],
+      category: 'clinical'
     },
     { 
       id: 'live-queue', 
       label: t('nav.liveQueue', 'Live OPD Queue TV'), 
       icon: Tv, 
-      badge: 'LIVE',
-      roles: ['admin','staff']
-    },
-    { 
-      id: 'billing', 
-      label: userRole === 'patient' 
-        ? t('nav.myBilling', 'My Bills & Receipts') 
-        : t('nav.billing', 'Billing & Invoices'), 
-      icon: Receipt,
-      roles: ['admin', 'patient']
-    },
-    { 
-      id: 'appointments', 
-      label: userRole === 'patient' 
-        ? t('nav.myAppointments', 'My Appointments & Health') 
-        : userRole === 'doctor' 
-        ? t('nav.opdQueue', 'OPD Queue & Consultations') 
-        : t('nav.appointments', 'Appointments & OPD'), 
-      icon: Calendar,
-      roles: ['admin', 'doctor', 'patient', 'staff']
+      badge: 'LIVE', 
+      roles: ['admin', 'staff'],
+      category: 'clinical'
     },
     { 
       id: 'nurse-station', 
       label: t('nav.nurseStation', 'Nurse Station & Meds'), 
       icon: HeartPulse, 
-      badge: 'CLINICAL',
-      roles: ['nurse', 'admin', 'doctor']
+      badge: 'CLINICAL', 
+      roles: ['nurse', 'admin', 'doctor'],
+      category: 'clinical'
     },
-    { 
-      id: 'housekeeping', 
-      label: t('nav.housekeeping', 'Housekeeping & QR Audits'), 
-      icon: Sparkles, 
-      badge: 'HYGIENE',
-      roles: ['cleaning', 'admin']
-    },
+
+    // Inpatient & Facilities
     { 
       id: 'beds', 
       label: t('nav.beds', 'Ward & Inpatient Beds'), 
-      icon: BedDouble,
-      roles: ['admin', 'doctor', 'nurse']
+      icon: BedDouble, 
+      roles: ['admin', 'doctor', 'nurse'],
+      category: 'facilities'
     },
     { 
-      id: 'doctors', 
-      label: t('nav.doctors', 'Medical Staff Directory'), 
-      icon: Stethoscope,
-      roles: ['admin']
+      id: 'housekeeping', 
+      label: t('nav.housekeeping', 'Housekeeping & QR'), 
+      icon: Sparkles, 
+      badge: 'HYGIENE', 
+      roles: ['cleaning', 'admin'],
+      category: 'facilities'
+    },
+
+    // Billing & Medical Records
+    { 
+      id: 'billing', 
+      label: userRole === 'patient' 
+        ? t('nav.myBilling', 'My Bills & Receipts') 
+        : t('nav.billing', 'Billing & Invoices'), 
+      icon: Receipt, 
+      roles: ['admin', 'patient'],
+      category: 'records'
     },
     { 
       id: 'prescriptions', 
       label: userRole === 'patient' 
         ? t('nav.myPrescriptions', 'My Prescriptions') 
         : t('nav.prescriptions', 'Prescriptions & Rx'), 
-      icon: FileText,
-      roles: ['admin', 'doctor', 'patient', 'nurse']
+      icon: FileText, 
+      roles: ['admin', 'doctor', 'patient', 'nurse'],
+      category: 'records'
     },
     { 
       id: 'lab-reports', 
       label: userRole === 'patient' 
         ? t('nav.myLabReports', 'My Lab Reports') 
         : t('nav.labReports', 'Diagnostic Labs'), 
-      icon: FlaskConical,
-      roles: ['admin', 'doctor', 'patient', 'nurse']
+      icon: FlaskConical, 
+      roles: ['admin', 'doctor', 'patient', 'nurse'],
+      category: 'records'
     },
+
+    // Intelligence & Administration
     { 
       id: 'ai-triage', 
       label: t('nav.aiTriage', 'AI Clinical Triage'), 
       icon: Sparkles, 
-      badge: 'AI',
-      roles: ['admin', 'doctor', 'patient']
+      badge: 'AI', 
+      roles: ['admin', 'doctor', 'patient'],
+      category: 'intelligence'
+    },
+    { 
+      id: 'dashboard', 
+      label: t('nav.dashboard', 'Command Center'), 
+      icon: LayoutDashboard, 
+      roles: ['admin'],
+      category: 'intelligence'
+    },
+    { 
+      id: 'doctors', 
+      label: t('nav.doctors', 'Medical Staff'), 
+      icon: Stethoscope, 
+      roles: ['admin'],
+      category: 'intelligence'
     },
   ];
 
-  const navItems = allNavItems.filter(item => item.roles.includes(userRole));
+  const categories = [
+    { key: 'clinical', label: t('navSection.clinical', 'Clinical Operations') },
+    { key: 'facilities', label: t('navSection.facilities', 'Inpatient & Wards') },
+    { key: 'records', label: t('navSection.records', 'Billing & Records') },
+    { key: 'intelligence', label: t('navSection.intelligence', 'Clinical AI & Admin') },
+  ];
 
-  const getRoleSectionHeader = () => {
-    switch (userRole) {
-      case 'staff':
-        return 'OPD ASSISTANT DESK';
-      case 'patient':
-        return t('brand.patientPortal', 'PATIENT HEALTH PORTAL');
-      case 'doctor':
-        return t('brand.doctorStation', 'PHYSICIAN CLINICAL STATION');
-      case 'nurse':
-        return t('nav.nurseStation', 'NURSE CLINICAL STATION');
-      case 'cleaning':
-        return t('nav.housekeeping', 'HOUSEKEEPING & SANITATION');
-      case 'admin':
-      default:
-        return t('brand.adminCommand', 'HOSPITAL COMMAND CENTER');
-    }
-  };
+  const userNavItems = allNavItems.filter(item => item.roles.includes(userRole));
 
   const getRoleBadge = (role) => {
-    switch(role) {
+    switch (role) {
       case 'staff':
         return <span className="badge badge-cyan">OPD ASSISTANT</span>;
       case 'admin':
         return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(244, 63, 94, 0.15)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: '#fb7185',
-            fontWeight: '700'
-          }}>
+          <span className="badge badge-rose">
             <Shield size={11} /> ADMIN
           </span>
         );
       case 'doctor':
         return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(6, 182, 212, 0.15)',
-            border: '1px solid rgba(6, 182, 212, 0.3)',
-            color: '#38bdf8',
-            fontWeight: '700'
-          }}>
+          <span className="badge badge-cyan">
             <Stethoscope size={11} /> DOCTOR
           </span>
         );
       case 'nurse':
         return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
-            color: '#818cf8',
-            fontWeight: '700'
-          }}>
+          <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
             <HeartPulse size={11} /> NURSE
           </span>
         );
       case 'cleaning':
         return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            color: '#fbbf24',
-            fontWeight: '700'
-          }}>
+          <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
             <Sparkles size={11} /> CLEANING
           </span>
         );
       case 'patient':
       default:
         return (
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.68rem',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            background: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            color: '#34d399',
-            fontWeight: '700'
-          }}>
+          <span className="badge badge-emerald">
             <UserCheck size={11} /> PATIENT
           </span>
         );
@@ -245,84 +206,45 @@ export default function Sidebar({
 
       <aside className={`app-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
         {/* Brand Header */}
-        <div style={{
-          padding: isCollapsed ? '16px 8px' : '20px 18px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          position: 'relative'
-        }}>
-          {/* Powered by MedTech AI Badge & Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: isCollapsed ? '4px' : '3px 8px',
-              borderRadius: '20px',
-              background: 'rgba(6, 182, 212, 0.12)',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
-              fontSize: '0.68rem',
-              fontWeight: '700',
-              color: '#38bdf8',
-              letterSpacing: '0.04em'
-            }}
-            title={t('brand.poweredBy', 'POWERED BY MEDTECH AI')}
-            >
-              <HeartPulse className="heartbeat-icon" size={14} />
-              {!isCollapsed && <span>{t('brand.poweredBy', 'POWERED BY MEDTECH AI')}</span>}
+        <div className="sidebar-brand-header">
+          <div className="sidebar-brand-top">
+            {/* MedTech AI Logo Mark */}
+            <div className="sidebar-brand-mark" title="MedTech AI Hospital OS">
+              <div className="brand-logo-icon-wrap">
+                <HeartPulse className="heartbeat-icon" size={18} />
+              </div>
+              {!isCollapsed && (
+                <div className="brand-title-wrap">
+                  <div className="brand-product-name">
+                    MedTech<span className="brand-accent-text">AI</span>
+                  </div>
+                  <div className="brand-subtext">Clinical Hospital OS</div>
+                </div>
+              )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Desktop Collapse & Mobile Close */}
+            <div className="sidebar-header-controls">
               {!isCollapsed && (
-                <span style={{
-                  fontSize: '0.65rem',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#34d399',
-                  fontWeight: '700'
-                }}>
-                  {t('brand.live', 'LIVE')}
+                <span className="telemetry-pill">
+                  <span className="telemetry-beacon-live" />
+                  <span>LIVE</span>
                 </span>
               )}
 
-              {/* Fold Sidebar Toggle Button (Desktop) */}
               <button
                 onClick={onToggleCollapse}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '6px',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  padding: '5px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.15s ease'
-                }}
-                title={isCollapsed ? "Unfold Sidebar (Expand Menu)" : "Fold Sidebar (Maximize Dashboard)"}
+                className="sidebar-collapse-btn"
+                title={isCollapsed ? "Expand Sidebar (Expand Menu)" : "Fold Sidebar (Compact View)"}
+                aria-label="Toggle Sidebar Collapse"
               >
                 {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
               </button>
 
-              {/* Mobile Close Button */}
               {isMobileOpen && (
                 <button
                   onClick={onCloseMobile}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '6px',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    padding: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
+                  className="sidebar-collapse-btn mobile-close-btn"
                   title="Close Menu"
                 >
                   <X size={16} />
@@ -331,150 +253,88 @@ export default function Sidebar({
             </div>
           </div>
 
-          {/* Big Prominent Hospital Name */}
+          {/* Hospital Clinical Unit Title */}
           {!isCollapsed && (
-            <div>
-              <h1 style={{ 
-                fontFamily: 'var(--font-display)', 
-                fontWeight: '800', 
-                fontSize: '1.15rem', 
-                lineHeight: '1.25',
-                letterSpacing: '-0.02em',
-                textTransform: 'uppercase',
-                color: 'var(--text-primary)',
-                textShadow: '0 2px 10px rgba(6, 182, 212, 0.15)'
-              }}>
+            <div className="sidebar-hospital-card">
+              <div className="hospital-title">
                 {hospitalInfo?.hospital_name || t('brand.defaultHospital', 'CITY MULTI-SPECIALTY HOSPITAL')}
-              </h1>
-              <div style={{ 
-                fontSize: '0.72rem', 
-                color: 'var(--text-secondary)',
-                marginTop: '3px',
-                lineHeight: '1.3'
-              }}>
+              </div>
+              <div className="hospital-tagline">
                 {hospitalInfo?.tagline || t('brand.defaultTagline', 'Tertiary Clinical Care & 24x7 Trauma Center')}
               </div>
             </div>
           )}
         </div>
 
-        {/* Navigation */}
-        <div style={{ padding: isCollapsed ? '16px 8px' : '20px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
-          {!isCollapsed && (
-            <div style={{ 
-              fontSize: '0.68rem', 
-              fontWeight: '700', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.08em', 
-              color: 'var(--text-muted)',
-              padding: '0 12px 8px 12px' 
-            }}>
-              {getRoleSectionHeader()}
-            </div>
-          )}
+        {/* Categorized Navigation */}
+        <div className="sidebar-nav-container">
+          {categories.map((cat) => {
+            const catItems = userNavItems.filter((i) => i.category === cat.key);
+            if (catItems.length === 0) return null;
 
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  onCloseMobile?.();
-                }}
-                title={item.label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: isCollapsed ? 'center' : 'flex-start',
-                  gap: '12px',
-                  padding: isCollapsed ? '12px 0' : '10px 14px',
-                  borderRadius: '8px',
-                  fontSize: '0.875rem',
-                  fontWeight: isActive ? '700' : '500',
-                  color: isActive ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                  backgroundColor: isActive ? 'var(--accent-cyan-bg)' : 'transparent',
-                  border: '1px solid',
-                  borderColor: isActive ? 'var(--border-active)' : 'transparent',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  width: '100%',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }
-                }}
-              >
-                <Icon size={isCollapsed ? 20 : 18} style={{ color: isActive ? 'var(--accent-cyan)' : 'var(--text-muted)' }} />
-                {!isCollapsed && <span style={{ flex: 1 }}>{item.label}</span>}
-                {!isCollapsed && item.badge && (
-                  <span style={{
-                    fontSize: '0.65rem',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)',
-                    color: '#fff',
-                    fontWeight: '700'
-                  }}>
-                    {item.badge}
-                  </span>
+              <div key={cat.key} className="sidebar-section">
+                {!isCollapsed && (
+                  <div className="sidebar-section-title">
+                    <span>{cat.label}</span>
+                  </div>
                 )}
-              </button>
+
+                <div className="sidebar-section-items">
+                  {catItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        id={`nav-item-${item.id}`}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          onCloseMobile?.();
+                        }}
+                        title={item.label}
+                        className={`sidebar-nav-btn ${isActive ? 'active' : ''}`}
+                      >
+                        <span className="nav-btn-icon-wrap">
+                          <Icon size={isCollapsed ? 20 : 18} />
+                        </span>
+
+                        {!isCollapsed && (
+                          <span className="nav-btn-label">
+                            {item.label}
+                          </span>
+                        )}
+
+                        {!isCollapsed && item.badge && (
+                          <span className={`nav-item-badge badge-${item.badge.toLowerCase()}`}>
+                            {item.badge}
+                          </span>
+                        )}
+
+                        {isActive && !isCollapsed && (
+                          <ChevronRight size={13} className="nav-active-arrow" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
 
         {/* User Profile Card in Sidebar Footer */}
         {user && (
-          <div 
-            style={{
-              padding: isCollapsed ? '12px 0' : '12px 16px',
-              borderTop: '1px solid var(--border-subtle)',
-              backgroundColor: 'rgba(255, 255, 255, 0.015)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isCollapsed ? 'center' : 'flex-start',
-              gap: '10px'
-            }}
-            title={user.fullName || user.email}
-          >
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: userRole === 'admin' ? 'rgba(244, 63, 94, 0.15)' : userRole === 'doctor' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-              border: `1px solid ${userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399'}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: userRole === 'admin' ? '#fb7185' : userRole === 'doctor' ? '#38bdf8' : '#34d399',
-              flexShrink: 0
-            }}>
-              {userRole === 'admin' ? <Shield size={18} /> : userRole === 'doctor' ? <Stethoscope size={18} /> : <UserCheck size={18} />}
+          <div className="sidebar-user-footer" title={user.fullName || user.email}>
+            <div className={`user-avatar-badge role-${userRole}`}>
+              {(user.fullName?.[0] || userRole[0] || 'U').toUpperCase()}
             </div>
             {!isCollapsed && (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                  fontSize: '0.85rem',
-                  fontWeight: '700',
-                  color: 'var(--text-primary)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
+              <div className="user-info-text">
+                <div className="user-display-name">
                   {user.fullName || user.email}
                 </div>
-                <div style={{ marginTop: '2px' }}>
+                <div className="user-role-badge-row">
                   {getRoleBadge(userRole)}
                 </div>
               </div>
@@ -482,31 +342,21 @@ export default function Sidebar({
           </div>
         )}
 
-        {/* Hospital Status Footer */}
+        {/* Live Hospital Telemetry Footer */}
         {!isCollapsed && (
-          <div style={{
-            padding: '14px 16px',
-            borderTop: '1px solid var(--border-subtle)',
-            backgroundColor: 'var(--bg-card-subtle)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#10b981',
-                boxShadow: '0 0 8px #10b981'
-              }} />
-              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#34d399' }}>
+          <div className="sidebar-telemetry-footer">
+            <div className="telemetry-status-row">
+              <span className="telemetry-beacon-live" />
+              <span className="telemetry-status-text">
                 {t('brand.statusReady', 'EMERGENCY READY')}
               </span>
             </div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              {t('brand.statusSubtext', 'SQLite WAL • Level-1 Trauma Active')}
+            <div className="telemetry-subtext">
+              {t('brand.statusSubtext', 'NABH Level-1 • SQLite WAL')}
             </div>
           </div>
         )}
       </aside>
-      </>
-    );
-  }
+    </>
+  );
+}

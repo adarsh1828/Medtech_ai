@@ -18,7 +18,10 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
-  HeartPulse
+  HeartPulse,
+  Activity,
+  AlertTriangle,
+  Bell
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -62,19 +65,19 @@ export default function TopHeader({
   }, []);
 
   const getRoleBadge = (role) => {
-    switch(role) {
+    switch (role) {
       case 'staff':
-        return <span className="badge badge-cyan"><UserCheck size={12} /> OPD ASSISTANT</span>;
+        return <span className="badge badge-cyan"><UserCheck size={11} /> OPD ASSISTANT</span>;
       case 'admin':
-        return <span className="badge badge-rose"><Shield size={12} /> {t('header.admin', 'ADMIN')}</span>;
+        return <span className="badge badge-rose"><Shield size={11} /> {t('header.admin', 'ADMIN')}</span>;
       case 'doctor':
-        return <span className="badge badge-cyan"><Stethoscope size={12} /> {t('header.doctor', 'DOCTOR')}</span>;
+        return <span className="badge badge-cyan"><Stethoscope size={11} /> {t('header.doctor', 'DOCTOR')}</span>;
       case 'nurse':
-        return <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.3)' }}><HeartPulse size={12} /> NURSE</span>;
+        return <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.3)' }}><HeartPulse size={11} /> NURSE</span>;
       case 'cleaning':
-        return <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}><Sparkles size={12} /> CLEANING</span>;
+        return <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}><Sparkles size={11} /> CLEANING</span>;
       case 'patient':
-        return <span className="badge badge-emerald"><UserCheck size={12} /> {t('header.patient', 'PATIENT')}</span>;
+        return <span className="badge badge-emerald"><UserCheck size={11} /> {t('header.patient', 'PATIENT')}</span>;
       default:
         return null;
     }
@@ -82,15 +85,15 @@ export default function TopHeader({
 
   return (
     <header className="top-header">
-      {/* Left: Sidebar Fold/Expand Toggle & Mobile Brand & Live Clock */}
-      <div className="top-header-left" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Left: Sidebar Toggle, Mobile Brand, Live Clock & ECG */}
+      <div className="top-header-left">
         <button
           className="sidebar-toggle-btn"
           onClick={onToggleSidebar}
           title={isSidebarCollapsed ? "Unfold Sidebar (Expand Menu)" : "Fold Sidebar (Maximize Dashboard)"}
           aria-label="Toggle Sidebar"
         >
-          {isSidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+          {isSidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
         </button>
 
         {/* Mobile Brand Title (visible only on mobile <= 768px) */}
@@ -111,37 +114,14 @@ export default function TopHeader({
         </div>
 
         {/* Desktop Live Clock */}
-        <div className="hide-on-mobile" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid var(--border-subtle)',
-          padding: '6px 12px',
-          borderRadius: '8px',
-          fontSize: '0.8rem',
-          color: 'var(--text-secondary)',
-          fontFamily: 'var(--font-mono)'
-        }}>
+        <div className="header-clock-pill hide-on-mobile">
           <span className="telemetry-beacon-live" />
-          <Clock size={14} color="var(--primary)" />
-          <span>{timeStr || t('header.liveClock', 'LIVE')}</span>
+          <Clock size={13} color="var(--primary)" />
+          <span className="tabular-clock-digits">{timeStr || t('header.liveClock', 'LIVE')}</span>
         </div>
 
         {/* Desktop Animated ECG Monitor & NABH Badge */}
-        <div className="hide-on-mobile" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '4px 12px',
-          borderRadius: '8px',
-          background: 'rgba(6, 182, 212, 0.08)',
-          border: '1px solid rgba(6, 182, 212, 0.25)',
-          fontSize: '0.72rem',
-          fontWeight: '700',
-          color: '#38bdf8',
-          letterSpacing: '0.03em'
-        }}>
+        <div className="header-ecg-pill hide-on-mobile">
           <svg width="44" height="16" viewBox="0 0 44 16" fill="none" style={{ overflow: 'visible' }}>
             <path
               d="M0 8 H10 L13 2 L17 14 L21 1 L25 15 L28 6 L31 8 H44"
@@ -152,99 +132,42 @@ export default function TopHeader({
               className="ecg-monitor-line"
             />
           </svg>
-          <span>NABH LEVEL-1 • 24x7 CLINICAL NETWORK</span>
+          <span className="ecg-pill-label">NABH LEVEL-1 • 24x7 CLINICAL NETWORK</span>
         </div>
       </div>
 
-      {/* Right: Actions & User Info & Language Selector */}
+      {/* Right: Actions, Language, Emergency SOS & User Profile */}
       <div className="top-header-actions">
-        
-        {/* Global Spotlight Search Button - Desktop Only */}
+        {/* Global Spotlight Search Button */}
         <button
           onClick={onOpenSearch}
-          className="hide-on-mobile"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid var(--border-subtle)',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            color: 'var(--text-secondary)',
-            fontSize: '0.8rem',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-          title="Spotlight Search (Ctrl + K)"
+          className="header-search-btn hide-on-mobile"
+          title="Spotlight Global Search (Ctrl + K / ⌘K)"
         >
-          <Search size={14} color="var(--primary)" />
+          <Search size={14} className="search-icon" />
           <span>Search...</span>
-          <kbd style={{
-            fontSize: '0.65rem',
-            padding: '2px 5px',
-            borderRadius: '4px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'var(--text-muted)',
-            fontFamily: 'var(--font-mono)'
-          }}>
+          <kbd className="search-kbd-shortcut">
             Ctrl K
           </kbd>
         </button>
 
         {/* Language Selector Dropdown */}
-        <div style={{ position: 'relative' }} ref={langDropdownRef}>
+        <div className="header-dropdown-wrap" ref={langDropdownRef}>
           <button
             id="language-selector-btn"
             onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: isLangDropdownOpen ? 'var(--accent-cyan-bg)' : 'rgba(255, 255, 255, 0.04)',
-              border: `1px solid ${isLangDropdownOpen ? 'var(--border-active)' : 'var(--border-subtle)'}`,
-              padding: '6px 9px',
-              borderRadius: '8px',
-              color: isLangDropdownOpen ? 'var(--accent-cyan)' : 'var(--text-primary)',
-              fontSize: '0.8rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
+            className={`header-lang-btn ${isLangDropdownOpen ? 'active' : ''}`}
             title={t('header.languages', 'Language')}
           >
             <Globe size={15} color="var(--primary)" className="hide-on-mobile" />
-            <span style={{ fontSize: '0.9rem' }}>{currentLangMeta?.flag}</span>
-            <span className="hide-on-mobile" style={{ fontWeight: '600' }}>{currentLangMeta?.nativeLabel}</span>
-            <ChevronDown size={14} style={{ opacity: 0.7, transform: isLangDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+            <span className="lang-flag">{currentLangMeta?.flag}</span>
+            <span className="hide-on-mobile lang-name">{currentLangMeta?.nativeLabel}</span>
+            <ChevronDown size={13} className={`lang-chevron ${isLangDropdownOpen ? 'rotated' : ''}`} />
           </button>
 
           {isLangDropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              right: 0,
-              width: '165px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '10px',
-              boxShadow: 'var(--shadow-md)',
-              padding: '6px',
-              zIndex: 1000,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '3px',
-              animation: 'fadeIn 0.15s ease'
-            }}>
-              <div style={{
-                fontSize: '0.68rem',
-                color: 'var(--text-muted)',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                padding: '4px 8px 6px'
-              }}>
+            <div className="header-dropdown-menu">
+              <div className="header-dropdown-title">
                 {t('header.languages', 'Select Language')}
               </div>
 
@@ -258,40 +181,13 @@ export default function TopHeader({
                       setLanguage(lang.code);
                       setIsLangDropdownOpen(false);
                     }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '8px 10px',
-                      borderRadius: '6px',
-                      backgroundColor: isSelected ? 'var(--accent-cyan-bg)' : 'transparent',
-                      color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '0.82rem',
-                      fontWeight: isSelected ? '700' : '500',
-                      textAlign: 'left',
-                      transition: 'all 0.12s ease',
-                      width: '100%'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
-                        e.currentTarget.style.color = 'var(--text-primary)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--text-secondary)';
-                      }
-                    }}
+                    className={`header-dropdown-item ${isSelected ? 'selected' : ''}`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '0.95rem' }}>{lang.flag}</span>
+                    <div className="dropdown-item-content">
+                      <span className="dropdown-flag">{lang.flag}</span>
                       <span>{lang.nativeLabel}</span>
                     </div>
-                    {isSelected && <Check size={14} color="var(--accent-cyan)" />}
+                    {isSelected && <Check size={14} className="selected-check" />}
                   </button>
                 );
               })}
@@ -299,111 +195,61 @@ export default function TopHeader({
           )}
         </div>
 
-        {/* Day / Night Mode Toggle */}
+        {/* Theme Toggle (Day / Night Mode) */}
         <button
           id="theme-toggle-btn"
           onClick={toggleTheme}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.05)',
-            border: '1px solid var(--border-subtle)',
-            color: isDark ? '#fbbf24' : '#0284c7',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            flexShrink: 0
-          }}
-          title={isDark ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+          className="header-theme-toggle"
+          title={isDark ? 'Switch to Crisp Day Mode' : 'Switch to Obsidian Night Mode'}
+          aria-label="Toggle Theme"
         >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          {isDark ? <Sun size={16} className="sun-icon" /> : <Moon size={16} className="moon-icon" />}
         </button>
 
         {/* 24x7 Emergency SOS Button */}
         <button
           onClick={onOpenEmergency}
-          style={{
-            background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '6px 10px',
-            fontSize: '0.78rem',
-            fontWeight: '800',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            cursor: 'pointer',
-            boxShadow: '0 2px 10px rgba(225, 29, 72, 0.35)',
-            transition: 'all 0.15s ease',
-            flexShrink: 0
-          }}
-          title="24x7 Ambulance & Emergency Trauma Center"
+          className="header-sos-btn"
+          title="24x7 Emergency Trauma & Ambulance Alert"
         >
           <span className="telemetry-beacon-emergency" />
           <span className="hide-on-mobile">🚨 SOS 108</span>
           <span className="show-on-mobile-inline">🚨 108</span>
         </button>
 
-        {/* Book Appointment - Desktop Only (Mobile has it on Dashboard & Bottom Nav) */}
+        {/* Book Appointment CTA (Desktop only) */}
         <button
           onClick={onOpenBookModal}
-          className="btn btn-primary btn-sm hide-on-mobile"
+          className="btn btn-primary btn-sm header-book-btn hide-on-mobile"
         >
-          <Plus size={16} /> {t('header.bookAppointment', 'Book Appointment')}
+          <Plus size={15} />
+          <span>{t('header.bookAppointment', 'Book Appointment')}</span>
         </button>
 
         {/* User Account / Auth Section */}
         {user ? (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-            padding: '4px 8px',
-            borderRadius: '10px',
-            flexShrink: 0
-          }}>
-            {/* Desktop user full name & badge */}
-            <div className="hide-on-mobile" style={{ textAlign: 'right', paddingRight: '4px' }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-primary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div className="header-user-chip">
+            <div className="header-user-meta hide-on-mobile">
+              <div className="user-name-title">
                 {user.fullName || user.email}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2px' }}>
+              <div className="user-badge-wrap">
                 {getRoleBadge(user.role)}
               </div>
             </div>
 
-            {/* Mobile compact role avatar circle */}
-            <div className="show-on-mobile-flex" style={{ alignItems: 'center' }}>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                background: user.role === 'admin' ? 'rgba(244, 63, 94, 0.2)' : user.role === 'doctor' ? 'rgba(6, 182, 212, 0.2)' : user.role === 'nurse' ? 'rgba(99, 102, 241, 0.2)' : user.role === 'cleaning' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                border: `1px solid ${user.role === 'admin' ? '#f43f5e' : user.role === 'doctor' ? '#06b6d4' : user.role === 'nurse' ? '#6366f1' : user.role === 'cleaning' ? '#f59e0b' : '#10b981'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.75rem',
-                fontWeight: '700',
-                color: user.role === 'admin' ? '#fb7185' : user.role === 'doctor' ? '#38bdf8' : user.role === 'nurse' ? '#818cf8' : user.role === 'cleaning' ? '#fbbf24' : '#34d399'
-              }}
-              title={`${user.fullName || user.email} (${user.role})`}
-              >
+            {/* Mobile avatar */}
+            <div className="show-on-mobile-flex">
+              <div className={`user-avatar-circle role-${user.role}`}>
                 {(user.fullName?.[0] || user.role?.[0] || 'U').toUpperCase()}
               </div>
             </div>
 
             <button
               onClick={onLogout}
-              className="btn btn-outline btn-sm"
-              style={{ padding: '6px', color: 'var(--text-muted)', minHeight: 'unset', height: '30px', width: '30px' }}
+              className="header-logout-btn"
               title={t('header.signOut', 'Sign Out')}
+              aria-label="Sign Out"
             >
               <LogOut size={14} />
             </button>
@@ -411,10 +257,10 @@ export default function TopHeader({
         ) : (
           <button
             onClick={onOpenLogin}
-            className="btn btn-outline btn-sm"
-            style={{ padding: '6px 12px', minHeight: 'unset', height: '32px' }}
+            className="btn btn-outline btn-sm header-signin-btn"
           >
-            <User size={15} /> <span className="hide-on-mobile">{t('header.signIn', 'Sign In')}</span>
+            <User size={14} />
+            <span className="hide-on-mobile">{t('header.signIn', 'Sign In')}</span>
           </button>
         )}
       </div>
