@@ -31,13 +31,6 @@ export const mr = {
     emergencySos: 'आपत्कालीन एसओएस ट्रायज'
   },
 
-  navSection: {
-    clinical: 'क्लिनिकल ऑपरेशन्स',
-    facilities: 'इनपेशंट व वॉर्ड',
-    records: 'बिलिंग व रेकॉर्ड्स',
-    intelligence: 'AI व व्यवस्थापन',
-  },
-
   // Header
   header: {
     liveClock: 'थेट',

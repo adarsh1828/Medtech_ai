@@ -21,7 +21,6 @@ import {
 import { api } from '../api';
 import { formatCurrency } from '../utils/currency';
 import { useLanguage } from '../context/LanguageContext';
-import { useToast } from '../context/ToastContext';
 
 export default function BillingView({ user, hospitalInfo }) {
   const { t } = useLanguage();
@@ -118,7 +117,7 @@ export default function BillingView({ user, hospitalInfo }) {
         setActiveReceiptInvoice(prev => ({ ...prev, payment_status: 'paid', payment_method: method, paid_at: new Date().toISOString() }));
       }
     } catch (err) {
-      showToast(err.message || 'Failed to record payment', 'error');
+      alert(err.message || 'Failed to record payment');
     }
   };
 
@@ -234,11 +233,11 @@ export default function BillingView({ user, hospitalInfo }) {
   const handleCreateInvoiceSubmit = async (e) => {
     e.preventDefault();
     if (!newInvoiceForm.patient_id) {
-      showToast('कृपया रुग्ण निवडा (Please select a patient).', 'warning');
+      alert('Please select a patient.');
       return;
     }
     if (newInvoiceForm.items.length === 0) {
-      showToast('कृपया किमान एक आयटम जोडा (Please add at least one line item).', 'warning');
+      alert('Please add at least one line item.');
       return;
     }
 
@@ -251,7 +250,7 @@ export default function BillingView({ user, hospitalInfo }) {
         handleOpenReceipt(res.invoice);
       }
     } catch (err) {
-      showToast(err.message || 'Failed to create invoice', 'error');
+      alert(err.message || 'Failed to create invoice');
     } finally {
       setIsSubmitting(false);
     }

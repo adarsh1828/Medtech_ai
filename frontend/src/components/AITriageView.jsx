@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import { useToast } from '../context/ToastContext';
 
 const PRESETS = [
   {
@@ -96,13 +95,12 @@ export default function AITriageView({ onBookWithDepartment }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const [triageError, setTriageError] = useState('');
 
   // Voice Speech Recognition Trigger (Marathi, Hindi, English)
   const toggleSpeechRecognition = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      showToast('तुमच्या ब्राउझरमध्ये व्हॉईस इनपुट सपोर्ट नाही. कृपया Chrome किंवा Edge वापरा.', 'warning');
+      alert('तुमच्या ब्राउझरमध्ये व्हॉईस इनपुट सपोर्ट नाही. कृपया Google Chrome किंवा Edge वापरा.');
       return;
     }
 
@@ -152,7 +150,6 @@ export default function AITriageView({ onBookWithDepartment }) {
 
     setAnalyzing(true);
     setResult(null);
-    setTriageError('');
 
     try {
       const res = await api.runAITriage({ symptoms: text });
@@ -175,7 +172,6 @@ export default function AITriageView({ onBookWithDepartment }) {
     } catch (err) {
       console.warn('API triage fallback to preset:', err);
       if (preset) setResult(preset);
-      else setTriageError('We couldn’t complete the assessment. Please check your connection and try again, or contact the care team directly.');
     } finally {
       setAnalyzing(false);
     }
@@ -197,72 +193,273 @@ export default function AITriageView({ onBookWithDepartment }) {
   };
 
   return (
-    <section className="ai-triage-page">
-      <header className="ai-triage-hero">
-        <div className="ai-triage-orb ai-triage-orb-one" />
-        <div className="ai-triage-orb ai-triage-orb-two" />
-        <div className="ai-triage-hero-copy">
-          <div className="ai-triage-eyebrow"><span className="ai-triage-spark"><Sparkles size={15} /></span> MEDTECH AI <span className="ai-triage-eyebrow-divider" /> CLINICAL SUPPORT</div>
-          <h1>Care starts with listening<span>.</span></h1>
-          <p>Share symptoms in Marathi, Hindi, or English. Get a clear urgency recommendation and the right care team to contact.</p>
-          <div className="ai-triage-hero-meta"><span><HeartPulse size={15} /> Multilingual support</span><span><ShieldCheck size={15} /> Clinician-guided next steps</span></div>
-        </div>
-        <div className="ai-triage-hero-art" aria-hidden="true">
-          <div className="ai-hero-ring ai-hero-ring-outer" /><div className="ai-hero-ring ai-hero-ring-inner" />
-          <div className="ai-hero-core"><Brain size={40} strokeWidth={1.6} /><span className="ai-hero-core-spark"><Sparkles size={15} /></span></div>
-          <span className="ai-hero-orbit-dot dot-one" /><span className="ai-hero-orbit-dot dot-two" /><span className="ai-hero-orbit-dot dot-three" />
-        </div>
-      </header>
-
-      <div className="ai-triage-layout">
-        <div className="ai-triage-main-column">
-          <section className="ai-triage-panel ai-triage-input-panel">
-            <div className="ai-triage-section-heading">
-              <div className="ai-section-icon"><Activity size={18} /></div>
-              <div><h2>Tell us what’s going on</h2><p>Include when it started and how it feels.</p></div>
-              <span className="ai-step-label">STEP 01 <span>/ 02</span></span>
-            </div>
-
-            <label htmlFor="triage-symptoms" className="ai-field-label">Patient symptoms</label>
-            <div className="ai-symptom-input-wrap">
-              <textarea id="triage-symptoms" rows="5" className="form-textarea ai-symptom-input" placeholder="Describe the symptoms, when they began, and anything that makes them better or worse…" value={symptomText} onChange={(e) => { setSymptomText(e.target.value); setResult(null); setTriageError(''); }} />
-              <div className="ai-input-footer"><span>{symptomText.length} characters</span><button type="button" onClick={toggleSpeechRecognition} className={`ai-mic-button ${isListening ? 'is-listening' : ''}`} aria-label={isListening ? 'Stop voice input' : 'Start voice input'} title={isListening ? 'Stop voice input' : 'Speak symptoms'}>{isListening ? <MicOff size={17} /> : <Mic size={17} />}<span>{isListening ? 'Listening' : 'Speak'}</span></button></div>
-            </div>
-
-            {isListening && <div className="ai-listening-status" role="status"><span className="ai-listening-dot" /> Listening in {language === 'mr' ? 'Marathi' : language === 'hi' ? 'Hindi' : 'English'}…</div>}
-            {triageError && <div className="ai-triage-error" role="alert"><AlertTriangle size={17} />{triageError}</div>}
-            <div className="ai-triage-form-actions">
-              {symptomText && <button onClick={() => { setSymptomText(''); setResult(null); setTriageError(''); }} className="btn btn-outline">Clear</button>}
-              <button onClick={() => runTriage()} disabled={analyzing || !symptomText.trim()} className="btn btn-primary ai-analyze-button" aria-busy={analyzing}>
-                {analyzing ? <><span className="ai-button-spinner" /> Reviewing symptoms…</> : <><Sparkles size={17} /> Get AI guidance <ArrowRight size={16} /></>}
-              </button>
-            </div>
-          </section>
-
-          {result && <section className={`ai-triage-result ai-result-${(result.urgency || 'standard').toLowerCase()}`} aria-live="polite">
-            <div className="ai-result-topline"><span className="ai-result-kicker"><Sparkles size={14} /> AI TRIAGE SUMMARY</span><span className={`ai-urgency-pill urgency-${(result.urgency || 'standard').toLowerCase()}`}><AlertTriangle size={14} /> {result.urgency} PRIORITY</span></div>
-            <div className="ai-result-heading"><div><span className="ai-result-label">Recommended care team</span><h2><Building2 size={21} /> {result.dept}</h2></div>{result.confidence && <div className="ai-confidence"><span>Model confidence</span><strong>{result.confidence}</strong></div>}</div>
-            {(result.suspectedConditions?.length > 0 || result.estimatedWaitTime) && <div className="ai-result-details">
-              {result.suspectedConditions?.length > 0 && <div className="ai-detail-block"><span className="ai-detail-label">Possible considerations</span><div className="ai-condition-list">{result.suspectedConditions.map((cond, idx) => <span className="ai-condition-chip" key={idx}>{cond}</span>)}</div></div>}
-              {result.estimatedWaitTime && <div className="ai-wait-time"><Clock size={17} /><div><span>Estimated wait</span><strong>{result.estimatedWaitTime}</strong></div></div>}
-            </div>}
-            <div className="ai-result-copy-grid">
-              <div className="ai-result-copy"><span className="ai-detail-label">Why this recommendation</span><p>{result.reasoning}</p></div>
-              <div className="ai-result-copy ai-result-guidance"><span className="ai-detail-label">While you arrange care</span><p>{result.precautions}</p></div>
-            </div>
-            <div className="ai-result-bottom"><p><ShieldCheck size={16} /> This is decision support, not a diagnosis. A clinician should assess the patient.</p><button onClick={handleBookAppointment} className="btn btn-primary">Continue to {result.dept} <ArrowRight size={16} /></button></div>
-          </section>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.12) 100%)',
+        border: '1px solid rgba(139, 92, 246, 0.3)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
+        <div style={{ maxWidth: '650px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '20px', color: '#c084fc', fontSize: '0.75rem', fontWeight: '700', marginBottom: '8px' }}>
+            <Sparkles size={14} /> MULTILINGUAL CLINICAL TRIAGE ENGINE
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>
+            AI लक्षण तपासणी व तात्काळ वर्गीकरण (AI Clinical Triage)
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.5', marginTop: '4px' }}>
+            मराठी, हिंदी किंवा इंग्रजीत लक्षणे सांगा. सिस्टीम रुग्णाची तीव्रता तपासून तात्काळ योग्य डॉक्टर आणि विभाग सुचवेल.
+          </p>
         </div>
 
-        <aside className="ai-triage-side-column">
-          <section className="ai-triage-panel ai-scenarios-panel">
-            <div className="ai-side-heading"><div className="ai-section-icon ai-section-icon-soft"><Sparkles size={17} /></div><div><h2>Try a sample</h2><p>Choose a scenario to see how triage works.</p></div></div>
-            <div className="ai-scenario-list">{PRESETS.map((preset, idx) => <button key={idx} className="ai-scenario-button" onClick={() => handleSelectPreset(preset)} disabled={analyzing}><span className="ai-scenario-number">{String(idx + 1).padStart(2, '0')}</span><span>{preset.titleEn}</span><ArrowRight size={15} /></button>)}</div>
-            <div className="ai-scenario-note"><Activity size={15} /> Sample scenarios are for demonstration only.</div>
-          </section>
-          <section className="ai-safety-card"><div className="ai-safety-icon"><AlertTriangle size={18} /></div><div><h3>Need urgent help?</h3><p>If someone is unconscious, struggling to breathe, or has severe chest pain, contact emergency services or go to the nearest emergency department now.</p></div></section>
-        </aside>
+        <div style={{
+          padding: '12px 18px',
+          background: 'rgba(0, 0, 0, 0.25)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '10px',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>
+            Triage Standard
+          </div>
+          <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#38bdf8', marginTop: '2px' }}>
+            Emergency Severity Index (ESI)
+          </div>
+        </div>
       </div>
-    </section>
+
+      {/* Preset Quick Symptoms */}
+      <div>
+        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>
+          लक्षणे निवडून त्वरित तपासा (Quick Test Scenarios):
+        </div>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {PRESETS.map((p, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSelectPreset(p)}
+              className="btn btn-outline btn-sm"
+              style={{ fontSize: '0.8rem', padding: '6px 14px', borderRadius: '8px' }}
+            >
+              {p.title}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Input Box with Voice Mic Trigger */}
+      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label className="form-label" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>
+            रुग्णाची लक्षणे, दुखण्याचा प्रकार व वेळ सांगा / लिहा:
+          </label>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            मराठी, हिंदी किंवा English मध्ये टाईप करा किंवा बोला
+          </span>
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          <textarea
+            rows="4"
+            className="form-textarea"
+            placeholder="उदा. छातीत डाव्या बाजूला खूप कळ येत आहे आणि घाम फुटत आहे... किंवा मायक्रोफोन बटण दाबून थेट बोला..."
+            value={symptomText}
+            onChange={(e) => setSymptomText(e.target.value)}
+            style={{ fontSize: '0.925rem', lineHeight: '1.5', paddingRight: '50px' }}
+          />
+
+          {/* Voice Input Mic Button */}
+          <button
+            type="button"
+            onClick={toggleSpeechRecognition}
+            title={isListening ? 'बोलणे थांबवा' : 'मायक्रोफोनने लक्षणे बोला (Voice Input)'}
+            style={{
+              position: 'absolute',
+              right: '12px',
+              bottom: '16px',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              border: isListening ? '2px solid #ef4444' : '1px solid var(--border-subtle)',
+              background: isListening ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: isListening ? '#ef4444' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              animation: isListening ? 'pulse 1.2s infinite' : 'none'
+            }}
+          >
+            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+        </div>
+
+        {isListening && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#ef4444', fontWeight: '600' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', display: 'inline-block', animation: 'ping 1s infinite' }} />
+            ऐकत आहे... कृपया तुमची लक्षणे बोला (Listening in {language === 'mr' ? 'Marathi' : language === 'hi' ? 'Hindi' : 'English'})...
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          {symptomText && (
+            <button
+              onClick={() => { setSymptomText(''); setResult(null); }}
+              className="btn btn-outline btn-sm"
+            >
+              साफ करा (Clear)
+            </button>
+          )}
+          <button
+            onClick={() => runTriage()}
+            disabled={analyzing || !symptomText.trim()}
+            className="btn btn-primary"
+            style={{ minWidth: '180px' }}
+          >
+            {analyzing ? (
+              <>
+                <Activity size={16} className="heartbeat-icon" /> AI तपासणी चालू आहे...
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} /> AI Triage ट्रिगर करा
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Triage Output Card */}
+      {result && (
+        <div
+          className="glass-card"
+          style={{
+            border: `2px solid ${
+              result.urgency === 'CRITICAL' ? 'rgba(244, 63, 94, 0.6)' :
+              result.urgency === 'HIGH' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(6, 182, 212, 0.6)'
+            }`,
+            background: 'linear-gradient(180deg, rgba(18, 28, 46, 0.95) 0%, rgba(13, 21, 36, 0.98) 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '18px',
+            animation: 'fadeIn 0.3s ease-out'
+          }}
+        >
+          {/* Top: Urgency & Department */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span className={`badge ${
+                result.urgency === 'CRITICAL' ? 'badge-rose' :
+                result.urgency === 'HIGH' ? 'badge-amber' : 'badge-cyan'
+              }`} style={{ fontSize: '0.85rem', padding: '6px 14px' }}>
+                <AlertTriangle size={14} /> {result.urgency} URGENCY
+              </span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                AI Diagnostic Confidence: <strong style={{ color: '#34d399' }}>{result.confidence}</strong>
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Building2 size={16} color="var(--primary)" />
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>शिफारस केलेला विभाग:</span>
+              <span style={{ fontWeight: '800', fontSize: '1.05rem', color: '#38bdf8' }}>{result.dept}</span>
+            </div>
+          </div>
+
+          {/* Differential Conditions & Wait Time */}
+          {(result.suspectedConditions?.length > 0 || result.estimatedWaitTime) && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(6, 182, 212, 0.08)',
+              border: '1px solid rgba(6, 182, 212, 0.2)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  संभाव्य निदान (Differential Diagnosis):
+                </span>
+                {result.suspectedConditions.map((cond, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(6, 182, 212, 0.15)',
+                      color: '#38bdf8',
+                      fontWeight: '600'
+                    }}
+                  >
+                    {cond}
+                  </span>
+                ))}
+              </div>
+
+              {result.estimatedWaitTime && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#fbbf24', fontWeight: '600' }}>
+                  <Clock size={14} /> प्रतीक्षेचा अंदाजित वेळ: {result.estimatedWaitTime}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Reasoning */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '10px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px'
+          }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-muted)' }}>
+              क्लिनिकल विश्लेषण (Clinical Diagnostic Assessment)
+            </div>
+            <p style={{ fontSize: '0.925rem', color: 'var(--text-primary)', lineHeight: '1.5' }}>
+              {result.reasoning}
+            </p>
+          </div>
+
+          {/* Precautions */}
+          <div style={{
+            background: 'rgba(245, 158, 11, 0.05)',
+            border: '1px solid rgba(245, 158, 11, 0.2)',
+            borderRadius: '10px',
+            padding: '14px 16px'
+          }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: '#fbbf24', marginBottom: '4px' }}>
+              तात्काळ प्रथमोपचार व मार्गदर्शन (Immediate First-Aid Guidance)
+            </div>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+              {result.precautions}
+            </p>
+          </div>
+
+          {/* 1-Click Action to Book with Auto-Fill */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '8px' }}>
+            <button
+              onClick={handleBookAppointment}
+              className="btn btn-primary"
+              style={{ padding: '12px 24px', fontSize: '0.95rem', gap: '8px' }}
+            >
+              {result.dept} विभागात तात्काळ अपॉइंटमेंट बुक करा <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

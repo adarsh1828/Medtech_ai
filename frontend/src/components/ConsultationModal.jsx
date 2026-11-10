@@ -14,18 +14,11 @@ import {
   MicOff,
   Radio,
   AlertOctagon,
-  Volume2,
-  Clock,
-  User,
-  Calendar,
-  Zap,
-  Activity
+  Volume2
 } from 'lucide-react';
 import { api } from '../api';
-import { useToast } from '../context/ToastContext';
 
 export default function ConsultationModal({ isOpen, onClose, appointment, onSuccess }) {
-  const { showToast } = useToast();
   const [vitals, setVitals] = useState({
     vitals_bp: appointment?.vitals_bp || '120/80',
     vitals_pulse: appointment?.vitals_pulse || '72 bpm',
@@ -43,7 +36,7 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
 
   // Voice Dictation (AI Speech-to-Rx) state
   const [isListening, setIsListening] = useState(false);
-  const [voiceTarget, setVoiceTarget] = useState('rx');
+  const [voiceTarget, setVoiceTarget] = useState('rx'); // 'rx' | 'notes' | 'diagnosis'
   const [speechTranscript, setSpeechTranscript] = useState('');
   const recognitionRef = useRef(null);
 
@@ -51,13 +44,11 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
     {
       medicine_name: '',
       dosage: '500 mg',
-      frequency: '1-0-1 (जेवणानंतर / After Food)',
-      duration: '5 दिवस (5 days)',
-      instructions: 'भरपूर पाणी प्यावे (Take with plenty of water)'
+      frequency: 'Twice daily (After meals)',
+      duration: '5 days',
+      instructions: 'Take with plenty of water'
     }
   ]);
-
-  const [activeMedicineIndex, setActiveMedicineIndex] = useState(0);
 
   // Sync state when appointment changes or modal opens
   useEffect(() => {
@@ -113,73 +104,97 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
     setAllergyAlerts(matches);
   }, [medicines, appointment]);
 
-  // Voice to text engine
-  const parseSpeechToPrescription = (spokenText) => {
-    if (!spokenText || typeof spokenText !== 'string') return;
-    const clean = spokenText.toLowerCase().trim();
+  // Real-time Speech-to-Rx Parser
+  const parseSpeechToPrescription = (text) => {
+    if (!text || !text.trim()) return;
 
-    let dosage = '500 mg';
-    const doseMatch = clean.match(/(\d+\s*(?:mg|ml|gm|mcg|tab|puff))/i);
-    if (doseMatch) dosage = doseMatch[1].toUpperCase();
+    // Normalizing and cleaning input
+    const cleanText = text.replace(/(\r\n|\n|\r)/gm, ' ').trim();
+    
+    // Check if multiple medicines are separated by "and", "plus", "ani", "next"
+    const segments = cleanText.split(/\band\b|\bplus\b|\bani\b|\bnext\b/i);
 
-    let frequency = '1-0-1 (Twice daily)';
-    if (clean.includes('once') || clean.includes('एका वेळ') || clean.includes('एकदा')) frequency = '1-0-0 (Once daily)';
-    else if (clean.includes('thrice') || clean.includes('तीन वेळा') || clean.includes('3 times')) frequency = '1-1-1 (Thrice daily)';
-    else if (clean.includes('night') || clean.includes('रात्री') || clean.includes('bedtime')) frequency = '0-0-1 (Night only)';
-    else if (clean.includes('sos') || clean.includes('गरज')) frequency = 'SOS (As needed)';
+    const parsedList = [];
 
-    let duration = '5 दिवस (5 days)';
-    const durMatch = clean.match(/(\d+)\s*(?:day|days|दिवस)/i);
-    if (durMatch) duration = `${durMatch[1]} days`;
+    segments.forEach(seg => {
+      const s = seg.trim();
+      if (!s) return;
 
-    let instructions = 'जेवणानंतर (After food)';
-    if (clean.includes('before') || clean.includes('आधी') || clean.includes('reciprocal') || clean.includes('empty')) {
-      instructions = 'जेवणापूर्वी / रिकाम्या पोटी (Before food)';
-    }
+      // Extract dosage (e.g., 650mg, 500 mg, 10ml, 1 tab)
+      const dosageMatch = s.match(/(\d+\s*(?:mg|gm|g|ml|mcg|tab|capsule|tablets?))/i);
+      const dosage = dosageMatch ? dosageMatch[0] : '1 Tab';
 
-    const words = spokenText.split(/\s+/);
-    let medName = words[0] || 'Rx Medication';
-    if (words.length > 1 && !/\d/.test(words[1]) && !['mg','tab','for','once','twice'].includes(words[1].toLowerCase())) {
-      medName = `${words[0]} ${words[1]}`;
-    }
+      // Extract duration (e.g., 3 days, 5 days, 1 week, 5 divas)
+      const durationMatch = s.match(/(\d+\s*(?:days?|weeks?|divas?|mahine|months?))/i);
+      const duration = durationMatch ? durationMatch[0] : '5 days';
 
-    setMedicines(prev => {
-      const copy = [...prev];
-      if (copy.length === 1 && !copy[0].medicine_name) {
-        copy[0] = { medicine_name: medName, dosage, frequency, duration, instructions };
-      } else {
-        copy.push({ medicine_name: medName, dosage, frequency, duration, instructions });
+      // Extract frequency
+      let frequency = 'Twice daily';
+      if (/once|daily|od|ekda|ek vela/i.test(s)) frequency = 'Once daily';
+      else if (/thrice|three times|tds|teen vela/i.test(s)) frequency = 'Thrice daily (TDS)';
+      else if (/twice|two times|bd|donda/i.test(s)) frequency = 'Twice daily';
+      else if (/sos|emergency|garaj asel/i.test(s)) frequency = 'As needed (SOS)';
+
+      // Extract instructions
+      let instructions = 'After meals';
+      if (/before (?:food|meals|breakfast)|rikamya|empty stomach/i.test(s)) instructions = 'Before meals / Empty stomach';
+      else if (/after|jevananantar/i.test(s)) instructions = 'After meals';
+      else if (/night|bedtime|jhopnyapurvi/i.test(s)) instructions = 'At bedtime';
+
+      // Extract medicine name by stripping recognized words
+      let medName = s
+        .replace(/(\d+\s*(?:mg|gm|g|ml|mcg|tab|capsule|tablets?))/gi, '')
+        .replace(/(\d+\s*(?:days?|weeks?|divas?|mahine|months?))/gi, '')
+        .replace(/\b(?:twice|thrice|once|daily|three times|two times|after|before|food|meals|breakfast|at|bedtime|take|give|tab|tablet|prescribe|sos)\b/gi, '')
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .trim();
+
+      // Capitalize
+      if (medName.length > 2) {
+        medName = medName.charAt(0).toUpperCase() + medName.slice(1);
+        parsedList.push({
+          medicine_name: medName,
+          dosage,
+          frequency,
+          duration,
+          instructions
+        });
       }
-      return copy;
     });
 
-    showToast(`Voice Rx: "${medName}" added to prescription`, 'success');
+    if (parsedList.length > 0) {
+      setMedicines(prev => {
+        const withoutEmpty = prev.filter(p => p.medicine_name.trim().length > 0);
+        return [...withoutEmpty, ...parsedList];
+      });
+    }
   };
 
-  const toggleVoiceDictation = (target) => {
-    setVoiceTarget(target);
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      showToast('Speech recognition is not supported in this browser. Please use Chrome/Edge.', 'warning');
-      return;
-    }
-
+  // Toggle Voice Recognition
+  const toggleVoiceDictation = (target = 'rx') => {
     if (isListening) {
-      if (recognitionRef.current) recognitionRef.current.stop();
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
       setIsListening(false);
       return;
     }
 
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert('तुमच्या ब्राउझरमध्ये व्हॉईस डिक्टेशन उपलब्ध नाही. कृपया Google Chrome किंवा Microsoft Edge वापरा.');
+      return;
+    }
+
     try {
-      const rec = new SpeechRecognition();
+      const rec = new SpeechRec();
       rec.continuous = true;
       rec.interimResults = true;
-      rec.lang = 'mr-IN, hi-IN, en-IN';
+      rec.lang = 'en-IN'; // Indian English accepts medical terminology easily
 
-      rec.onstart = () => {
-        setIsListening(true);
-        setSpeechTranscript('ऐकत आहे... (Listening to doctor)...');
-      };
+      setVoiceTarget(target);
+      setIsListening(true);
+      setSpeechTranscript('ऐकत आहे... (Listening to doctor)...');
 
       rec.onresult = (event) => {
         let currentText = '';
@@ -249,19 +264,15 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
       {
         medicine_name: '',
         dosage: '1 Tab',
-        frequency: '1-0-1 (सकाळ-रात्र / Twice daily)',
-        duration: '5 दिवस (5 days)',
-        instructions: 'जेवणानंतर (After food)'
+        frequency: 'Once daily (Morning)',
+        duration: '7 days',
+        instructions: 'After breakfast'
       }
     ]);
-    setActiveMedicineIndex(medicines.length);
   };
 
   const removeMedicineRow = (index) => {
     setMedicines(medicines.filter((_, i) => i !== index));
-    if (activeMedicineIndex >= medicines.length - 1) {
-      setActiveMedicineIndex(Math.max(0, medicines.length - 2));
-    }
   };
 
   const updateMedicine = (index, field, value) => {
@@ -270,18 +281,10 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
     setMedicines(updated);
   };
 
-  // Quick chip applicator for the active row
-  const applyChipToActiveMedicine = (field, value) => {
-    if (medicines.length === 0) return;
-    const targetIdx = Math.min(activeMedicineIndex, medicines.length - 1);
-    updateMedicine(targetIdx, field, value);
-    showToast(`Updated ${field}: ${value}`, 'info');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!diagnosis.trim()) {
-      setError('कृपया क्लिनिकल डायग्नोसिस (Clinical Diagnosis) टाका.');
+      setError('Please enter a clinical diagnosis.');
       return;
     }
 
@@ -289,10 +292,13 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
     setError('');
 
     try {
+      // 1. Save vitals
       await api.updateAppointmentVitals(appointment.id, vitals);
 
+      // 2. Filter valid medicines
       const validMedicines = medicines.filter(m => m.medicine_name.trim().length > 0);
 
+      // 3. Create Prescription
       await api.createPrescription({
         appointment_id: appointment.id,
         patient_id: appointment.patient_id,
@@ -303,12 +309,10 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
         medicines: validMedicines
       });
 
-      showToast(`प्रिस्क्रिप्शन यशस्वीरीत्या जतन झाले! Token #${appointment.token_number}`, 'success', 'Prescription Issued');
-      onSuccess?.();
+      onSuccess();
       onClose();
     } catch (err) {
       setError(err.message || 'Failed to save prescription.');
-      showToast(err.message || 'प्रिस्क्रिप्शन जतन करताना त्रुटी आली.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -318,647 +322,476 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div 
-        className="modal-content" 
-        style={{ 
-          maxWidth: '1080px', 
-          width: '95vw',
-          maxHeight: '92vh',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '0',
-          overflow: 'hidden',
-          borderRadius: '16px'
-        }} 
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Top Header */}
+      <div className="modal-content" style={{ maxWidth: '780px' }} onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer'
+          }}
+        >
+          <X size={20} />
+        </button>
+
+        {/* Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <div style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '10px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#34d399'
+          }}>
+            <Stethoscope size={22} />
+          </div>
+          <div>
+            <h2 style={{ fontSize: '1.3rem', fontFamily: 'var(--font-display)', fontWeight: '700' }}>
+              Doctor Consultation & Digital Prescription
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+              Recording vitals, clinical observations, and digital medication for Token #{appointment.token_number}
+            </p>
+          </div>
+        </div>
+
+        {/* Patient Quick Info Card */}
         <div style={{
-          padding: '18px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)'
+          alignItems: 'center',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '10px',
+          padding: '12px 16px',
+          marginBottom: '20px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '10px',
-              background: 'rgba(6, 182, 212, 0.2)',
-              border: '1px solid rgba(6, 182, 212, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#38bdf8'
-            }}>
-              <Stethoscope size={22} />
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>
+              {appointment.patient_name}
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', fontWeight: '800', margin: 0 }}>
-                  Doctor Clinical Workstation & Digital Rx
-                </h2>
-                <span className="badge badge-cyan" style={{ fontSize: '0.7rem' }}>
-                  Token #{appointment.token_number}
-                </span>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              Blood: <strong style={{ color: '#fb7185' }}>{appointment.patient_blood_group || 'N/A'}</strong> • Gender: {appointment.patient_gender} • Phone: {appointment.patient_phone || 'N/A'}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <div>Reason for Visit:</div>
+            <div style={{ color: 'var(--text-primary)', fontStyle: 'italic' }}>"{appointment.reason_for_visit}"</div>
+          </div>
+        </div>
+
+        {error && (
+          <div style={{
+            background: 'rgba(244, 63, 94, 0.12)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            color: '#fb7185',
+            fontSize: '0.85rem',
+            marginBottom: '16px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Vitals Section */}
+          <div style={{
+            background: 'rgba(6, 182, 212, 0.04)',
+            border: '1px solid rgba(6, 182, 212, 0.2)',
+            borderRadius: '10px',
+            padding: '14px 16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: '700', color: '#38bdf8', marginBottom: '10px', textTransform: 'uppercase' }}>
+              <HeartPulse size={16} /> Patient Triage Vitals
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Blood Pressure</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="120/80 mmHg"
+                  value={vitals.vitals_bp}
+                  onChange={(e) => setVitals({ ...vitals, vitals_bp: e.target.value })}
+                />
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: '2px 0 0' }}>
-                Recording clinical diagnosis, vitals, and NMC-compliant digital prescription
-              </p>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Pulse Rate</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="72 bpm"
+                  value={vitals.vitals_pulse}
+                  onChange={(e) => setVitals({ ...vitals, vitals_pulse: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Body Temp</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="98.6 F"
+                  value={vitals.vitals_temp}
+                  onChange={(e) => setVitals({ ...vitals, vitals_temp: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Weight</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="65 kg"
+                  value={vitals.vitals_weight}
+                  onChange={(e) => setVitals({ ...vitals, vitals_weight: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="toast-close-btn"
-            style={{ width: '32px', height: '32px', borderRadius: '8px' }}
-            aria-label="Close"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* 2-Pane Split Layout (Left: Patient Context & Vitals, Right: Rx Pad & Diagnosis) */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(280px, 320px) 1fr',
-          flex: 1,
-          overflow: 'hidden',
-          minHeight: 0
-        }}>
-          
-          {/* Left Column: Patient Context & Vitals */}
-          <div style={{
-            padding: '20px',
-            borderRight: '1px solid var(--border-subtle)',
-            backgroundColor: 'var(--bg-card-subtle)',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
-            {/* Patient Card */}
-            <div style={{
-              padding: '16px',
-              borderRadius: '12px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  border: '1px solid #10b981',
-                  color: '#34d399',
-                  display: 'flex',
+          {/* Clinical Findings & Diagnosis */}
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+              <label className="form-label" style={{ margin: 0 }}>Clinical Diagnosis *</label>
+              <button
+                type="button"
+                onClick={() => toggleVoiceDictation('diagnosis')}
+                style={{
+                  background: isListening && voiceTarget === 'diagnosis' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(6, 182, 212, 0.1)',
+                  border: `1px solid ${isListening && voiceTarget === 'diagnosis' ? '#f87171' : 'rgba(6, 182, 212, 0.3)'}`,
+                  color: isListening && voiceTarget === 'diagnosis' ? '#f87171' : '#38bdf8',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  fontSize: '0.72rem',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '800',
-                  fontSize: '0.9rem'
-                }}>
-                  {(appointment.patient_name?.[0] || 'P').toUpperCase()}
-                </div>
-                <div>
-                  <div style={{ fontWeight: '800', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                    {appointment.patient_name}
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    {appointment.patient_gender} • Phone: {appointment.patient_phone || 'N/A'}
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.76rem' }}>
-                <span className="badge badge-rose" style={{ fontSize: '0.7rem' }}>
-                  Blood: {appointment.patient_blood_group || 'N/A'}
-                </span>
-                <span className="badge badge-cyan" style={{ fontSize: '0.7rem' }}>
-                  Room: {appointment.doctor_room || '408'}
-                </span>
-              </div>
-
-              <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)', fontSize: '0.8rem' }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '700' }}>
-                  तक्रार (Reason for Visit):
-                </div>
-                <div style={{ color: 'var(--text-primary)', fontStyle: 'italic', marginTop: '3px' }}>
-                  "{appointment.reason_for_visit || 'General Consultation'}"
-                </div>
-              </div>
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                {isListening && voiceTarget === 'diagnosis' ? <Radio size={12} className="heartbeat-icon" /> : <Mic size={12} />}
+                {isListening && voiceTarget === 'diagnosis' ? 'ऐकत आहे (Recording...)' : 'बोलून लिहा (Voice)'}
+              </button>
             </div>
+            <input
+              type="text"
+              required
+              className="form-input"
+              placeholder="e.g. Acute Bronchitis / Stage 1 Essential Hypertension"
+              value={diagnosis}
+              onChange={(e) => setDiagnosis(e.target.value)}
+            />
+          </div>
 
-            {/* Patient Allergies Alert Pill */}
-            <div style={{
-              padding: '12px 14px',
-              borderRadius: '10px',
-              background: appointment.patient_allergies && !appointment.patient_allergies.toLowerCase().includes('none')
-                ? 'rgba(244, 63, 94, 0.14)'
-                : 'rgba(16, 185, 129, 0.08)',
-              border: `1px solid ${appointment.patient_allergies && !appointment.patient_allergies.toLowerCase().includes('none') ? 'rgba(244, 63, 94, 0.35)' : 'rgba(16, 185, 129, 0.2)'}`
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.75rem',
-                fontWeight: '800',
-                color: appointment.patient_allergies && !appointment.patient_allergies.toLowerCase().includes('none') ? '#fb7185' : '#34d399',
-                textTransform: 'uppercase'
-              }}>
-                <ShieldAlert size={14} />
-                <span>ॲलर्जी नोंद (Allergy Profile)</span>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <label className="form-label" style={{ margin: 0 }}>Clinical Examination Notes</label>
+                <button
+                  type="button"
+                  onClick={() => toggleVoiceDictation('notes')}
+                  style={{
+                    background: isListening && voiceTarget === 'notes' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(6, 182, 212, 0.1)',
+                    border: `1px solid ${isListening && voiceTarget === 'notes' ? '#f87171' : 'rgba(6, 182, 212, 0.3)'}`,
+                    color: isListening && voiceTarget === 'notes' ? '#f87171' : '#38bdf8',
+                    borderRadius: '6px',
+                    padding: '3px 8px',
+                    fontSize: '0.72rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isListening && voiceTarget === 'notes' ? <Radio size={12} className="heartbeat-icon" /> : <Mic size={12} />}
+                  {isListening && voiceTarget === 'notes' ? 'ऐकत आहे' : 'Voice'}
+                </button>
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginTop: '4px', fontWeight: '600' }}>
-                {appointment.patient_allergies || 'कोणतीही अलर्जी नोंदवलेली नाही (None)'}
-              </div>
+              <textarea
+                rows="2"
+                className="form-textarea"
+                placeholder="Findings from auscultation, patient history..."
+                value={clinicalNotes}
+                onChange={(e) => setClinicalNotes(e.target.value)}
+              />
             </div>
-
-            {/* Vitals Form Card */}
-            <div style={{
-              padding: '14px',
-              borderRadius: '12px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: '800', color: '#38bdf8', textTransform: 'uppercase' }}>
-                <HeartPulse size={15} />
-                <span>रुग्ण Vitals (Clinical Triage)</span>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <div>
-                  <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>रक्तदाब (BP)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    style={{ fontSize: '0.82rem', padding: '6px 8px', fontFamily: 'var(--font-mono)' }}
-                    placeholder="120/80"
-                    value={vitals.vitals_bp}
-                    onChange={(e) => setVitals({ ...vitals, vitals_bp: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>पल्स (Pulse)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    style={{ fontSize: '0.82rem', padding: '6px 8px', fontFamily: 'var(--font-mono)' }}
-                    placeholder="72 bpm"
-                    value={vitals.vitals_pulse}
-                    onChange={(e) => setVitals({ ...vitals, vitals_pulse: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>तापमान (Temp)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    style={{ fontSize: '0.82rem', padding: '6px 8px', fontFamily: 'var(--font-mono)' }}
-                    placeholder="98.6 F"
-                    value={vitals.vitals_temp}
-                    onChange={(e) => setVitals({ ...vitals, vitals_temp: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>वजन (Weight)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    style={{ fontSize: '0.82rem', padding: '6px 8px', fontFamily: 'var(--font-mono)' }}
-                    placeholder="65 kg"
-                    value={vitals.vitals_weight}
-                    onChange={(e) => setVitals({ ...vitals, vitals_weight: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Follow-up Date */}
-            <div>
-              <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>
-                पुढील तपासणी तारीख (Follow-up)
-              </label>
-              <input
-                type="date"
-                className="form-input"
-                style={{ fontSize: '0.84rem', marginTop: '4px' }}
-                value={followUpDate}
-                onChange={(e) => setFollowUpDate(e.target.value)}
+            <div className="form-group">
+              <label className="form-label">Lifestyle Advice & Precautions</label>
+              <textarea
+                rows="2"
+                className="form-textarea"
+                placeholder="Hydration, dietary instructions, rest..."
+                value={advice}
+                onChange={(e) => setAdvice(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Right Column: Rx Pad & Diagnosis Form */}
-          <div style={{
-            padding: '24px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              {/* Diagnosis Field with Voice Option */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label className="form-label" style={{ margin: 0, fontWeight: '700', fontSize: '0.86rem' }}>
-                    क्लिनिकल डायग्नोसिस (Clinical Diagnosis) *
-                  </label>
+          {/* Smart Allergy Conflict Radar */}
+          {allergyAlerts.length > 0 && (
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              border: '2px solid rgba(239, 68, 68, 0.6)',
+              boxShadow: '0 0 25px rgba(239, 68, 68, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              animation: 'pulse 1.8s infinite'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontWeight: '800', fontSize: '0.9rem' }}>
+                <AlertOctagon size={20} color="#ef4444" />
+                <span>⚠️ रुग्ण औषध ॲलर्जी रडार अलर्ट (ALLERGY CONFLICT DETECTED)</span>
+              </div>
+              {allergyAlerts.map((al, idx) => (
+                <div key={idx} style={{ fontSize: '0.82rem', color: '#fecaca', lineHeight: '1.4' }}>
+                  <strong>{al.medicine}</strong>: {al.reason}
+                </div>
+              ))}
+              <div style={{ fontSize: '0.76rem', color: '#fef08a', fontStyle: 'italic', marginTop: '2px' }}>
+                शिफारस: कृपया हे औषध बदलून ॲलर्जी-मुक्त सुरक्षित पर्याय निवडा.
+              </div>
+            </div>
+          )}
 
+          {/* Medicines Prescription Builder */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="form-label" style={{ fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+                  Prescribed Medications
+                </span>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8' }}>
+                  {medicines.length} Medicines
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {/* Voice to Rx Dictation Button */}
+                <button
+                  type="button"
+                  onClick={() => toggleVoiceDictation('rx')}
+                  style={{
+                    fontSize: '0.78rem',
+                    padding: '5px 12px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: '700',
+                    border: '1px solid',
+                    borderColor: isListening && voiceTarget === 'rx' ? '#ef4444' : 'rgba(168, 85, 247, 0.5)',
+                    background: isListening && voiceTarget === 'rx' ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.15))',
+                    color: isListening && voiceTarget === 'rx' ? '#f87171' : '#c084fc',
+                    boxShadow: isListening && voiceTarget === 'rx' ? '0 0 15px rgba(239, 68, 68, 0.4)' : 'none'
+                  }}
+                  title="बोलून औषधे डिक्टेट करा"
+                >
+                  {isListening && voiceTarget === 'rx' ? <MicOff size={15} /> : <Mic size={15} />}
+                  <span>{isListening && voiceTarget === 'rx' ? 'डिक्टेशन थांबवा (Stop)' : '🎙️ AI बोलून लिहा (Voice Rx)'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={addMedicineRow}
+                  className="btn btn-outline btn-sm"
+                  style={{ fontSize: '0.75rem', padding: '5px 12px' }}
+                >
+                  <Plus size={14} /> Add Row
+                </button>
+              </div>
+            </div>
+
+            {/* Voice Dictation Live Speech Preview Bar */}
+            {isListening && voiceTarget === 'rx' && (
+              <div style={{
+                marginBottom: '12px',
+                padding: '12px 16px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)',
+                border: '1px solid rgba(168, 85, 247, 0.4)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c084fc', fontSize: '0.8rem', fontWeight: '700' }}>
+                    <Radio size={16} className="heartbeat-icon" color="#ec4899" />
+                    <span>AI व्हॉईस डिक्टेशन चालू आहे (Listening live speech)...</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => toggleVoiceDictation('diagnosis')}
-                    style={{
-                      background: isListening && voiceTarget === 'diagnosis' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(6, 182, 212, 0.1)',
-                      border: `1px solid ${isListening && voiceTarget === 'diagnosis' ? '#f87171' : 'rgba(6, 182, 212, 0.3)'}`,
-                      color: isListening && voiceTarget === 'diagnosis' ? '#f87171' : '#38bdf8',
-                      borderRadius: '6px',
-                      padding: '3px 8px',
-                      fontSize: '0.74rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      cursor: 'pointer',
-                      fontWeight: '600'
-                    }}
+                    onClick={applySpokenTranscriptToRx}
+                    className="btn btn-sm"
+                    style={{ background: '#8b5cf6', color: '#fff', fontSize: '0.75rem', padding: '4px 10px' }}
                   >
-                    {isListening && voiceTarget === 'diagnosis' ? <Radio size={12} className="heartbeat-icon" /> : <Mic size={12} />}
-                    <span>{isListening && voiceTarget === 'diagnosis' ? 'ऐकत आहे (Recording...)' : 'बोलून लिहा (Voice)'}</span>
+                    ✓ टेबलमध्ये भरा (Add to Table)
                   </button>
                 </div>
-
-                <input
-                  type="text"
-                  required
-                  className="form-input"
-                  style={{ fontSize: '0.9rem' }}
-                  placeholder="उदा. Acute Bronchitis / Type 2 Diabetes Mellitus"
-                  value={diagnosis}
-                  onChange={(e) => setDiagnosis(e.target.value)}
-                />
-              </div>
-
-              {/* Notes and Advice */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <label className="form-label" style={{ margin: 0, fontSize: '0.78rem' }}>तपासणी नोंदी (Clinical Notes)</label>
-                    <button
-                      type="button"
-                      onClick={() => toggleVoiceDictation('notes')}
-                      style={{
-                        background: isListening && voiceTarget === 'notes' ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
-                        border: 'none',
-                        color: isListening && voiceTarget === 'notes' ? '#f87171' : 'var(--text-muted)',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <Mic size={13} />
-                    </button>
-                  </div>
-                  <textarea
-                    rows="2"
-                    className="form-textarea"
-                    placeholder="Findings, observations..."
-                    value={clinicalNotes}
-                    onChange={(e) => setClinicalNotes(e.target.value)}
-                  />
+                <div style={{ fontSize: '0.82rem', color: '#ffffff', fontStyle: 'italic', background: 'rgba(0, 0, 0, 0.25)', padding: '8px 12px', borderRadius: '6px' }}>
+                  "{speechTranscript || 'उदा: Paracetamol 650mg twice daily for 3 days after meals...'}"
                 </div>
-
-                <div>
-                  <label className="form-label" style={{ marginBottom: '4px', fontSize: '0.78rem' }}>सल्ला व पथ्य (Advice & Precautions)</label>
-                  <textarea
-                    rows="2"
-                    className="form-textarea"
-                    placeholder="पाणी भरपूर पिणे, विश्रांती..."
-                    value={advice}
-                    onChange={(e) => setAdvice(e.target.value)}
-                  />
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                  💡 टीप: डॉक्टर औषधाचे नाव, डोस (उदा. 500mg), फ्रिक्वेन्सी (twice daily) आणि दिवस (3 days) स्पष्ट बोला.
                 </div>
               </div>
+            )}
 
-              {/* Allergy Warning Alert */}
-              {allergyAlerts.length > 0 && (
-                <div style={{
-                  padding: '12px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  border: '2px solid rgba(239, 68, 68, 0.6)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  animation: 'fadeIn 0.2s ease'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontWeight: '800', fontSize: '0.88rem' }}>
-                    <AlertOctagon size={18} color="#ef4444" />
-                    <span>⚠️ ॲलर्जी अलर्ट (ALLERGY CONFLICT DETECTED)</span>
-                  </div>
-                  {allergyAlerts.map((al, idx) => (
-                    <div key={idx} style={{ fontSize: '0.82rem', color: '#fecaca', lineHeight: '1.4' }}>
-                      <strong>{al.medicine}</strong>: {al.reason}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Prescription Medicine Builder Header */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="form-label" style={{ fontWeight: '800', color: 'var(--text-primary)', margin: 0, fontSize: '0.88rem' }}>
-                      औषधोपचार (Prescribed Medications)
-                    </span>
-                    <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', fontWeight: '700' }}>
-                      {medicines.length} औषधे
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button
-                      type="button"
-                      onClick={() => toggleVoiceDictation('rx')}
-                      style={{
-                        fontSize: '0.76rem',
-                        padding: '4px 10px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontWeight: '700',
-                        border: '1px solid',
-                        borderColor: isListening && voiceTarget === 'rx' ? '#ef4444' : 'rgba(168, 85, 247, 0.5)',
-                        background: isListening && voiceTarget === 'rx' ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.15))',
-                        color: isListening && voiceTarget === 'rx' ? '#f87171' : '#c084fc'
-                      }}
-                    >
-                      {isListening && voiceTarget === 'rx' ? <MicOff size={14} /> : <Mic size={14} />}
-                      <span>{isListening && voiceTarget === 'rx' ? 'डिक्टेशन थांबवा' : '🎙️ AI बोलून लिहा (Voice Rx)'}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={addMedicineRow}
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.76rem', padding: '4px 10px' }}
-                    >
-                      <Plus size={14} /> नवीन औषध (Add Row)
-                    </button>
-                  </div>
-                </div>
-
-                {/* Voice speech preview */}
-                {isListening && voiceTarget === 'rx' && (
-                  <div style={{
-                    marginBottom: '10px',
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    background: 'rgba(168, 85, 247, 0.15)',
-                    border: '1px solid rgba(168, 85, 247, 0.4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '10px'
-                  }}>
-                    <span style={{ fontSize: '0.8rem', color: '#c084fc', fontStyle: 'italic' }}>
-                      "{speechTranscript || 'उदा. Paracetamol 650mg twice daily for 3 days after meals...'}"
-                    </span>
-                    <button
-                      type="button"
-                      onClick={applySpokenTranscriptToRx}
-                      className="btn btn-sm"
-                      style={{ background: '#8b5cf6', color: '#fff', fontSize: '0.72rem', padding: '3px 8px' }}
-                    >
-                      ✓ जोडा (Add to Table)
-                    </button>
-                  </div>
-                )}
-
-                {/* Quick Frequency & Timing Chips Bar (One-click prescription helper) */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  flexWrap: 'wrap',
-                  marginBottom: '10px',
-                  padding: '8px 10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '8px'
-                }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)', marginRight: '4px' }}>
-                    क्विक चिप्स (Row #{activeMedicineIndex + 1}):
-                  </span>
-                  
-                  {['1-0-1 (सकाळ-रात्र)', '1-1-1 (तिन्ही वेळ)', '1-0-0 (सकाळी)', '0-0-1 (रात्री)', 'SOS (गरज असेल तेव्हा)'].map(fq => (
-                    <button
-                      key={fq}
-                      type="button"
-                      onClick={() => applyChipToActiveMedicine('frequency', fq)}
-                      style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 7px',
-                        borderRadius: '4px',
-                        background: 'rgba(6, 182, 212, 0.1)',
-                        border: '1px solid rgba(6, 182, 212, 0.3)',
-                        color: '#38bdf8',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {fq}
-                    </button>
-                  ))}
-
-                  {['जेवणानंतर (After food)', 'जेवणापूर्वी (Before food)'].map(inst => (
-                    <button
-                      key={inst}
-                      type="button"
-                      onClick={() => applyChipToActiveMedicine('instructions', inst)}
-                      style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 7px',
-                        borderRadius: '4px',
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        color: '#34d399',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {inst}
-                    </button>
-                  ))}
-
-                  {['३ दिवस', '५ दिवस', '७ दिवस', '१५ दिवस'].map(dur => (
-                    <button
-                      key={dur}
-                      type="button"
-                      onClick={() => applyChipToActiveMedicine('duration', dur)}
-                      style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 7px',
-                        borderRadius: '4px',
-                        background: 'rgba(245, 158, 11, 0.1)',
-                        border: '1px solid rgba(245, 158, 11, 0.3)',
-                        color: '#fbbf24',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {dur}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Medicine Rows */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {medicines.map((med, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setActiveMedicineIndex(idx)}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '2fr 1fr 1.6fr 1fr 1.8fr 34px',
-                        gap: '6px',
-                        alignItems: 'center',
-                        background: activeMedicineIndex === idx ? 'rgba(6, 182, 212, 0.06)' : 'rgba(255, 255, 255, 0.02)',
-                        border: `1px solid ${activeMedicineIndex === idx ? 'rgba(6, 182, 212, 0.4)' : 'var(--border-subtle)'}`,
-                        borderRadius: '8px',
-                        padding: '8px',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Medicine Name (उदा. Paracetamol)"
-                        className="form-input"
-                        style={{ fontSize: '0.82rem', padding: '6px 8px', fontWeight: '600' }}
-                        value={med.medicine_name}
-                        onChange={(e) => updateMedicine(idx, 'medicine_name', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Dosage (500mg)"
-                        className="form-input"
-                        style={{ fontSize: '0.82rem', padding: '6px 8px' }}
-                        value={med.dosage}
-                        onChange={(e) => updateMedicine(idx, 'dosage', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Frequency"
-                        className="form-input"
-                        style={{ fontSize: '0.82rem', padding: '6px 8px' }}
-                        value={med.frequency}
-                        onChange={(e) => updateMedicine(idx, 'frequency', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Duration"
-                        className="form-input"
-                        style={{ fontSize: '0.82rem', padding: '6px 8px' }}
-                        value={med.duration}
-                        onChange={(e) => updateMedicine(idx, 'duration', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Instructions"
-                        className="form-input"
-                        style={{ fontSize: '0.82rem', padding: '6px 8px' }}
-                        value={med.instructions}
-                        onChange={(e) => updateMedicine(idx, 'instructions', e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeMedicineRow(idx)}
-                        className="toast-close-btn"
-                        style={{ width: '28px', height: '28px' }}
-                        title="Remove Medicine"
-                      >
-                        <Trash2 size={15} color="#fb7185" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Drug-drug Interaction Warnings */}
-                {drugAlerts.hasConflicts ? (
-                  <div style={{
-                    marginTop: '10px',
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.4)',
-                    display: 'flex',
-                    flexDirection: 'column',
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {medicines.map((med, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1.2fr 1.5fr 1fr 2fr 36px',
                     gap: '6px',
-                    animation: 'fadeIn 0.2s ease'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontWeight: '700', fontSize: '0.82rem' }}>
-                      <AlertTriangle size={16} />
-                      <span>AI CLINICAL ALERT: DRUG-DRUG CONTRAINDICATION DETECTED</span>
-                    </div>
-
-                    {drugAlerts.interactions.map((inter, i) => (
-                      <div key={i} style={{ fontSize: '0.76rem', color: '#fca5a5', lineHeight: '1.4' }}>
-                        <div>
-                          <strong style={{ color: '#ffffff' }}>{inter.drug1}</strong> + <strong style={{ color: '#ffffff' }}>{inter.drug2}</strong>: {inter.title} ({inter.severity})
-                        </div>
-                        <div style={{ color: '#fed7aa', marginTop: '2px', fontStyle: 'italic' }}>
-                          Recommendation: {inter.recommendation}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : medicines.filter(m => m.medicine_name.trim().length > 0).length >= 2 ? (
-                  <div style={{
-                    marginTop: '8px',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                    border: '1px solid rgba(16, 185, 129, 0.25)',
-                    display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    color: '#34d399',
-                    fontSize: '0.74rem'
-                  }}>
-                    <Sparkles size={14} /> AI Clinical Safety: Verified no major adverse pharmacotherapy conflicts detected.
-                  </div>
-                ) : null}
-              </div>
-
-              {error && (
-                <div style={{
-                  padding: '8px 12px',
-                  background: 'rgba(244, 63, 94, 0.12)',
-                  border: '1px solid rgba(244, 63, 94, 0.3)',
-                  borderRadius: '6px',
-                  color: '#fb7185',
-                  fontSize: '0.82rem'
-                }}>
-                  {error}
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    padding: '8px'
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Medicine Name"
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '6px 8px' }}
+                    value={med.medicine_name}
+                    onChange={(e) => updateMedicine(idx, 'medicine_name', e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Dosage (500mg)"
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '6px 8px' }}
+                    value={med.dosage}
+                    onChange={(e) => updateMedicine(idx, 'dosage', e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Frequency (Twice daily)"
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '6px 8px' }}
+                    value={med.frequency}
+                    onChange={(e) => updateMedicine(idx, 'frequency', e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Duration"
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '6px 8px' }}
+                    value={med.duration}
+                    onChange={(e) => updateMedicine(idx, 'duration', e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Instructions"
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '6px 8px' }}
+                    value={med.instructions}
+                    onChange={(e) => updateMedicine(idx, 'instructions', e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeMedicineRow(idx)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Remove"
+                  >
+                    <Trash2 size={16} color="#fb7185" />
+                  </button>
                 </div>
-              )}
+              ))}
+            </div>
 
-              {/* Submit CTA */}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="btn btn-emerald"
-                style={{ width: '100%', padding: '12px', fontWeight: '800', fontSize: '0.92rem' }}
-              >
-                <CheckCircle size={18} />
-                <span>{submitting ? 'प्रिस्क्रिप्शन जतन करत आहे...' : 'Save & Issue Official Digital Prescription'}</span>
-              </button>
-            </form>
+            {/* Real-time AI Drug-Drug Interaction Warning Box */}
+            {drugAlerts.hasConflicts ? (
+              <div style={{
+                marginTop: '12px',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                animation: 'fadeIn 0.2s ease-in'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontWeight: '700', fontSize: '0.85rem' }}>
+                  <AlertTriangle size={18} />
+                  <span>AI CLINICAL ALERT: DRUG-DRUG CONTRAINDICATION DETECTED</span>
+                </div>
+
+                {drugAlerts.interactions.map((inter, i) => (
+                  <div key={i} style={{ fontSize: '0.78rem', color: '#fca5a5', lineHeight: '1.4' }}>
+                    <div>
+                      <strong style={{ color: '#ffffff' }}>{inter.drug1}</strong> + <strong style={{ color: '#ffffff' }}>{inter.drug2}</strong>: {inter.title} ({inter.severity})
+                    </div>
+                    <div style={{ color: '#fecaca', marginTop: '2px' }}>
+                      {inter.effect}
+                    </div>
+                    <div style={{ color: '#fed7aa', marginTop: '2px', fontStyle: 'italic' }}>
+                      Recommendation: {inter.recommendation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : medicines.filter(m => m.medicine_name.trim().length > 0).length >= 2 ? (
+              <div style={{
+                marginTop: '8px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#34d399',
+                fontSize: '0.75rem'
+              }}>
+                <Sparkles size={14} /> AI Clinical Safety: Verified no major adverse pharmacotherapy conflicts detected.
+              </div>
+            ) : null}
           </div>
-        </div>
+
+          {/* Follow-up Date */}
+          <div className="form-group" style={{ maxWidth: '240px' }}>
+            <label className="form-label">Recommended Follow-up Date</label>
+            <input
+              type="date"
+              className="form-input"
+              value={followUpDate}
+              onChange={(e) => setFollowUpDate(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn btn-emerald"
+            style={{ width: '100%', marginTop: '8px' }}
+          >
+            {submitting ? 'Saving prescription...' : 'Save & Issue Prescription'}
+          </button>
+        </form>
       </div>
     </div>
   );

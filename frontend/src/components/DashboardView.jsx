@@ -21,10 +21,7 @@ import {
   Zap,
   Radio,
   Tv,
-  HeartPulse,
-  TrendingUp,
-  FileText,
-  BadgeAlert
+  HeartPulse
 } from 'lucide-react';
 import { api } from '../api';
 import { useLanguage } from '../context/LanguageContext';
@@ -37,10 +34,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
 
   // Live Hospital Telemetry Events Feed
   const [recentEvents] = useState([
-    { id: 1, time: '२ मिनिटांपूर्वी (2m ago)', text: 'Dr. Ramesh Surye generated NMC-stamped Digital Rx with QR for Token #103', badge: 'Digital Rx', color: '#06b6d4' },
-    { id: 2, time: '७ मिनिटांपूर्वी (7m ago)', text: 'Bed #ICU-03 reserved for Post-Op Critical Observation (Cardiology)', badge: 'ICU Telemetry', color: '#f59e0b' },
-    { id: 3, time: '१४ मिनिटांपूर्वी (14m ago)', text: 'Token #104 checked into OPD Room 408 with Dr. Arjun Mehta', badge: 'Live OPD', color: '#10b981' },
-    { id: 4, time: '२२ मिनिटांपूर्वी (22m ago)', text: '24x7 Emergency Ambulance Dispatch: All ALS Units on Active Standby', badge: 'SOS 108', color: '#f43f5e' }
+    { id: 1, time: '2m ago', text: 'Dr. Ramesh Surye generated NMC-stamped Digital Rx with QR for Token #103', badge: 'Digital Rx', color: '#06b6d4' },
+    { id: 2, time: '7m ago', text: 'Bed #ICU-03 reserved for Post-Op Critical Observation (Cardiology)', badge: 'ICU Telemetry', color: '#f59e0b' },
+    { id: 3, time: '14m ago', text: 'Token #104 checked into OPD Room 408 with Dr. Arjun Mehta', badge: 'Live OPD', color: '#10b981' },
+    { id: 4, time: '22m ago', text: '24x7 Emergency Ambulance Dispatch Center: All 4 ALS Units on Standby', badge: 'SOS 108', color: '#f43f5e' }
   ]);
 
   useEffect(() => {
@@ -50,6 +47,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
   const loadDashboardData = async () => {
     setLoading(true);
     try {
+      // If admin, fetch full admin overview
       let ov = null;
       if (user?.role === 'admin') {
         ov = await api.getAdminOverview().catch(() => null);
@@ -57,19 +55,20 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
       
       const adminData = ov?.overview || ov || {};
       
+      // Also fetch beds, doctors, appointments to compute live stats
       const bedsRes = await api.getBeds().catch(() => ({ beds: [], stats: {} }));
       const docsRes = await api.getDoctors().catch(() => ({ doctors: [] }));
       const apptsRes = await api.getAppointments().catch(() => ({ appointments: [] }));
 
       const totalBeds = adminData.totalBeds ?? bedsRes.stats?.total ?? 18;
       const occupiedBeds = adminData.occupiedBeds ?? bedsRes.stats?.occupied ?? 8;
-      const availableBeds = adminData.availableBeds ?? bedsRes.stats?.available ?? 10;
+      const availableBeds = adminData.availableBeds ?? bedsRes.stats?.available ?? 9;
       const occupancyRate = adminData.occupancyRate ?? (totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 44);
 
       const docsOnDuty = adminData.doctorsOnDuty ?? docsRes.doctors?.filter(d => d.is_on_duty).length ?? 3;
       const totalDocs = adminData.totalDoctors ?? docsRes.doctors?.length ?? 4;
       const totalRegisteredPatients = adminData.totalRegisteredPatients ?? 14;
-      const appointmentsToday = adminData.patientsToday ?? apptsRes.appointments?.length ?? 5;
+      const appointmentsToday = adminData.patientsToday ?? apptsRes.appointments?.length ?? 3;
       const pendingDoctorsCount = adminData.pendingDoctorsCount ?? 0;
 
       setOverview({
@@ -83,16 +82,17 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         availableBeds,
         occupancyRate,
         departments: adminData.departmentStats || [
-          { name: 'Cardiology (हृदयरोग)', doctors_count: 1, appointments_today: 2, beds_count: 5, beds_occupied: 2 },
-          { name: 'Neurology (मेंदू व मज्जासंस्था)', doctors_count: 1, appointments_today: 1, beds_count: 4, beds_occupied: 2 },
-          { name: 'Orthopedics (अस्थिरोग व हाडे)', doctors_count: 1, appointments_today: 1, beds_count: 3, beds_occupied: 1 },
-          { name: 'General Medicine (सामान्य औषधोपचार)', doctors_count: 1, appointments_today: 1, beds_count: 4, beds_occupied: 2 },
-          { name: 'Pediatrics (बालरोग)', doctors_count: 0, appointments_today: 0, beds_count: 2, beds_occupied: 1 }
+          { name: 'Cardiology', doctors_count: 1, appointments_today: 2, beds_count: 5, beds_occupied: 2 },
+          { name: 'Neurology', doctors_count: 1, appointments_today: 1, beds_count: 4, beds_occupied: 2 },
+          { name: 'Orthopedics', doctors_count: 1, appointments_today: 0, beds_count: 3, beds_occupied: 1 },
+          { name: 'General Medicine', doctors_count: 1, appointments_today: 0, beds_count: 4, beds_occupied: 2 },
+          { name: 'Pediatrics', doctors_count: 0, appointments_today: 0, beds_count: 2, beds_occupied: 1 }
         ]
       });
 
+      // Show first 5 appointments for today
       if (apptsRes.appointments) {
-        setTodayAppointments(apptsRes.appointments.slice(0, 6));
+        setTodayAppointments(apptsRes.appointments.slice(0, 5));
       }
     } catch (err) {
       console.error('Error fetching dashboard summary:', err);
@@ -102,71 +102,58 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.25s ease-out' }}>
-      
-      {/* ========================================================
-          1. TOP HERO COMMAND BANNER
-         ======================================================== */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.2s ease-out' }}>
+      {/* Top Hero Banner */}
       <div className="dashboard-hero-banner" style={{
-        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.1) 45%, rgba(139, 92, 246, 0.08) 100%)',
+        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(139, 92, 246, 0.08) 100%)',
         border: '1px solid rgba(6, 182, 212, 0.3)',
-        borderTop: '1px solid rgba(6, 182, 212, 0.55)',
-        borderRadius: '16px',
+        borderTop: '1px solid rgba(6, 182, 212, 0.5)',
+        borderRadius: 'var(--radius-lg)',
         padding: '28px 32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0 16px 38px rgba(0, 0, 0, 0.35)'
+        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.3)'
       }}>
-        <div style={{ zIndex: 2, maxWidth: '720px' }}>
+        <div style={{ zIndex: 2, maxWidth: '680px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '4px 11px',
-              background: 'rgba(6, 182, 212, 0.16)',
+              padding: '4px 10px',
+              background: 'rgba(6, 182, 212, 0.18)',
               border: '1px solid rgba(6, 182, 212, 0.4)',
               borderRadius: '20px',
               color: '#38bdf8',
-              fontSize: '0.74rem',
-              fontWeight: '700',
-              letterSpacing: '0.04em'
+              fontSize: '0.75rem',
+              fontWeight: '700'
             }}>
-              <Activity size={14} className="heartbeat-icon" />
-              <span>{t('dashboard.platformBadge', 'AI CLINICAL COMMAND CENTER')}</span>
+              <Activity size={14} className="heartbeat-icon" /> {t('dashboard.platformBadge', 'AI CLINICAL COMMAND CENTER')}
             </div>
 
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '4px 11px',
-              background: 'rgba(16, 185, 129, 0.14)',
+              padding: '4px 10px',
+              background: 'rgba(16, 185, 129, 0.15)',
               border: '1px solid rgba(16, 185, 129, 0.35)',
               borderRadius: '20px',
               color: '#34d399',
-              fontSize: '0.74rem',
+              fontSize: '0.72rem',
               fontWeight: '700'
             }}>
-              <span className="telemetry-beacon-live" />
-              <span>NABH LEVEL-1 • LIVE TELEMETRY</span>
+              <span className="telemetry-beacon-live" /> NABH LEVEL-1 ACCREDITED • 100% UPTIME
             </div>
           </div>
 
-          <h1 style={{
-            fontSize: '1.95rem',
-            fontFamily: 'var(--font-display)',
-            fontWeight: '800',
-            letterSpacing: '-0.02em',
-            marginBottom: '8px',
-            color: 'var(--text-primary)'
-          }}>
-            {t('dashboard.welcome', 'Welcome back,')} {user?.fullName || t('dashboard.clinician', 'Clinician')} 👋
+          <h1 style={{ fontSize: '1.95rem', fontFamily: 'var(--font-display)', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '8px' }}>
+            {t('dashboard.welcome', 'Welcome back,')} {user?.fullName || t('dashboard.clinician', 'Clinician')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: '1.55' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: '1.5' }}>
             {t('dashboard.telemetryDesc', 'Hospital telemetry, active ward beds, intelligent patient triage, and scheduling are operating synchronously across all medical departments.')}
           </p>
         </div>
@@ -175,294 +162,170 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           <button
             onClick={() => setActiveTab('ai-triage')}
             className="btn btn-outline"
-            style={{
-              borderColor: 'rgba(139, 92, 246, 0.4)',
-              color: '#c084fc',
-              background: 'rgba(139, 92, 246, 0.12)',
-              fontWeight: '700'
-            }}
+            style={{ borderColor: 'rgba(139, 92, 246, 0.4)', color: '#c084fc', background: 'rgba(139, 92, 246, 0.1)' }}
           >
-            <Sparkles size={16} />
-            <span>{t('dashboard.aiTriageBtn', 'AI Clinical Triage')}</span>
+            <Sparkles size={16} /> {t('dashboard.aiTriageBtn', 'AI Triage')}
           </button>
-          
           <button
             onClick={onOpenBookModal}
             className="btn btn-primary"
-            style={{ fontWeight: '700' }}
           >
-            <Calendar size={16} />
-            <span>{t('dashboard.bookAppointmentBtn', 'Book Appointment')}</span>
+            <Calendar size={16} /> {t('dashboard.bookAppointmentBtn', 'Book Appointment')}
           </button>
         </div>
 
-        {/* Ambient Decorative Lighting */}
+        {/* Decorative background glow */}
         <div style={{
           position: 'absolute',
-          right: '-40px',
-          top: '-40px',
-          width: '280px',
-          height: '280px',
+          right: '-50px',
+          top: '-50px',
+          width: '300px',
+          height: '300px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%)',
           filter: 'blur(35px)',
-          zIndex: 1,
-          pointerEvents: 'none'
+          zIndex: 1
         }} />
       </div>
 
-      {/* ========================================================
-          2. PRIMARY CLINICAL KPI CARDS (WITH SPARKLINE TRENDS)
-         ======================================================== */}
-      {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="skeleton-card skeleton-shimmer" style={{ height: '140px' }} />
-          ))}
-        </div>
-      ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px'
-        }}>
-          {/* KPI 1: Total Registered Patients */}
-          <div 
-            className="glass-card" 
-            onClick={() => setActiveTab('appointments')}
-            style={{
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              cursor: 'pointer',
-              border: '1px solid rgba(6, 182, 212, 0.25)',
-              background: 'var(--card-gradient-cyan)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                नोंदणीकृत रुग्ण (Patients)
-              </span>
-              <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
-                <Users size={18} />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                {overview?.totalPatients ?? '--'}
-              </div>
-
-              {/* Decorative mini Sparkline */}
-              <svg width="64" height="24" viewBox="0 0 64 24" fill="none">
-                <path d="M2 18 L16 14 L30 19 L44 9 L62 4" stroke="#06b6d4" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M2 18 L16 14 L30 19 L44 9 L62 4 V24 H2 Z" fill="url(#sparkline-cyan)" opacity="0.25" />
-                <defs>
-                  <linearGradient id="sparkline-cyan" x1="0" y1="0" x2="0" y2="1">
-                    <stop stopColor="#06b6d4" />
-                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700' }}>
-              <TrendingUp size={14} /> +12% चालू आठवड्यात • EHR सक्रिय
-            </div>
-          </div>
-
-          {/* KPI 2: Today's OPD Visits */}
-          <div 
-            className="glass-card" 
-            onClick={() => setActiveTab('appointments')}
-            style={{
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              cursor: 'pointer',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              background: 'var(--card-gradient-emerald)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                आजची OPD रांग (Today's Visits)
-              </span>
-              <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
-                <Calendar size={18} />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                {overview?.appointmentsToday ?? '--'}
-              </div>
-
-              {/* Decorative mini Sparkline */}
-              <svg width="64" height="24" viewBox="0 0 64 24" fill="none">
-                <path d="M2 19 L15 15 L28 17 L42 8 L62 3" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M2 19 L15 15 L28 17 L42 8 L62 3 V24 H2 Z" fill="url(#sparkline-emerald)" opacity="0.25" />
-                <defs>
-                  <linearGradient id="sparkline-emerald" x1="0" y1="0" x2="0" y2="1">
-                    <stop stopColor="#10b981" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-
-            <div style={{ fontSize: '0.75rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600' }}>
-              <Clock size={13} /> सरासरी प्रतीक्षा वेळ: १४ मिनिटे
-            </div>
-          </div>
-
-          {/* KPI 3: Clinicians On Duty */}
-          <div 
-            className="glass-card" 
-            onClick={() => setActiveTab('doctors')}
-            style={{
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              cursor: 'pointer',
-              border: '1px solid rgba(245, 158, 11, 0.25)',
-              background: 'var(--card-gradient-amber)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                उपलब्ध डॉक्टर्स (On Duty)
-              </span>
-              <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
-                <Stethoscope size={18} />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                {overview?.doctorsOnDuty ?? 0}
-              </div>
-              <span style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                / {overview?.totalDoctors ?? 0} विशेषज्ञ
-              </span>
-            </div>
-
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: '600' }}>
-              कार्डिओ, न्यूरो, ऑर्थो केबिन सक्रिय
-            </div>
-          </div>
-
-          {/* KPI 4: Bed Occupancy Rate */}
-          <div 
-            className="glass-card" 
-            onClick={() => setActiveTab('beds')}
-            style={{
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              cursor: 'pointer',
-              border: '1px solid rgba(139, 92, 246, 0.25)',
-              background: 'var(--card-gradient-violet)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                बेड ऑक्युपन्सी (Bed Capacity)
-              </span>
-              <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
-                <BedDouble size={18} />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                {overview?.occupancyRate ?? 0}%
-              </div>
-              <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                ऑक्युपाईड
-              </span>
-            </div>
-
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
-              <span style={{ color: '#34d399', fontWeight: '700' }}>{overview?.availableBeds ?? 0} उपलब्ध</span> • {overview?.occupiedBeds ?? 0} ॲडमिट बेड्स
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================
-          3. REAL-TIME TELEMETRY FEED TICKER (LIVE EVENT STREAM)
-         ======================================================== */}
-      <div className="glass-card" style={{
-        padding: '16px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-        border: '1px solid rgba(6, 182, 212, 0.25)',
-        background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%)',
-        borderRadius: '12px',
-        overflow: 'hidden'
+      {/* Primary KPI Metrics Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '16px'
       }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          paddingRight: '16px',
-          borderRight: '1px solid var(--border-subtle)',
-          flexShrink: 0
-        }}>
-          <Radio size={16} color="#06b6d4" className="heartbeat-icon" />
-          <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#38bdf8', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            लाइव्ह इव्हेंट फीड
-          </span>
+        {/* Metric 1: Total Patients */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('appointments')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(6, 182, 212, 0.25)',
+            background: 'var(--card-gradient-cyan)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              एकूण नोंदणीकृत रुग्ण (Total Patients)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
+              <Users size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.totalPatients ?? '--'}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}>
+            <ArrowUpRight size={14} /> रिअल-टाइम ईएचआर रेकॉर्ड्स
+          </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', overflowX: 'auto', flex: 1, scrollbarWidth: 'none' }}>
-          {recentEvents.map((evt) => (
-            <div key={evt.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-              <span style={{
-                fontSize: '0.65rem',
-                fontWeight: '700',
-                padding: '2px 7px',
-                borderRadius: '4px',
-                background: `${evt.color}22`,
-                border: `1px solid ${evt.color}55`,
-                color: evt.color
-              }}>
-                {evt.badge}
-              </span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-                {evt.text}
-              </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                ({evt.time})
-              </span>
+        {/* Metric 2: Today's Appointments */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('appointments')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            background: 'var(--card-gradient-emerald)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              आजच्या ओपीडी भेटी (Today's Visits)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
+              <Calendar size={18} />
             </div>
-          ))}
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.appointmentsToday ?? '--'}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
+            कन्सल्टेशन आणि टोकन ट्रॅकिंग
+          </div>
+        </div>
+
+        {/* Metric 3: Clinicians On Duty */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('doctors')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'var(--card-gradient-amber)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              ड्युटीवर डॉक्टर्स (On-Duty Doctors)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
+              <Stethoscope size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.doctorsOnDuty ?? 0} <span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-secondary)' }}>/ {overview?.totalDoctors ?? 0}</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: '600' }}>
+            बोर्ड सर्टिफाइड तज्ज्ञ डॉक्टर
+          </div>
+        </div>
+
+        {/* Metric 4: Bed Occupancy */}
+        <div 
+          className="glass-card" 
+          onClick={() => setActiveTab('beds')}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            background: 'var(--card-gradient-violet)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              बेड ऑक्युपन्सी (Bed Occupancy)
+            </span>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
+              <BedDouble size={18} />
+            </div>
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            {overview?.occupancyRate ?? 0}%
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
+            {overview?.occupiedBeds ?? 0} ॲडमिट • {overview?.availableBeds ?? 0} रिकामे बेड्स
+          </div>
         </div>
       </div>
 
-      {/* ========================================================
-          4. EXECUTIVE ACTION DOCK (ONE-CLICK LAUNCHERS)
-         ======================================================== */}
+      {/* Quick Action Executive Command Dock */}
       <div className="dashboard-quick-dock">
         <button
           onClick={() => setActiveTab('appointments')}
           className="glass-card"
           style={{
-            padding: '14px 18px',
+            padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -472,12 +335,12 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             background: 'var(--card-gradient-cyan)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)' }}>
             <Stethoscope size={18} />
           </div>
           <div>
-            <div style={{ fontWeight: '700', fontSize: '0.86rem', color: 'var(--text-primary)' }}>Doctor Workstation</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>OPD Consultations & Rx</div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Doctor Station</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Live OPD Consultations</div>
           </div>
         </button>
 
@@ -485,7 +348,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           onClick={() => setActiveTab('beds')}
           className="glass-card"
           style={{
-            padding: '14px 18px',
+            padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -495,12 +358,12 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             background: 'var(--card-gradient-amber)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-amber-bg)', color: 'var(--accent-amber)' }}>
             <BedDouble size={18} />
           </div>
           <div>
-            <div style={{ fontWeight: '700', fontSize: '0.86rem', color: 'var(--text-primary)' }}>Ward & ICU Beds</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Bed Admission & Telemetry</div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Ward & ICU Beds</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Live Bed Allocator</div>
           </div>
         </button>
 
@@ -508,7 +371,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           onClick={() => setActiveTab('live-queue')}
           className="glass-card"
           style={{
-            padding: '14px 18px',
+            padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -518,12 +381,12 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             background: 'var(--card-gradient-emerald)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' }}>
             <Tv size={18} />
           </div>
           <div>
-            <div style={{ fontWeight: '700', fontSize: '0.86rem', color: 'var(--text-primary)' }}>Live OPD Queue TV</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Waiting Room Hall Display</div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>OPD Queue TV</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Waiting Room Display</div>
           </div>
         </button>
 
@@ -531,7 +394,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           onClick={() => setActiveTab('prescriptions')}
           className="glass-card"
           style={{
-            padding: '14px 18px',
+            padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -541,12 +404,12 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             background: 'var(--card-gradient-violet)'
           }}
         >
-          <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
+          <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' }}>
             <QrCode size={18} />
           </div>
           <div>
-            <div style={{ fontWeight: '700', fontSize: '0.86rem', color: 'var(--text-primary)' }}>Digital Rx & QR</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Verified WhatsApp Rx</div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Digital Rx & QR</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>WhatsApp Rx Sender</div>
           </div>
         </button>
 
@@ -555,7 +418,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             onClick={onOpenEmergency}
             className="glass-card"
             style={{
-              padding: '14px 18px',
+              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
@@ -565,37 +428,35 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
               background: 'var(--card-gradient-rose)'
             }}
           >
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)' }}>
               <Flame size={18} />
             </div>
             <div>
-              <div style={{ fontWeight: '800', fontSize: '0.86rem', color: 'var(--accent-rose)' }}>SOS 108 Center</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Code Red Emergency</div>
+              <div style={{ fontWeight: '700', fontSize: '0.85rem', color: 'var(--accent-rose)' }}>SOS 108 Center</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Code Red Dispatch</div>
             </div>
           </button>
         )}
       </div>
 
-      {/* ========================================================
-          5. MAIN 2-COLUMN CLINICAL SECTION: QUEUE + WARDS
-         ======================================================== */}
+
+
+      {/* Main 2-Column Section: Appointments Queue + Department Bed Distribution */}
       <div className="dashboard-main-grid">
-        
-        {/* Left Column: Live Consultation Queue */}
+        {/* Appointments Queue */}
         <div className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '700', fontFamily: 'var(--font-display)' }}>
                 {t('dashboard.deptDistribution', 'Live Clinical Consultation Queue')}
               </h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 {t('dashboard.deptSubtext', 'Patients scheduled for doctor consultation today')}
               </p>
             </div>
             <button
               onClick={() => setActiveTab('appointments')}
               className="btn btn-outline btn-sm"
-              style={{ fontWeight: '600' }}
             >
               {t('common.viewDetails', 'View Full Queue')} <ChevronRight size={14} />
             </button>
@@ -605,18 +466,18 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>टोकन (Token)</th>
-                  <th>रुग्ण (Patient)</th>
-                  <th>विभाग / डॉक्टर (Doctor)</th>
-                  <th>वेळ (Time)</th>
-                  <th>स्थिती (Status)</th>
+                  <th>Token</th>
+                  <th>Patient</th>
+                  <th>Department / Doctor</th>
+                  <th>Time</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {todayAppointments.length === 0 ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
-                      आजच्या दिवशी अद्याप कोणतीही अपॉइंटमेंट नोंदवलेली नाही.
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                      No appointments scheduled yet.
                     </td>
                   </tr>
                 ) : (
@@ -625,11 +486,10 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
                       <td>
                         <span style={{
                           fontFamily: 'var(--font-mono)',
-                          fontWeight: '800',
-                          fontSize: '0.84rem',
+                          fontWeight: '700',
                           padding: '3px 8px',
-                          background: 'rgba(6, 182, 212, 0.12)',
-                          border: '1px solid rgba(6, 182, 212, 0.35)',
+                          background: 'rgba(6, 182, 212, 0.1)',
+                          border: '1px solid rgba(6, 182, 212, 0.3)',
                           borderRadius: '6px',
                           color: '#38bdf8'
                         }}>
@@ -637,18 +497,18 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
                         </span>
                       </td>
                       <td>
-                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{appt.patient_name}</div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '1px' }}>
-                          रक्तगट: {appt.patient_blood_group || 'N/A'} • {appt.patient_gender}
+                        <div style={{ fontWeight: '600' }}>{appt.patient_name}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          Blood: {appt.patient_blood_group || 'N/A'} • {appt.patient_gender}
                         </div>
                       </td>
                       <td>
-                        <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{appt.doctor_name}</div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          {appt.department_name} (केबिन {appt.doctor_room})
+                        <div style={{ color: 'var(--text-primary)' }}>{appt.doctor_name}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {appt.department_name} (Room {appt.doctor_room})
                         </div>
                       </td>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
                         {appt.time_slot}
                       </td>
                       <td>
@@ -668,21 +528,20 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           </div>
         </div>
 
-        {/* Right Column: Department Ward & Bed Status */}
+        {/* Department Wards & Bed Status */}
         <div className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '700', fontFamily: 'var(--font-display)' }}>
                 {t('dashboard.deptDistribution', 'Department Bed Status')}
               </h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 {t('dashboard.deptSubtext', 'Live ward occupancy across units')}
               </p>
             </div>
             <button
               onClick={() => setActiveTab('beds')}
               className="btn btn-outline btn-sm"
-              style={{ fontWeight: '600' }}
             >
               {t('nav.beds', 'Ward Map')} <ChevronRight size={14} />
             </button>
@@ -706,21 +565,18 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Building2 size={16} color="var(--primary)" />
-                      <span style={{ fontWeight: '700', fontSize: '0.86rem', color: 'var(--text-primary)' }}>{dept.name}</span>
+                      <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>{dept.name}</span>
                     </div>
-                    <span style={{ fontSize: '0.78rem', fontFamily: 'var(--font-mono)', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                      {occ}/{total} बेड्स ({pct}%)
+                    <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                      {occ}/{total} {t('dashboard.bedsAvailable', 'Beds')} ({pct}%)
                     </span>
                   </div>
-                  
-                  {/* Progress Bar with Gradient */}
-                  <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '5px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{
                       width: `${pct}%`,
                       height: '100%',
-                      background: pct > 80 ? 'linear-gradient(90deg, #f59e0b, #f43f5e)' : pct > 50 ? 'linear-gradient(90deg, #06b6d4, #f59e0b)' : 'linear-gradient(90deg, #06b6d4, #10b981)',
-                      borderRadius: '4px',
-                      transition: 'width 0.4s ease'
+                      background: pct > 80 ? '#f43f5e' : pct > 50 ? '#f59e0b' : '#10b981',
+                      borderRadius: '3px'
                     }} />
                   </div>
                 </div>
@@ -728,42 +584,41 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             })}
           </div>
 
-          {/* AI Symptom Triage Quick Access Card */}
+          {/* Quick AI Triage Banner */}
           <div style={{
             marginTop: '20px',
             padding: '16px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.16) 0%, rgba(6, 182, 212, 0.12) 100%)',
-            border: '1px solid rgba(139, 92, 246, 0.35)',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px'
           }}>
             <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'rgba(139, 92, 246, 0.25)',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              background: 'rgba(139, 92, 246, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#c084fc',
-              flexShrink: 0
+              color: '#c084fc'
             }}>
               <Sparkles size={20} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.86rem', fontWeight: '800', color: 'var(--text-primary)' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                 MedTech Clinical AI
               </div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '1px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                 {t('dashboard.actionTriageDesc', 'Intelligent symptom screening & department routing')}
               </div>
             </div>
             <button
               onClick={() => setActiveTab('ai-triage')}
               className="btn btn-sm"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', fontWeight: '700' }}
+              style={{ background: '#8b5cf6', color: '#fff' }}
             >
               {t('dashboard.aiTriageBtn', 'Start AI Triage')}
             </button>
@@ -771,29 +626,27 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         </div>
       </div>
 
-      {/* ========================================================
-          6. ENTERPRISE HOSPITAL ADVANTAGE SHOWCASE
-         ======================================================== */}
+      {/* Enterprise Hospital Advantage Showcase (High-Converting Sales Pitch Section) */}
       <div className="glass-card" style={{
-        marginTop: '8px',
+        marginTop: '10px',
         padding: '28px 32px',
         border: '1px solid rgba(6, 182, 212, 0.3)',
         background: 'linear-gradient(135deg, rgba(13, 21, 36, 0.95) 0%, rgba(18, 28, 46, 0.9) 100%)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '22px', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', fontWeight: '800', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
-              <ShieldCheck size={15} /> Hospital Trust & Doctor Advantage
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', fontWeight: '800', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+              <ShieldCheck size={14} /> Hospital Trust & Doctor Advantage
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
               Why Doctors & Multispecialty Hospitals Choose MedTech OS
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.74rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', fontWeight: '700', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <span style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', fontWeight: '700' }}>
               ✓ NABH & ABDM Ready
             </span>
-            <span style={{ fontSize: '0.74rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', fontWeight: '700', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+            <span style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '20px', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', fontWeight: '700' }}>
               ✓ 256-Bit Encrypted
             </span>
           </div>
@@ -802,9 +655,9 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '16px'
+          gap: '18px'
         }}>
-          {/* Card 1: WhatsApp & QR Digital Rx */}
+          {/* Feature 1: Digital Rx & WhatsApp */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid var(--border-subtle)',
@@ -826,7 +679,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             }}>
               <QrCode size={22} />
             </div>
-            <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
               1-Click WhatsApp & QR Digital Rx
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
@@ -834,7 +687,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             </div>
           </div>
 
-          {/* Card 2: 2FA & Doctor Verification */}
+          {/* Feature 2: 2FA & Doctor Verification */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid var(--border-subtle)',
@@ -856,7 +709,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             }}>
               <ShieldCheck size={22} />
             </div>
-            <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
               2FA Security & Admin Approval
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
@@ -864,7 +717,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             </div>
           </div>
 
-          {/* Card 3: Smart Bed & Ward Telemetry */}
+          {/* Feature 3: Smart Bed & Ward Telemetry */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid var(--border-subtle)',
@@ -886,7 +739,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             }}>
               <BedDouble size={22} />
             </div>
-            <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
               Live Ward & ICU Bed Telemetry
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
@@ -894,7 +747,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             </div>
           </div>
 
-          {/* Card 4: 24x7 SOS & AI Triage */}
+          {/* Feature 4: Emergency SOS & AI Triage */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid var(--border-subtle)',
@@ -916,7 +769,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
             }}>
               <Flame size={22} />
             </div>
-            <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
               24x7 SOS 108 & AI Clinical Triage
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
@@ -925,7 +778,6 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
           </div>
         </div>
       </div>
-
     </div>
   );
 }
