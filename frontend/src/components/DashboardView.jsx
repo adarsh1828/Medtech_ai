@@ -556,7 +556,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
                 <div
                   key={idx}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
+                    background: 'var(--bg-card-subtle)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '10px',
                     padding: '12px 14px'
@@ -571,7 +571,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
                       {occ}/{total} {t('dashboard.bedsAvailable', 'Beds')} ({pct}%)
                     </span>
                   </div>
-                  <div style={{ width: '100%', height: '5px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '5px', background: 'var(--border-subtle)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{
                       width: `${pct}%`,
                       height: '100%',
@@ -631,7 +631,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         marginTop: '10px',
         padding: '28px 32px',
         border: '1px solid rgba(6, 182, 212, 0.3)',
-        background: 'linear-gradient(135deg, rgba(13, 21, 36, 0.95) 0%, rgba(18, 28, 46, 0.9) 100%)'
+        background: 'var(--card-gradient-cyan)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
@@ -659,7 +659,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
         }}>
           {/* Feature 1: Digital Rx & WhatsApp */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '12px',
             padding: '18px 20px',
@@ -689,7 +689,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
 
           {/* Feature 2: 2FA & Doctor Verification */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '12px',
             padding: '18px 20px',
@@ -719,7 +719,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
 
           {/* Feature 3: Smart Bed & Ward Telemetry */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '12px',
             padding: '18px 20px',
@@ -749,7 +749,7 @@ export default function DashboardView({ user, setActiveTab, onOpenBookModal, onO
 
           {/* Feature 4: Emergency SOS & AI Triage */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '12px',
             padding: '18px 20px',

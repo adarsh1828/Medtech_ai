@@ -460,11 +460,11 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                       <CheckCircle2 size={16} />
                       <span>तपासणी पूर्ण शेरा (Admin Remark):</span>
                     </div>
-                    <div style={{ color: '#f0fdf4', marginTop: '3px', fontWeight: '600' }}>
+                    <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontWeight: '600' }}>
                       {appt.completion_remark || 'तपासणी यशस्वीरित्या पूर्ण झाली (Consultation Completed)'}
                     </div>
                     {appt.completed_at && (
-                      <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.72rem', marginTop: '4px' }}>
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', marginTop: '4px' }}>
                         पूर्ण झालेली वेळ: {new Date(appt.completed_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                       </div>
                     )}
@@ -485,7 +485,7 @@ export default function AppointmentsView({ user, onOpenBookModal, onOpenConsulta
                       <span>डॉक्टरांच्या केबिनमध्ये तपासणी सुरू आहे</span>
                     </div>
                     {appt.consultation_started_at && (
-                      <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.74rem', marginTop: '3px' }}>
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', marginTop: '3px' }}>
                         सुरू झालेली वेळ: {new Date(appt.consultation_started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     )}

@@ -52,10 +52,10 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div 
-        className="modal-content"
+        className="modal-content emergency-sos-modal"
         style={{
           maxWidth: '540px',
-          background: 'linear-gradient(180deg, #18090c 0%, #0f172a 100%)',
+          
           border: '2px solid rgba(244, 63, 94, 0.4)',
           borderRadius: '16px',
           boxShadow: '0 20px 60px rgba(244, 63, 94, 0.25)',
@@ -131,7 +131,7 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
                 <CheckCircle2 size={40} />
               </div>
 
-              <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#ffffff', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '8px' }}>
                 🚨 EMERGENCY CODE RED BROADCASTED!
               </h3>
               <p style={{ fontSize: '0.88rem', color: '#34d399', fontWeight: '600', marginBottom: '16px' }}>
@@ -231,7 +231,7 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>
                     HOSPITAL DIRECT TRAUMA ROOM
                   </div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', marginTop: '2px' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-primary)', marginTop: '2px' }}>
                     {emergencyPhone}
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export default function EmergencySOSModal({ isOpen, onClose, hospitalInfo, user 
                         border: '1px solid',
                         borderColor: selectedEmergencyType === type ? '#f43f5e' : 'var(--border-subtle)',
                         background: selectedEmergencyType === type ? 'rgba(244, 63, 94, 0.2)' : 'var(--bg-card)',
-                        color: selectedEmergencyType === type ? '#ffffff' : 'var(--text-secondary)'
+                        color: selectedEmergencyType === type ? '#ffffff' : 'var(--text-primary)'
                       }}
                     >
                       {type}

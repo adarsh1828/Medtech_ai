@@ -220,7 +220,7 @@ export default function AITriageView({ onBookWithDepartment }) {
 
         <div style={{
           padding: '12px 18px',
-          background: 'rgba(0, 0, 0, 0.25)',
+          background: 'var(--bg-card-subtle)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '10px',
           textAlign: 'center'
@@ -345,7 +345,7 @@ export default function AITriageView({ onBookWithDepartment }) {
               result.urgency === 'CRITICAL' ? 'rgba(244, 63, 94, 0.6)' :
               result.urgency === 'HIGH' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(6, 182, 212, 0.6)'
             }`,
-            background: 'linear-gradient(180deg, rgba(18, 28, 46, 0.95) 0%, rgba(13, 21, 36, 0.98) 100%)',
+            background: 'var(--bg-card)',
             display: 'flex',
             flexDirection: 'column',
             gap: '18px',
@@ -417,7 +417,7 @@ export default function AITriageView({ onBookWithDepartment }) {
 
           {/* Reasoning */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '10px',
             padding: '16px',

@@ -517,7 +517,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
         alignItems: 'center',
         padding: '16px 28px',
         borderBottom: '1px solid var(--border-subtle)',
-        background: 'rgba(10, 15, 29, 0.6)',
+        background: 'var(--bg-header)',
         backdropFilter: 'blur(12px)',
         zIndex: 10
       }}>
@@ -594,7 +594,7 @@ export default function AuthPage({ onLoginSuccess, hospitalInfo }) {
                 top: 'calc(100% + 6px)',
                 right: 0,
                 width: '150px',
-                background: '#0d1524',
+                background: 'var(--bg-card)',
                 border: '1px solid rgba(6, 182, 212, 0.3)',
                 borderRadius: '8px',
                 boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)',

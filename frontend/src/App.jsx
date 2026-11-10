@@ -493,7 +493,7 @@ function HospitalApp() {
           padding: '16px'
         }}>
           <div style={{
-            background: '#0d1527',
+            background: 'var(--bg-card)',
             border: '1px solid rgba(245, 158, 11, 0.4)',
             borderRadius: '16px',
             padding: '28px',

@@ -276,7 +276,7 @@ export default function BedsView({ user }) {
                 }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <div style={{ fontWeight: '700', fontSize: '0.95rem', color: '#fff' }}>
+                  <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
                     {isIcu && '🚨 '}
                     {isEmergency && '⚡ '}
                     {w.ward_type}

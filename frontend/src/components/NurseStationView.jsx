@@ -615,7 +615,7 @@ export default function NurseStationView({ user, hospitalInfo }) {
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: '700', color: '#fff' }}>{n.full_name}</div>
+                    <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{n.full_name}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                       {n.phone || n.email}
                     </div>

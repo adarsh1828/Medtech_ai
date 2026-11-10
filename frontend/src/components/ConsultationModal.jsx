@@ -638,7 +638,7 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
                     ✓ टेबलमध्ये भरा (Add to Table)
                   </button>
                 </div>
-                <div style={{ fontSize: '0.82rem', color: '#ffffff', fontStyle: 'italic', background: 'rgba(0, 0, 0, 0.25)', padding: '8px 12px', borderRadius: '6px' }}>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)', fontStyle: 'italic', background: 'var(--bg-card-subtle)', border: '1px solid var(--border-subtle)', padding: '8px 12px', borderRadius: '6px' }}>
                   "{speechTranscript || 'उदा: Paracetamol 650mg twice daily for 3 days after meals...'}"
                 </div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
@@ -743,7 +743,7 @@ export default function ConsultationModal({ isOpen, onClose, appointment, onSucc
                 {drugAlerts.interactions.map((inter, i) => (
                   <div key={i} style={{ fontSize: '0.78rem', color: '#fca5a5', lineHeight: '1.4' }}>
                     <div>
-                      <strong style={{ color: '#ffffff' }}>{inter.drug1}</strong> + <strong style={{ color: '#ffffff' }}>{inter.drug2}</strong>: {inter.title} ({inter.severity})
+                      <strong style={{ color: 'var(--text-primary)' }}>{inter.drug1}</strong> + <strong style={{ color: 'var(--text-primary)' }}>{inter.drug2}</strong>: {inter.title} ({inter.severity})
                     </div>
                     <div style={{ color: '#fecaca', marginTop: '2px' }}>
                       {inter.effect}

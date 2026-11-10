@@ -390,7 +390,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 10px #34d399' }} />
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '700', fontFamily: 'var(--font-display)', color: '#fff' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '700', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
                 सफाई काम वाटप व प्रगती (Dispatched Staff Tasks & Hygiene Board)
               </h3>
             </div>
@@ -439,7 +439,7 @@ export default function HousekeepingView({ user, hospitalInfo }) {
                 >
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                      <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#fff' }}>
+                      <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-primary)' }}>
                         {t.area_name}
                       </div>
                       <span style={{
