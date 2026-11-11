@@ -1,23 +1,10 @@
 {
-  "buildCommand": "node scripts/prepare-vercel.js",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
-    },
-    {
-      "source": "/skills/assets/(.*)",
-      "destination": "/skills/assets/$1"
-    },
-    {
-      "source": "/skills/(.*)",
-      "destination": "/skills/index.html"
-    },
-    {
-      "source": "/skills",
-      "destination": "/skills/index.html"
     },
     {
       "source": "/(.*)",

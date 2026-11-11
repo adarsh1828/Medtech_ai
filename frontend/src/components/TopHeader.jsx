@@ -322,33 +322,6 @@ export default function TopHeader({
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        {/* Matt Pocock Agent Skills Portal Link */}
-        <a
-          href="/skills"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.22) 0%, rgba(49, 120, 198, 0.22) 100%)',
-            border: '1px solid rgba(139, 92, 246, 0.45)',
-            padding: '6px 11px',
-            borderRadius: '8px',
-            color: '#c4b5fd',
-            fontSize: '0.78rem',
-            fontWeight: '700',
-            textDecoration: 'none',
-            transition: 'all 0.15s ease',
-            flexShrink: 0,
-            boxShadow: '0 0 12px rgba(139, 92, 246, 0.25)'
-          }}
-          title="Open Matt Pocock Agent Skills Explorer"
-        >
-          <Sparkles size={14} color="#a78bfa" />
-          <span className="hide-on-mobile">Agent Skills</span>
-        </a>
-
         {/* 24x7 Emergency SOS Button */}
         <button
           onClick={onOpenEmergency}

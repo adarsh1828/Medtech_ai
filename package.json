@@ -4,12 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/prepare-vercel.js",
-    "vercel-build": "node scripts/prepare-vercel.js",
+    "build": "cd frontend && npm install && npm run build",
+    "vercel-build": "cd frontend && npm install && npm run build",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "dev:skills": "cd skills-web && node node_modules/vite/bin/vite.js --port 5180",
-    "build:skills": "node scripts/extract-skills.js && cd skills-web && node node_modules/vite/bin/vite.js build",
     "start": "node backend/src/server.js"
   },
   "dependencies": {
