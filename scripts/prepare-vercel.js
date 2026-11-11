@@ -45,6 +45,17 @@ try {
 
   fs.cpSync(srcDist, targetDist, { recursive: true });
 
+  // 5. Also copy skills-web/dist/assets into frontend/dist/assets as a fallback
+  const srcAssets = path.resolve('skills-web/dist/assets');
+  const targetAssets = path.resolve('frontend/dist/assets');
+  if (fs.existsSync(srcAssets)) {
+    if (!fs.existsSync(targetAssets)) {
+      fs.mkdirSync(targetAssets, { recursive: true });
+    }
+    fs.cpSync(srcAssets, targetAssets, { recursive: true });
+    console.log('🛡️ Dual-routed assets copied into frontend/dist/assets for zero-404 safety.');
+  }
+
   console.log('✅ Successfully copied skills-web into frontend/dist/skills!');
   console.log('🎉 Unified Vercel Build Completed Successfully!');
 } catch (err) {

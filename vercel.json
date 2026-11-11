@@ -1,18 +1,23 @@
 {
   "buildCommand": "node scripts/prepare-vercel.js",
   "outputDirectory": "frontend/dist",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
     },
     {
-      "source": "/skills",
-      "destination": "/skills/index.html"
+      "source": "/skills/assets/(.*)",
+      "destination": "/skills/assets/$1"
     },
     {
       "source": "/skills/(.*)",
-      "destination": "/skills/$1"
+      "destination": "/skills/index.html"
+    },
+    {
+      "source": "/skills",
+      "destination": "/skills/index.html"
     },
     {
       "source": "/(.*)",
